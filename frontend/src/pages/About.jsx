@@ -138,6 +138,7 @@ const About = () => {
                 </div>
             </section>
 
+
             {/* Team */}
             <section className="section team">
                 <div className="container">

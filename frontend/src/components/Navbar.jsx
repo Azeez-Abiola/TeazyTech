@@ -128,7 +128,7 @@ const Navbar = () => {
               <li className={location.pathname === '/blog' ? 'active' : ''}>
                 <Link to="/blog">
                   <span className="nav-icon">📝</span>
-                  <span className="nav-text">Blog</span>
+                  <span className="nav-text">Blogs</span>
                 </Link>
               </li>
               <li className={location.pathname === '/contact' ? 'active' : ''}>

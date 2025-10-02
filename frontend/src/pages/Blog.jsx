@@ -13,7 +13,7 @@ const Blog = () => {
   const [totalPages, setTotalPages] = useState(1)
   const [totalPosts, setTotalPosts] = useState(0)
   const postsPerPage = 10
-  const navigate = useNavigate()
+  const navigate = useNavigate()                                                                                                                                                                                                                                                                                                                                               
 
   const fetchPosts = async (page = 1) => {
     setLoading(true)
