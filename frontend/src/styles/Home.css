@@ -133,7 +133,6 @@
 .hero-image-container {
     position: relative;
     z-index: 4;
-    animation: fadeIn 1s ease 0.3s both;
     display: flex;
     justify-content: center;
     width: 100%;
@@ -147,23 +146,12 @@
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 20px 60px rgba(47, 111, 204, 0.15);
-    transform: perspective(1000px) rotateY(-5deg);
-    transition: transform 0.5s ease;
-}
-
-.hero-image-wrapper:hover {
-    transform: perspective(1000px) rotateY(0deg);
 }
 
 .hero-image {
     width: 100%;
     height: auto;
     display: block;
-    transition: transform 0.5s ease;
-}
-
-.hero-image-wrapper:hover .hero-image {
-    transform: scale(1.03);
 }
 
 .hero-floating-element {
@@ -175,7 +163,6 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    animation: float 4s ease-in-out infinite;
     max-width: calc(100% - 2rem);
 }
 
@@ -483,6 +470,9 @@
 /* Features Section */
 .features {
     background-color: var(--primary-white);
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
 }
 
 .section-header {
@@ -1295,6 +1285,9 @@
     transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
     transition-duration: var(--animation-duration, 800ms);
     will-change: opacity, transform;
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
 }
 
 /* Visible state for all animations */
@@ -1344,7 +1337,7 @@
 
 /* Bounce animation */
 .animated-bounce {
-    transform: translateY(60px);
+    transform: translateY(20px);
     transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .animated-bounce.animated-visible {
@@ -1383,9 +1376,14 @@
 }
 
 /* Special animation for feature cards */
+.animated-features {
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+}
 .animated-features .feature-card {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateY(20px);
     transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
