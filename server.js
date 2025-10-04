@@ -104,7 +104,7 @@ app.use(
         scriptSrc: ["'self'", "'unsafe-inline'"],
         styleSrc: ["'self'", "https:", "'unsafe-inline'"],
         imgSrc: ["'self'", "data:", "*"],
-        connectSrc: ["'self'", "https:", process.env.NODE_ENV === 'development' ? "http://localhost:8080" : null].filter(Boolean),
+        connectSrc: ["'self'", "https:"],
         fontSrc: ["'self'", "https:"],
         objectSrc: ["'none'"],
         upgradeInsecureRequests: [],

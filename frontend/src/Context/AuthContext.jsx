@@ -17,10 +17,17 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false); 
 
-  // Get API base URL - use localhost only in development, production domain otherwise
-  const API_BASE_URL = import.meta.env.DEV 
-    ? (import.meta.env.VITE_BACKEND_DOMAIN || 'http://localhost:8080')
-    : 'https://teazytech.org';
+  // Determine API base URL based on environment
+  // For development (Vite dev server on 3000), use localhost:8080
+  // For production or when running on localhost:8080, use relative URLs
+  const API_BASE_URL = (() => {
+    // If we're in Vite development mode (localhost:3000)
+    if (import.meta.env.DEV && window.location.port === '3000') {
+      return import.meta.env.VITE_BACKEND_DOMAIN || 'http://localhost:8080';
+    }
+    // If we're on the backend server (localhost:8080) or production, use relative URLs
+    return '';
+  })();
 
   useEffect(() => {
     axios.defaults.withCredentials = true;
