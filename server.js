@@ -122,7 +122,7 @@ const __dirname = path.dirname(__filename)
 
 // Serve static files with proper cache headers
 app.use(express.static(path.join(__dirname, "dist"), {
-  maxAge: '1d', // Cache for 1 day
+  maxAge: '1h', // Reduced cache time to help with updates
   etag: true,
   lastModified: true,
   setHeaders: (res, path) => {
@@ -131,6 +131,10 @@ app.use(express.static(path.join(__dirname, "dist"), {
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
+    }
+    // Also force fresh assets for js files
+    if (path.endsWith('.js')) {
+      res.setHeader('Cache-Control', 'public, max-age=3600');
     }
   }
 }))

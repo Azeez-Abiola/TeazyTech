@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }) => {
   // Determine API base URL based on environment
   // For development (Vite dev server on 3000), use localhost:8080
   // For production or when running on localhost:8080, use relative URLs
+  // Updated: Force fresh deployment
   const API_BASE_URL = (() => {
     // If we're in Vite development mode (localhost:3000)
     if (import.meta.env.DEV && window.location.port === '3000') {
