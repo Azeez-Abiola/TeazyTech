@@ -17,8 +17,10 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false); 
 
-  // Get API base URL from environment or use production domain
-  const API_BASE_URL = import.meta.env.VITE_BACKEND_DOMAIN || 'https://teazytech.org';
+  // Get API base URL - use localhost only in development, production domain otherwise
+  const API_BASE_URL = import.meta.env.DEV 
+    ? (import.meta.env.VITE_BACKEND_DOMAIN || 'http://localhost:8080')
+    : 'https://teazytech.org';
 
   useEffect(() => {
     axios.defaults.withCredentials = true;
