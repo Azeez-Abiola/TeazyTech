@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
     
     const getAuthAdmin = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/me`, { 
+        const response = await axios.get(`/api/admin/me`, { 
           withCredentials: true,
           signal: controller.signal
         });
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setIsLoading(true);
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/login`, 
+      const response = await axios.post(`/api/admin/login`, 
         { email, password },
         { withCredentials: true }
       );
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       setIsLoading(true);
-      await axios.post(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/admin/logout`, 
+      await axios.post(`/api/admin/logout`, 
         {},
         { withCredentials: true }
       );
