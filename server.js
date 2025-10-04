@@ -120,7 +120,20 @@ app.use(express.urlencoded({ extended: true }))
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-app.use(express.static(path.join(__dirname, "dist")))
+// Serve static files with proper cache headers
+app.use(express.static(path.join(__dirname, "dist"), {
+  maxAge: '1d', // Cache for 1 day
+  etag: true,
+  lastModified: true,
+  setHeaders: (res, path) => {
+    // Force no-cache for HTML files to ensure updates are loaded
+    if (path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+  }
+}))
 logger.info("Initializing Firebase Admin SDK...")
 
 let db
