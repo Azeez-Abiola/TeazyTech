@@ -140,22 +140,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// MOVE DIAGNOSTIC ROUTES TO THE TOP
-// Simple test endpoints to verify Vercel allows requests
-app.get("/api/test-get", (req, res) => {
-  logger.info("Test GET endpoint hit successfully");
-  res.json({ success: true, message: "GET request works!", timestamp: new Date().toISOString() });
-});
-
-app.post("/api/test-post", (req, res) => {
-  logger.info("Test POST endpoint hit successfully", { body: req.body });
-  res.json({
-    success: true,
-    message: "POST request works!",
-    receivedBody: req.body,
-    timestamp: new Date().toISOString()
-  });
-});
+// Diagnostics moved below middleware for better isolation testing
 
 // Multipart diagnostic endpoint
 app.post("/api/test-multipart", upload.none(), (req, res) => {
@@ -206,6 +191,24 @@ app.use(cors({
 app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+
+// DIAGNOSTICS SECTION (AFTER MIDDLEWARE)
+app.get("/api/test-get", (req, res) => {
+  res.json({ success: true, message: "GET request works (after middleware)!", timestamp: new Date().toISOString() });
+});
+
+app.post("/api/test-post", (req, res) => {
+  res.json({ success: true, message: "POST request works (after middleware)!", receivedBody: req.body, timestamp: new Date().toISOString() });
+});
+
+// Admin Path Prefix Test
+app.get("/api/admin/test-diagnostic", (req, res) => {
+  res.json({ success: true, message: "Admin GET path works!", timestamp: new Date().toISOString() });
+});
+
+app.post("/api/admin/test-diagnostic", (req, res) => {
+  res.json({ success: true, message: "Admin POST path works!", timestamp: new Date().toISOString() });
+});
 
 logger.info("Calculating __dirname for static serving");
 const __filename = fileURLToPath(import.meta.url);
