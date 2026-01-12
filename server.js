@@ -140,6 +140,23 @@ app.use((req, res, next) => {
   next();
 });
 
+// MOVE DIAGNOSTIC ROUTES TO THE TOP
+// Simple test endpoints to verify Vercel allows requests
+app.get("/api/test-get", (req, res) => {
+  logger.info("Test GET endpoint hit successfully");
+  res.json({ success: true, message: "GET request works!", timestamp: new Date().toISOString() });
+});
+
+app.post("/api/test-post", (req, res) => {
+  logger.info("Test POST endpoint hit successfully", { body: req.body });
+  res.json({
+    success: true,
+    message: "POST request works!",
+    receivedBody: req.body,
+    timestamp: new Date().toISOString()
+  });
+});
+
 logger.info("Applying security headers with helmet");
 app.use(
   helmet({
@@ -254,16 +271,7 @@ const updateUserStats = async (userId, amount) => {
   logger.info("User stats update transaction committed");
 };
 
-// Simple test endpoints to verify Vercel allows requests
-app.get("/api/test-get", (req, res) => {
-  logger.info("Test GET endpoint hit successfully");
-  res.json({ success: true, message: "GET request works!", timestamp: new Date().toISOString() });
-});
-
-app.post("/api/test-post", (req, res) => {
-  logger.info("Test POST endpoint hit successfully");
-  res.json({ success: true, message: "POST request works!", timestamp: new Date().toISOString() });
-});
+// Simple test endpoints moved to top for reliable matching
 
 logger.info("Defining /api/admin/upload-image POST route");
 app.post(
