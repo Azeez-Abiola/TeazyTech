@@ -131,6 +131,7 @@ const CreatePost = () => {
         `https://api.cloudinary.com/v1_1/${signData.cloudName}/image/upload`,
         formData,
         {
+          withCredentials: false,
           headers: { "Content-Type": "multipart/form-data" },
           onUploadProgress: (progressEvent) => {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -371,9 +372,7 @@ const CreatePost = () => {
                   onChange={handleThumbnailChange}
                   className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
                 />
-                <p className="text-[10px] text-gray-500 italic">
-                  * Cloudinary limit: 50MB. Vercel proxy limit: ~4.5MB.
-                </p>
+
               </div>
               {thumbnailPreview && (
                 <img
