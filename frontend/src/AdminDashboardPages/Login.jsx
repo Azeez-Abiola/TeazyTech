@@ -9,7 +9,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth();
+  const { login, error: authError } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -21,9 +21,8 @@ const Login = () => {
       const success = await login(email, password);
       if (success) {
         navigate("/dashboard");
-      } else {
-        setError("Invalid email or password");
       }
+      // Error is handled by AuthContext and shown via the shared error state if we use it
     } catch (err) {
       setError("An error occurred during login");
     } finally {
@@ -40,9 +39,9 @@ const Login = () => {
         </div>
 
         <div className="p-6">
-          {error && (
+          {(error || authError) && (
             <div className="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
-              <p>{error}</p>
+              <p>{error || authError}</p>
             </div>
           )}
 

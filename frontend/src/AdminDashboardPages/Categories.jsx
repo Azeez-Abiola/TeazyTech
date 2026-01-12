@@ -12,7 +12,7 @@ const Categories = () => {
   const [newCategory, setNewCategory] = useState({ name: '', description: '' });
   const [editedCategory, setEditedCategory] = useState({ name: '', description: '' });
   const [isAdding, setIsAdding] = useState(false);
-  
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -43,16 +43,16 @@ const Categories = () => {
 
   const saveEdit = async (id) => {
     if (!editedCategory.name.trim()) return;
-    
+
     try {
-      await axios.put(`/api/admin/categories/${id}`, 
+      await axios.put(`/api/admin/categories/${id}`,
         editedCategory,
         { withCredentials: true }
       );
-      
-      setCategories(categories.map(cat => 
-        cat.id === id 
-          ? { ...cat, ...editedCategory } 
+
+      setCategories(categories.map(cat =>
+        cat.id === id
+          ? { ...cat, ...editedCategory }
           : cat
       ));
       setEditingId(null);
@@ -86,13 +86,13 @@ const Categories = () => {
 
   const addCategory = async () => {
     if (!newCategory.name.trim()) return;
-    
+
     try {
       const response = await axios.post(`/api/admin/categories`,
         newCategory,
         { withCredentials: true }
       );
-      
+
       setCategories([...categories, response.data]);
       setIsAdding(false);
     } catch (err) {
@@ -104,7 +104,7 @@ const Categories = () => {
     return (
       <Layout title="Manage Categories">
         <div className="flex justify-center items-center h-64">
-          <p>Loading categories...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#e94235]"></div>
         </div>
       </Layout>
     );

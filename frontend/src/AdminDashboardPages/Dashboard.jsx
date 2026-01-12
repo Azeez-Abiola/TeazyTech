@@ -19,7 +19,7 @@ const Dashboard = () => {
   };
 
   const categoryPosts = getCategoryCounts();
- 
+
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -62,12 +62,12 @@ const Dashboard = () => {
     };
     fetchPosts();
   }, [user?.total_views]);
-  
+
   if (loading) {
     return (
       <Layout title="Dashboard">
         <div className="flex justify-center items-center h-64">
-          <p>Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#e94235]"></div>
         </div>
       </Layout>
     );
@@ -138,11 +138,10 @@ const Dashboard = () => {
                         </div>
                       </div>
                       <div className="ml-4 flex-shrink-0">
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          post.status === 'published' 
-                            ? 'bg-green-100 text-green-800' 
+                        <span className={`px-2 py-1 text-xs rounded-full ${post.status === 'published'
+                            ? 'bg-green-100 text-green-800'
                             : 'bg-yellow-100 text-yellow-800'
-                        }`}>
+                          }`}>
                           {post.status}
                         </span>
                       </div>
@@ -174,8 +173,8 @@ const Dashboard = () => {
                       <span className="text-sm text-gray-500">{category.count} {category.count === 1 ? 'post' : 'posts'}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div 
-                        className="bg-[#e94235] h-2.5 rounded-full" 
+                      <div
+                        className="bg-[#e94235] h-2.5 rounded-full"
                         style={{ width: `${(category.count / user?.total_posts) * 100}%` }}
                       ></div>
                     </div>

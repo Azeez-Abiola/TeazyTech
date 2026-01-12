@@ -1,5 +1,6 @@
 import rateLimit from "express-rate-limit";
 import express from "express";
+import cors from "cors";
 import admin from "firebase-admin";
 import cookieParser from "cookie-parser";
 import fetch from "node-fetch";
@@ -36,7 +37,10 @@ const storage = new CloudinaryStorage({
 logger.info("Initializing Multer upload middleware");
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: {
+    fileSize: 20 * 1024 * 1024, // 20MB for files
+    fieldSize: 50 * 1024 * 1024 // 50MB for fields (like content)
+  },
 });
 
 logger.info("Defining Joi schemas");
@@ -136,10 +140,22 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://vercel.live",
+          "https://*.vercel.live"
+        ],
         styleSrc: ["'self'", "https:", "'unsafe-inline'"],
         imgSrc: ["'self'", "data:", "*"],
-        connectSrc: ["'self'", "https:"],
+        connectSrc: [
+          "'self'",
+          "https:",
+          "https://vercel.live",
+          "https://*.vercel.live",
+          "https://vercel.com",
+          "https://*.vercel.com"
+        ],
         fontSrc: ["'self'", "https:"],
         objectSrc: ["'none'"],
         upgradeInsecureRequests: [],
@@ -149,7 +165,11 @@ app.use(
 );
 
 logger.info("Applying body parsers and cookie parser");
-app.use(express.json({ limit: "10kb" }));
+app.use(cors({
+  origin: ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:3001", "http://127.0.0.1:3001"],
+  credentials: true
+}));
+app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
@@ -1342,9 +1362,19 @@ app.post("/api/posts/:id/view", endpointLimiter, async (req, res, next) => {
 });
 
 logger.info("Defining catch-all route for SPA client-side routing");
-app.get("*", (_req, res) => {
+app.get("*", (req, res) => {
+  // Check if the request is for an asset (contains a dot and extension)
+  const isAsset = req.path.includes('.') || req.path.startsWith('/assets/');
+
+  if (isAsset) {
+    logger.warn("Asset not found, avoiding SPA catch-all", {
+      path: req.originalUrl,
+    });
+    return res.status(404).send("Not found");
+  }
+
   logger.info("Serving SPA index.html for catch-all route", {
-    path: _req.originalUrl,
+    path: req.originalUrl,
   });
   res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
@@ -1378,6 +1408,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 logger.info("Starting server listen", { port: PORT });
 app.listen(PORT, () => logger.info(`Server running on port ${PORT}`));

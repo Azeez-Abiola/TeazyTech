@@ -69,6 +69,41 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
         class:
           "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl max-w-full focus:outline-none p-4 min-h-[150px]",
       },
+      handleDrop: (view, event, slice, moved) => {
+        if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) {
+          const file = event.dataTransfer.files[0];
+          if (file.type.startsWith("image/")) {
+            uploadImage(file).then(url => {
+              if (url) {
+                const { schema } = view.state;
+                const coordinates = view.posAtCoords({ left: event.clientX, top: event.clientY });
+                const node = schema.nodes.image.create({ src: url });
+                const transaction = view.state.tr.insert(coordinates.pos, node);
+                view.dispatch(transaction);
+              }
+            });
+            return true;
+          }
+        }
+        return false;
+      },
+      handlePaste: (view, event, slice) => {
+        const items = Array.from(event.clipboardData?.items || []);
+        const item = items.find(i => i.type.startsWith("image/"));
+        if (item) {
+          const file = item.getAsFile();
+          uploadImage(file).then(url => {
+            if (url) {
+              const { schema } = view.state;
+              const node = schema.nodes.image.create({ src: url });
+              const transaction = view.state.tr.replaceSelectionWith(node);
+              view.dispatch(transaction);
+            }
+          });
+          return true;
+        }
+        return false;
+      },
     },
   });
 
@@ -113,8 +148,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
   };
 
   const btnClass = (isActive) =>
-    `p-1.5 rounded hover:bg-gray-200 transition-colors ${
-      isActive ? "bg-gray-300 text-black" : "text-gray-600"
+    `p-1.5 rounded hover:bg-gray-200 transition-colors ${isActive ? "bg-gray-300 text-black" : "text-gray-600"
     }`;
 
   return (

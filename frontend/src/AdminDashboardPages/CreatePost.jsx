@@ -161,6 +161,14 @@ const CreatePost = () => {
     }
   };
 
+  const isFormValid =
+    title.trim() !== "" &&
+    author.trim() !== "" &&
+    excerpt.trim() !== "" &&
+    category !== "" &&
+    content.replace(/<[^>]*>/g, "").trim() !== "" &&
+    thumbnail !== null;
+
   return (
     <Layout title="Create Post">
       <Toaster richColors position="top-right" />
@@ -244,7 +252,8 @@ const CreatePost = () => {
                       setCategory(e.target.value);
                       clearError("category");
                     }}
-                    className={`w-full px-3 py-2 border ${errors.category ? "border-red-500" : "border-gray-300"} rounded-md`}
+                    className={`w-full px-4 py-2 bg-white border ${errors.category ? "border-red-500" : "border-gray-200"} rounded-lg shadow-sm focus:ring-2 focus:ring-[#e94235] focus:border-transparent transition-all outline-none appearance-none`}
+                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundPosition: 'right 0.75rem center', backgroundSize: '1.25rem', backgroundRepeat: 'no-repeat' }}
                   >
                     <option value="">Select a category</option>
                     {categories.map((cat, idx) => (
@@ -254,29 +263,6 @@ const CreatePost = () => {
                     ))}
                   </select>
                 )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Status
-                </label>
-                <div className="flex items-center gap-4">
-                  <label>
-                    <input
-                      type="radio"
-                      checked={status === "draft"}
-                      onChange={() => setStatus("draft")}
-                    />
-                    Draft
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      checked={status === "published"}
-                      onChange={() => setStatus("published")}
-                    />
-                    Published
-                  </label>
-                </div>
               </div>
             </div>
           </div>
@@ -301,12 +287,27 @@ const CreatePost = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-4">
-          <button type="button" onClick={() => navigate("/posts")}>
+        <div className="flex items-center justify-end gap-4 pb-8">
+          <button
+            type="button"
+            onClick={() => navigate("/posts")}
+            className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+          >
             Cancel
           </button>
-          <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Publishing..." : "Publish Post"}
+          <button
+            type="submit"
+            disabled={isSubmitting || !isFormValid}
+            className="px-6 py-2.5 bg-[#e94235] text-white rounded-lg hover:bg-[#d23c30] transition-colors font-medium shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="animate-spin h-5 w-5" />
+                Publishing...
+              </>
+            ) : (
+              "Publish Post"
+            )}
           </button>
         </div>
       </form>

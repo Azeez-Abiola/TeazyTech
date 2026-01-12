@@ -15,20 +15,13 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false); 
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Determine API base URL based on environment
   // For development (Vite dev server on 3000), use localhost:8080
   // For production or when running on localhost:8080, use relative URLs
   // Updated: Force fresh deployment
-  const API_BASE_URL = (() => {
-    // If we're in Vite development mode (localhost:3000)
-    if (import.meta.env.DEV && window.location.port === '3000') {
-      return import.meta.env.VITE_BACKEND_DOMAIN || 'http://localhost:8080';
-    }
-    // If we're on the backend server (localhost:8080) or production, use relative URLs
-    return '';
-  })();
+  const API_BASE_URL = '';
 
   useEffect(() => {
     axios.defaults.withCredentials = true;
@@ -37,19 +30,19 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     let isMounted = true;
     const controller = new AbortController();
-    
+
     const getAuthAdmin = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/admin/me`, { 
+        const response = await axios.get(`${API_BASE_URL}/api/admin/me`, {
           withCredentials: true,
           signal: controller.signal
         });
         if (isMounted) {
           setUser(response.data);
-          setIsAuthenticated(true); 
+          setIsAuthenticated(true);
           setError(null);
         }
-      } catch(error) {
+      } catch (error) {
         if (isMounted && !axios.isCancel(error)) {
           setUser(null);
           setIsAuthenticated(false);
@@ -61,7 +54,7 @@ export const AuthProvider = ({ children }) => {
         }
       }
     };
-    
+
     getAuthAdmin();
     return () => {
       isMounted = false;
@@ -72,15 +65,15 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setIsLoading(true);
-      const response = await axios.post(`${API_BASE_URL}/api/admin/login`, 
+      const response = await axios.post(`${API_BASE_URL}/api/admin/login`,
         { email, password },
         { withCredentials: true }
       );
       setUser(response.data);
-      setIsAuthenticated(true); 
+      setIsAuthenticated(true);
       setError(null);
       return true;
-    } catch(error) {
+    } catch (error) {
       setError(error.response?.data?.error || "Login failed");
       setIsAuthenticated(false);
       return false;
@@ -92,14 +85,14 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       setIsLoading(true);
-      await axios.post(`${API_BASE_URL}/api/admin/logout`, 
+      await axios.post(`${API_BASE_URL}/api/admin/logout`,
         {},
         { withCredentials: true }
       );
       setUser(null);
       setIsAuthenticated(false);
       setError(null);
-    } catch(error) {
+    } catch (error) {
       setError("Logout failed");
     } finally {
       setIsLoading(false);
@@ -110,7 +103,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated, 
+        isAuthenticated,
         isLoading,
         error,
         login,
