@@ -189,7 +189,7 @@ const __dirname = path.dirname(__filename);
 
 logger.info("Serving static files from frontend/dist directory");
 // Serve static files with proper cache headers
-app.use(express.static(path.join(__dirname, "frontend", "dist"), {
+app.use(express.static(path.join(process.cwd(), "frontend", "dist"), {
   maxAge: '1h', // Reduced cache time to help with updates
   etag: true,
   lastModified: true,
@@ -251,6 +251,30 @@ const updateUserStats = async (userId, amount) => {
   });
   logger.info("User stats update transaction committed");
 };
+
+// File system diagnostic to see what Vercel actually deployed
+app.get("/api/debug/fs", async (req, res) => {
+  try {
+    const fs = await import('fs');
+    const path = await import('path');
+    const distPath = path.join(process.cwd(), "frontend", "dist");
+    const exists = fs.existsSync(distPath);
+    let files = [];
+    if (exists) {
+      files = fs.readdirSync(distPath);
+    }
+    res.json({
+      cwd: process.cwd(),
+      dirname: __dirname,
+      distPath,
+      exists,
+      files,
+      timestamp: new Date().toISOString()
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
 
 // Simple test endpoints moved to top for reliable matching
 
@@ -1587,7 +1611,7 @@ app.get("*", (req, res) => {
   });
   // Add no-cache for the fallback HTML as well
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+  res.sendFile(path.join(process.cwd(), "frontend", "dist", "index.html"));
 });
 
 logger.info("Defining global error handler middleware");
