@@ -428,6 +428,27 @@ app.get("/api/admin/me", async (req, res, next) => {
   }
 });
 
+app.get("/api/debug/auth", async (req, res, next) => {
+  const token = req.cookies.accessToken;
+  if (!token) return res.json({ error: "No token" });
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    const user = await admin.auth().getUser(decoded.uid);
+    const adminDoc = await db.collection("user").doc(decoded.uid).get();
+    const adminsDoc = await db.collection("users").doc(decoded.uid).get();
+    res.json({
+      uid: decoded.uid,
+      tokenClaims: decoded,
+      authClaims: user.customClaims,
+      userDocExists: adminDoc.exists,
+      usersDocExists: adminsDoc.exists,
+      userDoc: adminDoc.exists ? adminDoc.data() : null
+    });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
 logger.info("Defining /api/admin/logout POST route");
 app.post("/api/admin/logout", (req, res) => {
   logger.info("Received logout request, clearing cookie");
@@ -1103,10 +1124,36 @@ app.get("/api/admin/categories", async (req, res, next) => {
   try {
     logger.debug("Verifying admin privileges");
     const decoded = await admin.auth().verifyIdToken(token);
-    const user = await admin.auth().getUser(decoded.uid);
-    if (!user.customClaims?.admin) {
-      logger.warn("Categories fetch forbidden: Not admin", { uid: user.uid });
-      return res.status(403).json({ error: "Admin access required" });
+    // Tier 1: Token Claim
+    let isAdmin = decoded.admin === true;
+    let reason = isAdmin ? null : "Token missing admin claim";
+
+    // Tier 2: Live Auth Record
+    if (!isAdmin) {
+      const userRec = await admin.auth().getUser(decoded.uid);
+      isAdmin = userRec.customClaims?.admin === true;
+      if (!isAdmin) reason = "Auth record missing admin claim";
+    }
+
+    // Tier 3: Firestore Fallback (check both 'user' and 'users')
+    if (!isAdmin) {
+      const adminDoc = await db.collection("user").doc(decoded.uid).get();
+      isAdmin = adminDoc.exists;
+      if (!isAdmin) {
+        const adminsDoc = await db.collection("users").doc(decoded.uid).get();
+        isAdmin = adminsDoc.exists;
+        if (!isAdmin) reason = "No document in 'user' or 'users' collection";
+      }
+    }
+
+    if (!isAdmin) {
+      logger.warn("Categories fetch forbidden: Not admin", { uid: decoded.uid, reason });
+      return res.status(403).json({
+        error: "Admin access required",
+        uid: decoded.uid,
+        reason,
+        message: "Your account does not have admin privileges. If you are an admin, please try logging out and back in."
+      });
     }
     logger.trace("Admin verified");
 
