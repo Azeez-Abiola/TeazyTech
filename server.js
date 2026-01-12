@@ -370,14 +370,23 @@ app.post("/api/admin/login", endpointLimiter, async (req, res, next) => {
 
     const userData = adminDoc.data();
     logger.info("Login successful, setting accessToken cookie");
-    res.cookie("accessToken", data.idToken, {
+
+    // Determine cookie domain for production
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isProduction,
       maxAge: 3600 * 1000,
       path: "/",
-      sameSite: "lax",
-      partitioned: true,
-    });
+      sameSite: isProduction ? "none" : "lax",
+    };
+
+    // In production, set domain so cookie works on both www and non-www
+    if (isProduction) {
+      cookieOptions.domain = ".teazytech.org";
+    }
+
+    res.cookie("accessToken", data.idToken, cookieOptions);
     return res.json({
       uid: user.uid,
       email: user.email,
@@ -452,12 +461,17 @@ app.get("/api/debug/auth", async (req, res, next) => {
 logger.info("Defining /api/admin/logout POST route");
 app.post("/api/admin/logout", (req, res) => {
   logger.info("Received logout request, clearing cookie");
-  res.clearCookie("accessToken", {
+  const isProduction = process.env.NODE_ENV === "production";
+  const clearOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isProduction,
     path: "/",
-    sameSite: "strict",
-  });
+    sameSite: isProduction ? "none" : "lax",
+  };
+  if (isProduction) {
+    clearOptions.domain = ".teazytech.org";
+  }
+  res.clearCookie("accessToken", clearOptions);
   logger.info("Logout successful");
   return res.json({ message: "Logged out" });
 });
