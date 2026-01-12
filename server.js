@@ -590,9 +590,17 @@ app.post(
       }
 
       logger.debug("Constructing post data object");
+      // Check for file upload (legacy/fallback) or body URL
+      let thumbnailPath = null;
+      if (req.file) {
+        thumbnailPath = req.file.path;
+      } else if (req.body.thumbnail) {
+        thumbnailPath = req.body.thumbnail;
+      }
+
       const postData = {
         ...value,
-        thumbnail: req.file ? req.file.path : null,
+        thumbnail: thumbnailPath,
         author_id: decoded.uid,
         created_at: admin.firestore.FieldValue.serverTimestamp(),
         updated_at: admin.firestore.FieldValue.serverTimestamp(),

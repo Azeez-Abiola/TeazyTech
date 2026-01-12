@@ -197,26 +197,31 @@ const CreatePost = () => {
     });
 
     try {
-      // Use thumbnail directly - Cloudinary handles up to 50MB
-      const finalThumbnail = thumbnail;
-
-      const formData = new FormData();
-      formData.append("title", trimmedTitle);
-      formData.append("author", trimmedAuthor);
-      formData.append("excerpt", trimmedExcerpt);
-      formData.append("content", content);
-      formData.append("category", trimmedCategory);
-      formData.append("status", status);
-      if (finalThumbnail) {
-        formData.append("thumbnail", finalThumbnail);
+      let finalThumbnail = thumbnail;
+      // If thumbnail is a File, upload it first to get the URL
+      if (thumbnail instanceof File) {
+        const uploadedUrl = await uploadImage(thumbnail);
+        if (!uploadedUrl) {
+          setIsSubmitting(false);
+          return; // uploadImage handles the error toast
+        }
+        finalThumbnail = uploadedUrl;
       }
 
-      if (status === "published") {
-        formData.append("published_date", new Date().toISOString());
-      }
+      // Prepare JSON payload
+      const payload = {
+        title: trimmedTitle,
+        author: trimmedAuthor,
+        excerpt: trimmedExcerpt,
+        content: content,
+        category: trimmedCategory,
+        status: status,
+        thumbnail: finalThumbnail,
+        published_date: status === "published" ? new Date().toISOString() : undefined
+      };
 
-      const response = await axios.post("/api/admin/create-post", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const response = await axios.post("/api/admin/create-post", payload, {
+        headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
 
@@ -231,7 +236,7 @@ const CreatePost = () => {
       const statusCode = error.response?.status;
 
       if (statusCode === 413 || statusCode === 403) {
-        toast.error("Upload failed: The image or content is too large (Vercel 4.5MB limit). Try a smaller image.");
+        toast.error("Validation failed: Content too large or permissions issue.");
       } else if (statusCode === 400 && error.response?.data?.errors) {
         // Validation errors from server
         const validationErrors = error.response.data.errors;
