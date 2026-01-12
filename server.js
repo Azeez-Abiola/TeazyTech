@@ -228,6 +228,12 @@ app.post("/api/test-html", (req, res) => {
   res.json({ success: true, message: "HTML content accepted!", bodyPreview: req.body.content?.substring(0, 50) });
 });
 
+// Test real file upload
+app.post("/api/test-file", upload.single("testFile"), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "No file received" });
+  res.json({ success: true, message: "File received by server!", fileName: req.file.originalname, size: req.file.size });
+});
+
 logger.info("Calculating __dirname for static serving");
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
