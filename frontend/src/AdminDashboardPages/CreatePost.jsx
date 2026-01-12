@@ -194,7 +194,10 @@ const CreatePost = () => {
         navigate("/posts", { replace: true });
       }
     } catch (error) {
-      toast.error("Failed to create post");
+      console.error("Create post error:", error);
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to create post";
+      const reason = error.response?.data?.reason ? ` (Reason: ${error.response.data.reason})` : "";
+      toast.error(`${errorMessage}${reason}`);
     } finally {
       setIsSubmitting(false);
     }
