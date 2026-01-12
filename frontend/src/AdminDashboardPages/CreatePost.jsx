@@ -107,18 +107,75 @@ const CreatePost = () => {
       return newErrors;
     });
   };
+  const compressImage = async (file) => {
+    if (!(file instanceof File)) return file;
+
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        // Max dimensions 1200px
+        const MAX_WIDTH = 1200;
+        const MAX_HEIGHT = 1200;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            reject(new Error("Compression failed"));
+            return;
+          }
+          const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", { type: "image/jpeg" });
+          console.log(`Optimized: ${file.size / 1024}KB -> ${compressedFile.size / 1024}KB`);
+          resolve(compressedFile);
+        }, "image/jpeg", 0.7);
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("Failed to load image"));
+      };
+
+      img.src = url;
+    });
+  };
 
   const uploadImage = async (file) => {
+    const loadingToastId = toast.loading("Optimizing and uploading image...");
     try {
+      const optimizedFile = await compressImage(file);
       const formData = new FormData();
-      formData.append("image", file);
+      formData.append("image", optimizedFile);
       const res = await axios.post("/api/admin/upload-image", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
+      toast.success("Image uploaded successfully!", { id: loadingToastId });
       return res.data.url;
-    } catch {
-      toast.error("Image upload failed");
+    } catch (err) {
+      console.error("Upload failed:", err);
+      toast.error("Image upload failed. Try a smaller image.", { id: loadingToastId });
       return "";
     }
   };
@@ -170,71 +227,22 @@ const CreatePost = () => {
     try {
       let finalThumbnail = thumbnail;
 
-      // Compress image if it's a File and exists
+      // Compress thumbnail if it exists
       if (thumbnail instanceof File) {
-        const loadingToastId = toast.loading("Optimizing high-res image...");
+        const loadingToastId = toast.loading("Optimizing thumbnail...");
         try {
-          finalThumbnail = await new Promise((resolve, reject) => {
-            const img = new Image();
-            const url = URL.createObjectURL(thumbnail);
-
-            img.onload = () => {
-              URL.revokeObjectURL(url);
-              const canvas = document.createElement("canvas");
-              let width = img.width;
-              let height = img.height;
-
-              // Max dimensions 1200px
-              const MAX_WIDTH = 1200;
-              const MAX_HEIGHT = 1200;
-
-              if (width > height) {
-                if (width > MAX_WIDTH) {
-                  height *= MAX_WIDTH / width;
-                  width = MAX_WIDTH;
-                }
-              } else {
-                if (height > MAX_HEIGHT) {
-                  width *= MAX_HEIGHT / height;
-                  height = MAX_HEIGHT;
-                }
-              }
-
-              canvas.width = width;
-              canvas.height = height;
-              const ctx = canvas.getContext("2d");
-              ctx.drawImage(img, 0, 0, width, height);
-
-              // Compress to JPEG with 0.7 quality
-              canvas.toBlob((blob) => {
-                if (!blob) {
-                  reject(new Error("Compression failed"));
-                  return;
-                }
-                const compressedFile = new File([blob], thumbnail.name.replace(/\.[^/.]+$/, "") + ".jpg", { type: "image/jpeg" });
-                console.log(`Original: ${thumbnail.size / 1024}KB, Compressed: ${compressedFile.size / 1024}KB`);
-                resolve(compressedFile);
-              }, "image/jpeg", 0.7);
-            };
-
-            img.onerror = () => {
-              URL.revokeObjectURL(url);
-              reject(new Error("Failed to load image"));
-            };
-
-            img.src = url;
-          });
-          toast.success("Image optimized successfully!", { id: loadingToastId });
+          finalThumbnail = await compressImage(thumbnail);
+          toast.success("Thumbnail optimized!", { id: loadingToastId });
         } catch (e) {
           console.error("Compression failed:", e);
-          toast.error("Could not optimize image, trying original...", { id: loadingToastId });
+          toast.error("Could not optimize thumbnail, trying original...", { id: loadingToastId });
           finalThumbnail = thumbnail;
         }
       }
 
       // Final sanity check for size (Vercel limit is 4.5MB)
       if (finalThumbnail && finalThumbnail.size > 4.2 * 1024 * 1024) {
-        toast.error("This image is too large for the server even after optimization. Please use a smaller file.");
+        toast.error("Thumbnail is too large even after optimization. Please use a smaller file.");
         setIsSubmitting(false);
         return;
       }
@@ -392,11 +400,17 @@ const CreatePost = () => {
               <h3 className="text-lg font-medium">Featured Image</h3>
             </div>
             <div className="p-6 space-y-4">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleThumbnailChange}
-              />
+              <div className="flex flex-col gap-1">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleThumbnailChange}
+                  className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
+                />
+                <p className="text-[10px] text-gray-500 italic">
+                  * Max payload 4.5MB. Large images will be auto-optimized.
+                </p>
+              </div>
               {thumbnailPreview && (
                 <img
                   src={thumbnailPreview}
