@@ -1370,7 +1370,7 @@ app.get("*", (req, res) => {
     logger.warn("Asset not found, avoiding SPA catch-all", {
       path: req.originalUrl,
     });
-    return res.status(404).send("Not found");
+    return res.status(404).end();
   }
 
   logger.info("Serving SPA index.html for catch-all route", {
