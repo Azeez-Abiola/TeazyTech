@@ -248,6 +248,12 @@ const updateUserStats = async (userId, amount) => {
   logger.info("User stats update transaction committed");
 };
 
+// Simple test POST endpoint to verify Vercel allows POST requests
+app.post("/api/test-post", (req, res) => {
+  logger.info("Test POST endpoint hit successfully");
+  res.json({ success: true, message: "POST request works!", timestamp: new Date().toISOString() });
+});
+
 logger.info("Defining /api/admin/upload-image POST route");
 app.post(
   "/api/admin/upload-image",
