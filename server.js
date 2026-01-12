@@ -267,8 +267,12 @@ app.post(
       const decoded = await admin.auth().verifyIdToken(token);
       logger.trace("Token decoded", { uid: decoded.uid });
 
-      // Check admin status from custom claims in the token
-      if (!decoded.admin) {
+      // Fetch user to confirm admin status reliably
+      const user = await admin.auth().getUser(decoded.uid);
+      const isAdmin = user.customClaims?.admin === true;
+      logger.trace("Admin check result", { isAdmin });
+
+      if (!isAdmin) {
         logger.warn("Image upload forbidden: Not admin", { uid: decoded.uid });
         return res.status(403).json({ error: "Admin access required" });
       }
@@ -436,7 +440,9 @@ app.post(
       const decoded = await admin.auth().verifyIdToken(token);
       logger.trace("Token decoded", { uid: decoded.uid });
 
-      const isAdmin = decoded.admin === true;
+      // Fetch user to confirm admin status reliably
+      const user = await admin.auth().getUser(decoded.uid);
+      const isAdmin = user.customClaims?.admin === true;
       logger.trace("Admin check result", { isAdmin });
 
       if (!isAdmin) {
@@ -465,7 +471,7 @@ app.post(
       const postData = {
         ...value,
         thumbnail: req.file ? req.file.path : null,
-        author_id: user.uid,
+        author_id: decoded.uid,
         created_at: admin.firestore.FieldValue.serverTimestamp(),
         updated_at: admin.firestore.FieldValue.serverTimestamp(),
       };
@@ -481,7 +487,7 @@ app.post(
       });
 
       logger.debug("Updating user post stats");
-      await updateUserStats(user.uid, 1);
+      await updateUserStats(decoded.uid, 1);
       logger.info("User stats updated after post creation");
 
       return res.status(201).json({
@@ -766,7 +772,9 @@ app.patch(
       const decoded = await admin.auth().verifyIdToken(token);
       logger.trace("Token decoded", { uid: decoded.uid });
 
-      const isAdmin = decoded.admin === true;
+      // Fetch user to confirm admin status reliably
+      const user = await admin.auth().getUser(decoded.uid);
+      const isAdmin = user.customClaims?.admin === true;
       logger.trace("Admin check result", { isAdmin });
 
       if (!isAdmin) {
@@ -916,7 +924,9 @@ app.delete("/api/admin/posts/:postId", async (req, res, next) => {
     const decoded = await admin.auth().verifyIdToken(token);
     logger.trace("Token decoded", { uid: decoded.uid });
 
-    const isAdmin = decoded.admin === true;
+    // Fetch user to confirm admin status reliably
+    const user = await admin.auth().getUser(decoded.uid);
+    const isAdmin = user.customClaims?.admin === true;
     logger.trace("Admin check result", { isAdmin });
 
     if (!isAdmin) {
@@ -1073,7 +1083,12 @@ app.post("/api/admin/categories", async (req, res, next) => {
   try {
     logger.debug("Verifying admin privileges");
     const decoded = await admin.auth().verifyIdToken(token);
-    if (!decoded.admin) {
+
+    // Fetch user to confirm admin status reliably
+    const user = await admin.auth().getUser(decoded.uid);
+    const isAdmin = user.customClaims?.admin === true;
+
+    if (!isAdmin) {
       logger.warn("Category creation forbidden: Not admin", { uid: decoded.uid });
       return res.status(403).json({ error: "Admin access required" });
     }
@@ -1146,7 +1161,12 @@ app.put("/api/admin/categories/:id", async (req, res, next) => {
   try {
     logger.debug("Verifying admin privileges");
     const decoded = await admin.auth().verifyIdToken(token);
-    if (!decoded.admin) {
+
+    // Fetch user to confirm admin status reliably
+    const user = await admin.auth().getUser(decoded.uid);
+    const isAdmin = user.customClaims?.admin === true;
+
+    if (!isAdmin) {
       logger.warn("Category update forbidden: Not admin", { uid: decoded.uid });
       return res.status(403).json({ error: "Admin access required" });
     }
@@ -1217,7 +1237,12 @@ app.delete("/api/admin/categories/:id", async (req, res, next) => {
   try {
     logger.debug("Verifying admin privileges");
     const decoded = await admin.auth().verifyIdToken(token);
-    if (!decoded.admin) {
+
+    // Fetch user to confirm admin status reliably
+    const user = await admin.auth().getUser(decoded.uid);
+    const isAdmin = user.customClaims?.admin === true;
+
+    if (!isAdmin) {
       logger.warn("Category delete forbidden: Not admin", { uid: decoded.uid });
       return res.status(403).json({ error: "Admin access required" });
     }
