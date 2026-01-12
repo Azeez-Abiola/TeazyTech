@@ -210,6 +210,24 @@ app.post("/api/admin/test-diagnostic", (req, res) => {
   res.json({ success: true, message: "Admin POST path works!", timestamp: new Date().toISOString() });
 });
 
+// Test authenticated state
+app.post("/api/admin/test-auth", async (req, res) => {
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json({ error: "No token" });
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    res.json({ success: true, message: "Server received valid admin token!", uid: decoded.uid });
+  } catch (e) {
+    res.status(401).json({ error: e.message });
+  }
+});
+
+// Test HTML content (WAF check)
+app.post("/api/test-html", (req, res) => {
+  logger.info("Test HTML content received", { contentLength: req.body.content?.length });
+  res.json({ success: true, message: "HTML content accepted!", bodyPreview: req.body.content?.substring(0, 50) });
+});
+
 logger.info("Calculating __dirname for static serving");
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
