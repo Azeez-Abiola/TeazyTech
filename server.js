@@ -278,6 +278,24 @@ app.get("/api/debug/fs", async (req, res) => {
 
 // Simple test endpoints moved to top for reliable matching
 
+// Basic admin check logic helper
+const checkAdmin = async (admin, db, decoded) => {
+  let isAdmin = decoded.admin === true;
+  if (!isAdmin) {
+    const user = await admin.auth().getUser(decoded.uid);
+    isAdmin = user.customClaims?.admin === true;
+  }
+  if (!isAdmin) {
+    const adminDoc = await db.collection("user").doc(decoded.uid).get();
+    isAdmin = adminDoc.exists;
+    if (!isAdmin) {
+      const adminsDoc = await db.collection("users").doc(decoded.uid).get();
+      isAdmin = adminsDoc.exists;
+    }
+  }
+  return isAdmin;
+};
+
 logger.info("Defining /api/admin/upload-image POST route");
 app.post(
   "/api/admin/upload-image",
@@ -295,56 +313,53 @@ app.post(
     try {
       logger.debug("Verifying ID token");
       const decoded = await admin.auth().verifyIdToken(token);
-
-      // Tier 1: Token Claim
-      let isAdmin = decoded.admin === true;
-      let reason = isAdmin ? null : "Token missing admin claim";
-
-      // Tier 2: Live Auth Record
-      if (!isAdmin) {
-        const user = await admin.auth().getUser(decoded.uid);
-        isAdmin = user.customClaims?.admin === true;
-        if (!isAdmin) reason = "Auth record missing admin claim";
-      }
-
-      // Tier 3: Firestore Fallback (check both 'user' and 'users')
-      if (!isAdmin) {
-        const adminDoc = await db.collection("user").doc(decoded.uid).get();
-        isAdmin = adminDoc.exists;
-        if (!isAdmin) {
-          const adminsDoc = await db.collection("users").doc(decoded.uid).get();
-          isAdmin = adminsDoc.exists;
-          if (!isAdmin) reason = "No document in 'user' or 'users' collection";
-        }
-      }
+      const isAdmin = await checkAdmin(admin, db, decoded);
 
       if (!isAdmin) {
-        logger.warn("Image upload forbidden: Not admin", { uid: decoded.uid, reason });
-        return res.status(403).json({
-          error: "Admin access required",
-          uid: decoded.uid,
-          reason,
-          message: "Your account does not have admin privileges. If you are an admin, please try logging out and back in."
-        });
+        logger.warn("Image upload forbidden: Not admin", { uid: decoded.uid });
+        return res.status(403).json({ error: "Unauthorized" });
       }
 
-      if (!req.file || !req.file.path) {
-        logger.warn("Image upload failed: No image uploaded");
-        return res
-          .status(400)
-          .json({ success: false, message: "No image uploaded" });
+      if (req.file) {
+        return res.json({ url: req.file.path });
       }
 
-      const imageUrl = req.file.path;
-      logger.info("Image uploaded successfully", { url: imageUrl });
-      return res.status(200).json({ success: true, url: imageUrl });
+      return res.status(400).json({ error: "No file provided" });
     } catch (error) {
-      logger.error({ error }, "Image upload failed in route handler");
-      next(error);
+      logger.error({ error }, "Upload failed");
+      return res.status(500).json({ error: "Upload failed" });
     }
-  },
+  }
 );
 
+logger.info("Defining /api/admin/sign-upload GET route");
+app.get("/api/admin/sign-upload", async (req, res) => {
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    const isAdmin = await checkAdmin(admin, db, decoded);
+
+    if (!isAdmin) return res.status(403).json({ error: "Unauthorized" });
+
+    const timestamp = Math.round((new Date()).getTime() / 1000);
+    const signature = cloudinary.utils.api_sign_request({
+      timestamp: timestamp,
+      folder: 'thumbnails',
+    }, process.env.CLOUDINARY_API_SECRET);
+
+    res.json({
+      timestamp,
+      signature,
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+      apiKey: process.env.CLOUDINARY_API_KEY
+    });
+  } catch (error) {
+    logger.error({ error }, "Signature generation failed");
+    res.status(500).json({ error: "Signature failed" });
+  }
+});
 logger.info("Defining /api/admin/login POST route");
 app.post("/api/admin/login", endpointLimiter, async (req, res, next) => {
   const { email, password } = req.body;

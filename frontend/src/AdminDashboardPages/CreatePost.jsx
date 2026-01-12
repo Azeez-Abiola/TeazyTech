@@ -112,24 +112,42 @@ const CreatePost = () => {
   // processes on their end after receiving the stream
 
   const uploadImage = async (file) => {
-    const loadingToastId = toast.loading("Uploading image...");
+    const loadingToastId = toast.loading("Starting direct upload...");
     try {
-      const formData = new FormData();
-      formData.append("image", file);
-      const res = await axios.post("/api/admin/upload-image", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true,
+      // 1. Get signature from backend
+      const { data: signData } = await axios.get("/api/admin/sign-upload", {
+        withCredentials: true
       });
+
+      // 2. Upload directly to Cloudinary
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("api_key", signData.apiKey);
+      formData.append("timestamp", signData.timestamp);
+      formData.append("signature", signData.signature);
+      formData.append("folder", "thumbnails");
+
+      const cloudinaryRes = await axios.post(
+        `https://api.cloudinary.com/v1_1/${signData.cloudName}/image/upload`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            // Update toast text rarely to avoid flicker/lag
+            if (percentCompleted % 20 === 0) {
+              toast.loading(`Uploading: ${percentCompleted}%`, { id: loadingToastId });
+            }
+          }
+        }
+      );
+
       toast.success("Image uploaded successfully!", { id: loadingToastId });
-      return res.data.url;
+      return cloudinaryRes.data.secure_url;
     } catch (err) {
-      console.error("Upload failed:", err);
-      const statusCode = err.response?.status;
-      if (statusCode === 413 || statusCode === 403) {
-        toast.error("Image too large for server. Max ~4.5MB per request.", { id: loadingToastId });
-      } else {
-        toast.error("Image upload failed.", { id: loadingToastId });
-      }
+      console.error("Direct upload failed:", err);
+      const msg = err.response?.data?.error?.message || "Upload failed";
+      toast.error(`Error: ${msg}`, { id: loadingToastId });
       return "";
     }
   };
