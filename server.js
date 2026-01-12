@@ -166,7 +166,7 @@ app.use(
 
 logger.info("Applying body parsers and cookie parser");
 app.use(cors({
-  origin: ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:3001", "http://127.0.0.1:3001", "https://teazytech.org", "https://www.teazytech.org"],
+  origin: ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:3001", "http://127.0.0.1:3001", "http://localhost:5173", "https://teazytech.org", "https://www.teazytech.org"],
   credentials: true
 }));
 app.use(express.json({ limit: "50mb" }));
@@ -265,16 +265,29 @@ app.post(
     try {
       logger.debug("Verifying ID token");
       const decoded = await admin.auth().verifyIdToken(token);
-      logger.trace("Token decoded", { uid: decoded.uid });
 
-      // Fetch user to confirm admin status reliably
-      const user = await admin.auth().getUser(decoded.uid);
-      const isAdmin = user.customClaims?.admin === true;
-      logger.trace("Admin check result", { isAdmin });
+      // Tier 1: Token Claim
+      let isAdmin = decoded.admin === true;
+
+      // Tier 2: Live Auth Record
+      if (!isAdmin) {
+        const user = await admin.auth().getUser(decoded.uid);
+        isAdmin = user.customClaims?.admin === true;
+      }
+
+      // Tier 3: Firestore Fallback
+      if (!isAdmin) {
+        const adminDoc = await db.collection("user").doc(decoded.uid).get();
+        isAdmin = adminDoc.exists;
+      }
 
       if (!isAdmin) {
         logger.warn("Image upload forbidden: Not admin", { uid: decoded.uid });
-        return res.status(403).json({ error: "Admin access required" });
+        return res.status(403).json({
+          error: "Admin access required",
+          uid: decoded.uid,
+          message: "Your account does not have admin privileges on this environment."
+        });
       }
 
       if (!req.file || !req.file.path) {
@@ -438,16 +451,29 @@ app.post(
     try {
       logger.debug("Verifying ID token for post creation");
       const decoded = await admin.auth().verifyIdToken(token);
-      logger.trace("Token decoded", { uid: decoded.uid });
 
-      // Fetch user to confirm admin status reliably
-      const user = await admin.auth().getUser(decoded.uid);
-      const isAdmin = user.customClaims?.admin === true;
-      logger.trace("Admin check result", { isAdmin });
+      // Tier 1: Token Claim
+      let isAdmin = decoded.admin === true;
+
+      // Tier 2: Live Auth Record
+      if (!isAdmin) {
+        const user = await admin.auth().getUser(decoded.uid);
+        isAdmin = user.customClaims?.admin === true;
+      }
+
+      // Tier 3: Firestore Fallback
+      if (!isAdmin) {
+        const adminDoc = await db.collection("user").doc(decoded.uid).get();
+        isAdmin = adminDoc.exists;
+      }
 
       if (!isAdmin) {
         logger.warn("Create post forbidden: Not admin", { uid: decoded.uid });
-        return res.status(403).json({ error: "Admin access required" });
+        return res.status(403).json({
+          error: "Admin access required",
+          uid: decoded.uid,
+          message: "Your account does not have admin privileges on this environment."
+        });
       }
 
       logger.debug("Validating request body against postSchema");
@@ -770,16 +796,29 @@ app.patch(
     try {
       logger.debug("Verifying ID token for update");
       const decoded = await admin.auth().verifyIdToken(token);
-      logger.trace("Token decoded", { uid: decoded.uid });
 
-      // Fetch user to confirm admin status reliably
-      const user = await admin.auth().getUser(decoded.uid);
-      const isAdmin = user.customClaims?.admin === true;
-      logger.trace("Admin check result", { isAdmin });
+      // Tier 1: Token Claim
+      let isAdmin = decoded.admin === true;
+
+      // Tier 2: Live Auth Record
+      if (!isAdmin) {
+        const user = await admin.auth().getUser(decoded.uid);
+        isAdmin = user.customClaims?.admin === true;
+      }
+
+      // Tier 3: Firestore Fallback
+      if (!isAdmin) {
+        const adminDoc = await db.collection("user").doc(decoded.uid).get();
+        isAdmin = adminDoc.exists;
+      }
 
       if (!isAdmin) {
         logger.warn("Post update forbidden: Not admin", { uid: decoded.uid });
-        return res.status(403).json({ error: "Admin access required" });
+        return res.status(403).json({
+          error: "Admin access required",
+          uid: decoded.uid,
+          message: "Your account does not have admin privileges on this environment."
+        });
       }
 
       const updateFields = {};
@@ -922,16 +961,29 @@ app.delete("/api/admin/posts/:postId", async (req, res, next) => {
   try {
     logger.debug("Verifying ID token for delete");
     const decoded = await admin.auth().verifyIdToken(token);
-    logger.trace("Token decoded", { uid: decoded.uid });
 
-    // Fetch user to confirm admin status reliably
-    const user = await admin.auth().getUser(decoded.uid);
-    const isAdmin = user.customClaims?.admin === true;
-    logger.trace("Admin check result", { isAdmin });
+    // Tier 1: Token Claim
+    let isAdmin = decoded.admin === true;
+
+    // Tier 2: Live Auth Record
+    if (!isAdmin) {
+      const user = await admin.auth().getUser(decoded.uid);
+      isAdmin = user.customClaims?.admin === true;
+    }
+
+    // Tier 3: Firestore Fallback
+    if (!isAdmin) {
+      const adminDoc = await db.collection("user").doc(decoded.uid).get();
+      isAdmin = adminDoc.exists;
+    }
 
     if (!isAdmin) {
       logger.warn("Post delete forbidden: Not admin", { uid: decoded.uid });
-      return res.status(403).json({ error: "Admin access required" });
+      return res.status(403).json({
+        error: "Admin access required",
+        uid: decoded.uid,
+        message: "Your account does not have admin privileges on this environment."
+      });
     }
 
     const postRef = db.collection("posts").doc(postId);
@@ -1084,13 +1136,28 @@ app.post("/api/admin/categories", async (req, res, next) => {
     logger.debug("Verifying admin privileges");
     const decoded = await admin.auth().verifyIdToken(token);
 
-    // Fetch user to confirm admin status reliably
-    const user = await admin.auth().getUser(decoded.uid);
-    const isAdmin = user.customClaims?.admin === true;
+    // Tier 1: Token Claim
+    let isAdmin = decoded.admin === true;
+
+    // Tier 2: Live Auth Record
+    if (!isAdmin) {
+      const user = await admin.auth().getUser(decoded.uid);
+      isAdmin = user.customClaims?.admin === true;
+    }
+
+    // Tier 3: Firestore Fallback
+    if (!isAdmin) {
+      const adminDoc = await db.collection("user").doc(decoded.uid).get();
+      isAdmin = adminDoc.exists;
+    }
 
     if (!isAdmin) {
       logger.warn("Category creation forbidden: Not admin", { uid: decoded.uid });
-      return res.status(403).json({ error: "Admin access required" });
+      return res.status(403).json({
+        error: "Admin access required",
+        uid: decoded.uid,
+        message: "Your account does not have admin privileges on this environment."
+      });
     }
     logger.trace("Admin verified");
 
@@ -1162,13 +1229,28 @@ app.put("/api/admin/categories/:id", async (req, res, next) => {
     logger.debug("Verifying admin privileges");
     const decoded = await admin.auth().verifyIdToken(token);
 
-    // Fetch user to confirm admin status reliably
-    const user = await admin.auth().getUser(decoded.uid);
-    const isAdmin = user.customClaims?.admin === true;
+    // Tier 1: Token Claim
+    let isAdmin = decoded.admin === true;
+
+    // Tier 2: Live Auth Record
+    if (!isAdmin) {
+      const user = await admin.auth().getUser(decoded.uid);
+      isAdmin = user.customClaims?.admin === true;
+    }
+
+    // Tier 3: Firestore Fallback
+    if (!isAdmin) {
+      const adminDoc = await db.collection("user").doc(decoded.uid).get();
+      isAdmin = adminDoc.exists;
+    }
 
     if (!isAdmin) {
       logger.warn("Category update forbidden: Not admin", { uid: decoded.uid });
-      return res.status(403).json({ error: "Admin access required" });
+      return res.status(403).json({
+        error: "Admin access required",
+        uid: decoded.uid,
+        message: "Your account does not have admin privileges on this environment."
+      });
     }
     logger.trace("Admin verified");
 
@@ -1238,13 +1320,28 @@ app.delete("/api/admin/categories/:id", async (req, res, next) => {
     logger.debug("Verifying admin privileges");
     const decoded = await admin.auth().verifyIdToken(token);
 
-    // Fetch user to confirm admin status reliably
-    const user = await admin.auth().getUser(decoded.uid);
-    const isAdmin = user.customClaims?.admin === true;
+    // Tier 1: Token Claim
+    let isAdmin = decoded.admin === true;
+
+    // Tier 2: Live Auth Record
+    if (!isAdmin) {
+      const user = await admin.auth().getUser(decoded.uid);
+      isAdmin = user.customClaims?.admin === true;
+    }
+
+    // Tier 3: Firestore Fallback
+    if (!isAdmin) {
+      const adminDoc = await db.collection("user").doc(decoded.uid).get();
+      isAdmin = adminDoc.exists;
+    }
 
     if (!isAdmin) {
       logger.warn("Category delete forbidden: Not admin", { uid: decoded.uid });
-      return res.status(403).json({ error: "Admin access required" });
+      return res.status(403).json({
+        error: "Admin access required",
+        uid: decoded.uid,
+        message: "Your account does not have admin privileges on this environment."
+      });
     }
     logger.trace("Admin verified");
 
