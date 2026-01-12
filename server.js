@@ -140,18 +140,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Diagnostics moved below middleware for better isolation testing
 
-// Multipart diagnostic endpoint
-app.post("/api/test-multipart", upload.none(), (req, res) => {
-  logger.info("Test Multipart endpoint hit successfully", { body: req.body });
-  res.json({
-    success: true,
-    message: "Multipart POST works!",
-    receivedFields: req.body,
-    timestamp: new Date().toISOString()
-  });
-});
 
 logger.info("Applying security headers with helmet");
 app.use(
@@ -192,59 +181,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
-// DIAGNOSTICS SECTION (AFTER MIDDLEWARE)
-app.get("/api/test-get", (req, res) => {
-  res.json({ success: true, message: "GET request works (after middleware)!", timestamp: new Date().toISOString() });
-});
 
-app.post("/api/test-post", (req, res) => {
-  res.json({ success: true, message: "POST request works (after middleware)!", receivedBody: req.body, timestamp: new Date().toISOString() });
-});
-
-// Admin Path Prefix Test
-app.get("/api/admin/test-diagnostic", (req, res) => {
-  res.json({ success: true, message: "Admin GET path works!", timestamp: new Date().toISOString() });
-});
-
-app.post("/api/admin/test-diagnostic", (req, res) => {
-  res.json({ success: true, message: "Admin POST path works!", timestamp: new Date().toISOString() });
-});
-
-// Test authenticated state
-app.post("/api/admin/test-auth", async (req, res) => {
-  const token = req.cookies.accessToken;
-  if (!token) return res.status(401).json({ error: "No token" });
-  try {
-    const decoded = await admin.auth().verifyIdToken(token);
-    res.json({ success: true, message: "Server received valid admin token!", uid: decoded.uid });
-  } catch (e) {
-    res.status(401).json({ error: e.message });
-  }
-});
-
-// Test HTML content (WAF check)
-app.post("/api/test-html", (req, res) => {
-  logger.info("Test HTML content received", { contentLength: req.body.content?.length });
-  res.json({ success: true, message: "HTML content accepted!", bodyPreview: req.body.content?.substring(0, 50) });
-});
-
-// Test real file upload (fixes the 500 by using memory storage instead of Cloudinary)
-app.post("/api/test-file", multer({ storage: multer.memoryStorage() }).single("testFile"), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: "No file received" });
-  res.json({
-    success: true,
-    message: "File received by server (memory storage)!",
-    fileName: req.file.originalname,
-    size: req.file.size,
-    mimetype: req.file.mimetype
-  });
-});
-
-// Test Vercel's 4.5MB payload limit
-app.post("/api/test-size", (req, res) => {
-  const size = JSON.stringify(req.body).length;
-  res.json({ success: true, receivedSize: size, message: "Server handled this payload size!" });
-});
 
 logger.info("Calculating __dirname for static serving");
 const __filename = fileURLToPath(import.meta.url);
