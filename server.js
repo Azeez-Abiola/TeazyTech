@@ -157,6 +157,17 @@ app.post("/api/test-post", (req, res) => {
   });
 });
 
+// Multipart diagnostic endpoint
+app.post("/api/test-multipart", upload.none(), (req, res) => {
+  logger.info("Test Multipart endpoint hit successfully", { body: req.body });
+  res.json({
+    success: true,
+    message: "Multipart POST works!",
+    receivedFields: req.body,
+    timestamp: new Date().toISOString()
+  });
+});
+
 logger.info("Applying security headers with helmet");
 app.use(
   helmet({
