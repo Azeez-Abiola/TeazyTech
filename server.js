@@ -268,25 +268,33 @@ app.post(
 
       // Tier 1: Token Claim
       let isAdmin = decoded.admin === true;
+      let reason = isAdmin ? null : "Token missing admin claim";
 
       // Tier 2: Live Auth Record
       if (!isAdmin) {
         const user = await admin.auth().getUser(decoded.uid);
         isAdmin = user.customClaims?.admin === true;
+        if (!isAdmin) reason = "Auth record missing admin claim";
       }
 
-      // Tier 3: Firestore Fallback
+      // Tier 3: Firestore Fallback (check both 'user' and 'users')
       if (!isAdmin) {
         const adminDoc = await db.collection("user").doc(decoded.uid).get();
         isAdmin = adminDoc.exists;
+        if (!isAdmin) {
+          const adminsDoc = await db.collection("users").doc(decoded.uid).get();
+          isAdmin = adminsDoc.exists;
+          if (!isAdmin) reason = "No document in 'user' or 'users' collection";
+        }
       }
 
       if (!isAdmin) {
-        logger.warn("Image upload forbidden: Not admin", { uid: decoded.uid });
+        logger.warn("Image upload forbidden: Not admin", { uid: decoded.uid, reason });
         return res.status(403).json({
           error: "Admin access required",
           uid: decoded.uid,
-          message: "Your account does not have admin privileges on this environment."
+          reason,
+          message: "Your account does not have admin privileges. If you are an admin, please try logging out and back in."
         });
       }
 
@@ -454,25 +462,33 @@ app.post(
 
       // Tier 1: Token Claim
       let isAdmin = decoded.admin === true;
+      let reason = isAdmin ? null : "Token missing admin claim";
 
       // Tier 2: Live Auth Record
       if (!isAdmin) {
         const user = await admin.auth().getUser(decoded.uid);
         isAdmin = user.customClaims?.admin === true;
+        if (!isAdmin) reason = "Auth record missing admin claim";
       }
 
-      // Tier 3: Firestore Fallback
+      // Tier 3: Firestore Fallback (check both 'user' and 'users')
       if (!isAdmin) {
         const adminDoc = await db.collection("user").doc(decoded.uid).get();
         isAdmin = adminDoc.exists;
+        if (!isAdmin) {
+          const adminsDoc = await db.collection("users").doc(decoded.uid).get();
+          isAdmin = adminsDoc.exists;
+          if (!isAdmin) reason = "No document in 'user' or 'users' collection";
+        }
       }
 
       if (!isAdmin) {
-        logger.warn("Create post forbidden: Not admin", { uid: decoded.uid });
+        logger.warn("Create post forbidden: Not admin", { uid: decoded.uid, reason });
         return res.status(403).json({
           error: "Admin access required",
           uid: decoded.uid,
-          message: "Your account does not have admin privileges on this environment."
+          reason,
+          message: "Your account does not have admin privileges. If you are an admin, please try logging out and back in."
         });
       }
 
@@ -799,25 +815,33 @@ app.patch(
 
       // Tier 1: Token Claim
       let isAdmin = decoded.admin === true;
+      let reason = isAdmin ? null : "Token missing admin claim";
 
       // Tier 2: Live Auth Record
       if (!isAdmin) {
         const user = await admin.auth().getUser(decoded.uid);
         isAdmin = user.customClaims?.admin === true;
+        if (!isAdmin) reason = "Auth record missing admin claim";
       }
 
-      // Tier 3: Firestore Fallback
+      // Tier 3: Firestore Fallback (check both 'user' and 'users')
       if (!isAdmin) {
         const adminDoc = await db.collection("user").doc(decoded.uid).get();
         isAdmin = adminDoc.exists;
+        if (!isAdmin) {
+          const adminsDoc = await db.collection("users").doc(decoded.uid).get();
+          isAdmin = adminsDoc.exists;
+          if (!isAdmin) reason = "No document in 'user' or 'users' collection";
+        }
       }
 
       if (!isAdmin) {
-        logger.warn("Post update forbidden: Not admin", { uid: decoded.uid });
+        logger.warn("Post update forbidden: Not admin", { uid: decoded.uid, reason });
         return res.status(403).json({
           error: "Admin access required",
           uid: decoded.uid,
-          message: "Your account does not have admin privileges on this environment."
+          reason,
+          message: "Your account does not have admin privileges. If you are an admin, please try logging out and back in."
         });
       }
 
