@@ -228,10 +228,22 @@ app.post("/api/test-html", (req, res) => {
   res.json({ success: true, message: "HTML content accepted!", bodyPreview: req.body.content?.substring(0, 50) });
 });
 
-// Test real file upload
-app.post("/api/test-file", upload.single("testFile"), (req, res) => {
+// Test real file upload (fixes the 500 by using memory storage instead of Cloudinary)
+app.post("/api/test-file", multer({ storage: multer.memoryStorage() }).single("testFile"), (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file received" });
-  res.json({ success: true, message: "File received by server!", fileName: req.file.originalname, size: req.file.size });
+  res.json({
+    success: true,
+    message: "File received by server (memory storage)!",
+    fileName: req.file.originalname,
+    size: req.file.size,
+    mimetype: req.file.mimetype
+  });
+});
+
+// Test Vercel's 4.5MB payload limit
+app.post("/api/test-size", (req, res) => {
+  const size = JSON.stringify(req.body).length;
+  res.json({ success: true, receivedSize: size, message: "Server handled this payload size!" });
 });
 
 logger.info("Calculating __dirname for static serving");
