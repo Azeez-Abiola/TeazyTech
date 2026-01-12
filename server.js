@@ -194,18 +194,12 @@ app.use(express.static(path.join(__dirname, "frontend", "dist"), {
   etag: true,
   lastModified: true,
   setHeaders: (res, path) => {
-    // Force no-cache for HTML files to ensure updates are loaded
-    if (path.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
-    }
-    // Also force fresh assets for js files
-    if (path.endsWith('.js') || path.endsWith('.css')) {
-      res.setHeader('Cache-Control', 'public, max-age=3600');
-    }
+    // Force no-cache for ALL files during this debugging phase to ensure updates are loaded
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
   }
-}))
+}));
 
 logger.info("Initializing Firebase Admin SDK...");
 let db;

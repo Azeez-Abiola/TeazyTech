@@ -293,8 +293,9 @@ const CreatePost = () => {
       <Toaster richColors position="top-right" />
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
-          <div className="px-6 py-4 bg-[#e94235] text-white">
+          <div className="px-6 py-4 bg-[#e94235] text-white flex justify-between items-center">
             <h3 className="text-lg font-medium">Post Details</h3>
+            <span className="text-xs bg-white/20 px-2 py-1 rounded">Update: v2 (Compression Active)</span>
           </div>
           <div className="p-6 space-y-6">
             <div>
