@@ -172,52 +172,71 @@ const CreatePost = () => {
 
       // Compress image if it's a File and exists
       if (thumbnail instanceof File) {
-        toast.loading("Optimizing image...", { id: "image-op" });
+        const loadingToastId = toast.loading("Optimizing high-res image...");
         try {
-          finalThumbnail = await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(thumbnail);
-            reader.onload = (event) => {
-              const img = new Image();
-              img.src = event.target.result;
-              img.onload = () => {
-                const canvas = document.createElement("canvas");
-                let width = img.width;
-                let height = img.height;
+          finalThumbnail = await new Promise((resolve, reject) => {
+            const img = new Image();
+            const url = URL.createObjectURL(thumbnail);
 
-                // Max dimensions 1200px
-                const MAX_WIDTH = 1200;
-                const MAX_HEIGHT = 1200;
+            img.onload = () => {
+              URL.revokeObjectURL(url);
+              const canvas = document.createElement("canvas");
+              let width = img.width;
+              let height = img.height;
 
-                if (width > height) {
-                  if (width > MAX_WIDTH) {
-                    height *= MAX_WIDTH / width;
-                    width = MAX_WIDTH;
-                  }
-                } else {
-                  if (height > MAX_HEIGHT) {
-                    width *= MAX_HEIGHT / height;
-                    height = MAX_HEIGHT;
-                  }
+              // Max dimensions 1200px
+              const MAX_WIDTH = 1200;
+              const MAX_HEIGHT = 1200;
+
+              if (width > height) {
+                if (width > MAX_WIDTH) {
+                  height *= MAX_WIDTH / width;
+                  width = MAX_WIDTH;
                 }
+              } else {
+                if (height > MAX_HEIGHT) {
+                  width *= MAX_HEIGHT / height;
+                  height = MAX_HEIGHT;
+                }
+              }
 
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext("2d");
-                ctx.drawImage(img, 0, 0, width, height);
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext("2d");
+              ctx.drawImage(img, 0, 0, width, height);
 
-                // Compress to JPEG with 0.8 quality
-                canvas.toBlob((blob) => {
-                  resolve(new File([blob], thumbnail.name, { type: "image/jpeg" }));
-                }, "image/jpeg", 0.8);
-              };
+              // Compress to JPEG with 0.7 quality
+              canvas.toBlob((blob) => {
+                if (!blob) {
+                  reject(new Error("Compression failed"));
+                  return;
+                }
+                const compressedFile = new File([blob], thumbnail.name.replace(/\.[^/.]+$/, "") + ".jpg", { type: "image/jpeg" });
+                console.log(`Original: ${thumbnail.size / 1024}KB, Compressed: ${compressedFile.size / 1024}KB`);
+                resolve(compressedFile);
+              }, "image/jpeg", 0.7);
             };
+
+            img.onerror = () => {
+              URL.revokeObjectURL(url);
+              reject(new Error("Failed to load image"));
+            };
+
+            img.src = url;
           });
-          toast.success("Image optimized!", { id: "image-op" });
+          toast.success("Image optimized successfully!", { id: loadingToastId });
         } catch (e) {
-          console.error("Compression failed, using original:", e);
-          toast.error("Image optimization failed, using original", { id: "image-op" });
+          console.error("Compression failed:", e);
+          toast.error("Could not optimize image, trying original...", { id: loadingToastId });
+          finalThumbnail = thumbnail;
         }
+      }
+
+      // Final sanity check for size (Vercel limit is 4.5MB)
+      if (finalThumbnail && finalThumbnail.size > 4.2 * 1024 * 1024) {
+        toast.error("This image is too large for the server even after optimization. Please use a smaller file.");
+        setIsSubmitting(false);
+        return;
       }
 
       const formData = new FormData();
@@ -247,13 +266,13 @@ const CreatePost = () => {
       }
     } catch (error) {
       console.error("Create post error:", error);
-      const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to create post";
-      const reason = error.response?.data?.reason ? ` (Reason: ${error.response.data.reason})` : "";
+      const statusCode = error.response?.status;
 
-      // Check for common infrastructure errors
-      if (error.response?.status === 413 || error.response?.status === 403) {
-        toast.error("The post content or image is too large for the server. Try a smaller image.");
+      if (statusCode === 413 || statusCode === 403) {
+        toast.error("Upload failed: The image or content is too large (Vercel 4.5MB limit). Try a smaller image.");
       } else {
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to create post";
+        const reason = error.response?.data?.reason ? ` (Reason: ${error.response.data.reason})` : "";
         toast.error(`${errorMessage}${reason}`);
       }
     } finally {
