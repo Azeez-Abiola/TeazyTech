@@ -134,6 +134,12 @@ const endpointLimiter = rateLimit({
   },
 });
 
+// Global request logger for debugging Vercel routing
+app.use((req, res, next) => {
+  logger.info(`[REQ] ${req.method} ${req.url}`);
+  next();
+});
+
 logger.info("Applying security headers with helmet");
 app.use(
   helmet({
@@ -248,7 +254,12 @@ const updateUserStats = async (userId, amount) => {
   logger.info("User stats update transaction committed");
 };
 
-// Simple test POST endpoint to verify Vercel allows POST requests
+// Simple test endpoints to verify Vercel allows requests
+app.get("/api/test-get", (req, res) => {
+  logger.info("Test GET endpoint hit successfully");
+  res.json({ success: true, message: "GET request works!", timestamp: new Date().toISOString() });
+});
+
 app.post("/api/test-post", (req, res) => {
   logger.info("Test POST endpoint hit successfully");
   res.json({ success: true, message: "POST request works!", timestamp: new Date().toISOString() });
