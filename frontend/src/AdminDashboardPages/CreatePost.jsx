@@ -46,7 +46,45 @@ const CreatePost = () => {
       }
     };
     fetchCategories();
+
+    // Load autosaved data
+    const savedPost = localStorage.getItem("teazy_autosave_post");
+    if (savedPost) {
+      try {
+        const data = JSON.parse(savedPost);
+        setTitle(data.title || "");
+        setAuthor(data.author || "");
+        setContent(data.content || "");
+        setExcerpt(data.excerpt || "");
+        setCategory(data.category || "");
+        toast.info("Restored unpublished changes", {
+          description: "We found unsaved content and restored it for you.",
+          action: {
+            label: "Clear",
+            onClick: () => {
+              localStorage.removeItem("teazy_autosave_post");
+              setTitle("");
+              setAuthor("");
+              setContent("");
+              setExcerpt("");
+              setCategory("");
+            },
+          },
+        });
+      } catch (e) {
+        console.error("Failed to parse autosaved post", e);
+      }
+    }
   }, []);
+
+  // Autosave when content changes
+  useEffect(() => {
+    const postData = { title, author, content, excerpt, category };
+    // Only save if at least one field is not empty
+    if (Object.values(postData).some(val => val.trim() !== "")) {
+      localStorage.setItem("teazy_autosave_post", JSON.stringify(postData));
+    }
+  }, [title, author, content, excerpt, category]);
 
   const handleThumbnailChange = (e) => {
     const file = e.target.files[0];
@@ -151,6 +189,7 @@ const CreatePost = () => {
       });
 
       if (response.status === 201) {
+        localStorage.removeItem("teazy_autosave_post");
         toast.success(`Post "${title}" created successfully!`);
         navigate("/posts", { replace: true });
       }
@@ -290,7 +329,10 @@ const CreatePost = () => {
         <div className="flex items-center justify-end gap-4 pb-8">
           <button
             type="button"
-            onClick={() => navigate("/posts")}
+            onClick={() => {
+              localStorage.removeItem("teazy_autosave_post");
+              navigate("/posts");
+            }}
             className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
           >
             Cancel
