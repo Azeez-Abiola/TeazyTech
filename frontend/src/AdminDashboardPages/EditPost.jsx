@@ -1,35 +1,52 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import Layout from '../components/Layout'
-import { Image, Calendar, Tag, AlertTriangle } from 'lucide-react'
-import ReactQuill from 'react-quill'
-import 'react-quill/dist/quill.snow.css'
-import axios from 'axios'
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import Layout from "../components/Layout";
+import { Image, Tag, AlertTriangle, Loader2 } from "lucide-react";
+import RichTextEditor from "../components/RichTextEditor";
+import axios from "axios";
+import { toast, Toaster } from "sonner";
 
 const EditPost = () => {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
-  const [excerpt, setExcerpt] = useState('')
-  const [category, setCategory] = useState('')
-  const [thumbnail, setThumbnail] = useState('')
-  const [thumbnailPreview, setThumbnailPreview] = useState('')
-  const [status, setStatus] = useState('draft')
-  const [errors, setErrors] = useState({})
-  const [loading, setLoading] = useState(true)
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [content, setContent] = useState("");
+  const [excerpt, setExcerpt] = useState("");
+  const [category, setCategory] = useState("");
+  const [thumbnail, setThumbnail] = useState("");
+  const [thumbnailPreview, setThumbnailPreview] = useState("");
+  const [status, setStatus] = useState("draft");
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
-  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const uploadImage = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      const res = await axios.post("/api/admin/upload-image", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
+      });
+      return res.data.url;
+    } catch {
+      toast.error("Image upload failed");
+      return "";
+    }
+  };
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(`/api/admin/categories`, {
-          withCredentials: true
+        const res = await axios.get("/api/admin/categories", {
+          withCredentials: true,
         });
-        setCategories(response.data.map(cat => cat.name));
-      } catch (err) {
-        console.error("Error fetching categories:", err);
+        setCategories(res.data.map((c) => c.name));
+      } catch {
+        toast.error("Failed to load categories");
       } finally {
         setLoadingCategories(false);
       }
@@ -40,142 +57,144 @@ const EditPost = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`/api/admin/posts/${id}`, {
-          withCredentials: true
-        })
-        
-        const post = response.data
-        setTitle(post.title)
-        setContent(post.content || '')
-        setExcerpt(post.excerpt || '')
-        setCategory(post.category)
-        setThumbnail(post.thumbnail || '')
-        setThumbnailPreview(post.thumbnail || '')
-        setStatus(post.status)
-        
-        if (post.published_date) {
-          const dateObj = new Date(post.published_date)
-          const formattedDate = dateObj.toISOString().split('T')[0]
-          setPublishDate(formattedDate)
-        }
-      } catch (error) {
-        console.error('Error fetching post:', error)
+        const res = await axios.get(`/api/admin/posts/${id}`, {
+          withCredentials: true,
+        });
+        const post = res.data;
+        setTitle(post.title);
+        setAuthor(post.author);
+        setContent(post.content || "");
+        setExcerpt(post.excerpt || "");
+        setCategory(post.category);
+        setThumbnail(post.thumbnail || "");
+        setThumbnailPreview(post.thumbnail || "");
+        setStatus(post.status);
+      } catch {
+        toast.error("Failed to load post");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-
-    fetchPost()
-  }, [id])
+    };
+    fetchPost();
+  }, [id]);
 
   const handleThumbnailChange = (e) => {
-    const url = e.target.value
-    setThumbnail(url)
-    setThumbnailPreview(url)
-  }
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      setThumbnail(file);
+      const reader = new FileReader();
+      reader.onload = () => setThumbnailPreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const clearError = (field) =>
+    setErrors((prev) => {
+      const copy = { ...prev };
+      delete copy[field];
+      return copy;
+    });
 
   const validateForm = () => {
-    const newErrors = {}
-    
-    if (!title.trim()) newErrors.title = 'Title is required'
-    if (!content.trim()) newErrors.content = 'Content is required'
-    if (!category) {
-      if (categories.length === 0) {
-        newErrors.category = 'No categories available. Please add categories first.';
-      } else {
-        newErrors.category = 'Category is required';
-      }
-    }
-    
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    const newErrors = {};
+    if (!title.trim()) newErrors.title = "Title is required";
+    if (!author.trim()) newErrors.author = "Author is required";
+    if (!content || content.replace(/<[^>]+>/g, "").trim() === "")
+      newErrors.content = "Content is required";
+    if (!category) newErrors.category = "Category is required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    
-    if (!validateForm()) {
-      if (categories.length === 0) {
-        alert("No categories available. Please add categories before creating posts.");
-        navigate('/categories');
-      }
-      return
-    }
+    e.preventDefault();
+    if (isSubmitting) return;
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
     try {
-      const response = await axios.put(`/api/admin/posts/${id}`, {
-        title,
-        excerpt,
-        content,
-        category,
-        thumbnail,
-        status,
-        published_date: new Date().toISOString()
-      }, {
-        withCredentials: true
-      })
+      const formData = new FormData();
+      formData.append("title", title.trim());
+      formData.append("author", author.trim());
+      formData.append("excerpt", excerpt.trim());
+      formData.append("content", content);
+      formData.append("category", category);
+      formData.append("status", status);
 
-      navigate('/posts')
-    } catch (error) {
-      if (error.response?.data?.errors) {
-        const backendErrors = error.response.data.errors.reduce((acc, err) => {
-          acc[err.field] = err.message
-          return acc
-        }, {})
-        setErrors(backendErrors)
-      } else {
-        console.error('Error updating post:', error)
+      if (thumbnail instanceof File) {
+        formData.append("thumbnail", thumbnail);
+      } else if (thumbnail) {
+        formData.append("thumbnail", thumbnail);
       }
+
+      if (status === "published") {
+        formData.append("published_date", new Date().toISOString());
+      }
+
+      console.log("Sending update data:", {
+        title: title.trim(),
+        author: author.trim(),
+        excerpt: excerpt.trim(),
+        content: content ? "content exists" : "no content",
+        category,
+        status,
+        hasThumbnail: !!thumbnail,
+      });
+
+      await axios.patch(`/api/admin/posts/${id}`, formData, {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success("Post updated successfully");
+      navigate("/posts");
+    } catch (error) {
+      console.error("Failed to update post:", error);
+      if (error.response?.data?.errors) {
+        const serverErrors = {};
+        error.response.data.errors.forEach((err) => {
+          serverErrors[err.field] = err.message;
+        });
+        setErrors(serverErrors);
+        toast.error("Please fix the validation errors");
+      } else {
+        toast.error("Failed to update post");
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  const modules = {
-  toolbar: [
-    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-    ['bold', 'italic', 'underline', 'strike'],
-    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-    ['link', 'image', 'video'],
-    ['blockquote', 'code-block'],
-    ['clean']
-  ]
-};
-
-const formats = [
-  'header',
-  'bold', 'italic', 'underline', 'strike',
-  'list', 'bullet',
-  'link', 'image', 'video',
-  'blockquote', 'code-block'
-];
-
-  if (loading) {
+  if (loading)
     return (
       <Layout title="Edit Post">
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#e94235]"></div>
+          <Loader2 className="animate-spin h-12 w-12 text-[#e94235]" />
         </div>
       </Layout>
-    )
-  }
+    );
 
   return (
     <Layout title="Edit Post">
+      <Toaster richColors position="top-right" />
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <div className="px-6 py-4 bg-[#e94235] text-white">
             <h3 className="text-lg font-medium">Edit Post</h3>
           </div>
-          <div className="p-6">
-            <div className="mb-6">
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-                Title <span className="text-red-500">*</span>
+          <div className="p-6 space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Title
               </label>
               <input
                 type="text"
-                id="title"
-                className={`w-full px-3 py-2 border ${errors.title ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]`}
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter post title"
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  clearError("title");
+                }}
+                className={`w-full px-3 py-2 border ${errors.title ? "border-red-500" : "border-gray-300"} rounded-md`}
               />
               {errors.title && (
                 <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -185,43 +204,55 @@ const formats = [
               )}
             </div>
 
-            <div className="mb-6">
-              <label htmlFor="excerpt" className="block text-sm font-medium text-gray-700 mb-1">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Author
+              </label>
+              <input
+                type="text"
+                value={author}
+                onChange={(e) => {
+                  setAuthor(e.target.value);
+                  clearError("author");
+                }}
+                className={`w-full px-3 py-2 border ${errors.author ? "border-red-500" : "border-gray-300"} rounded-md`}
+              />
+              {errors.author && (
+                <p className="mt-1 text-sm text-red-600 flex items-center">
+                  <AlertTriangle className="h-4 w-4 mr-1" />
+                  {errors.author}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Excerpt
               </label>
               <textarea
-                id="excerpt"
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]"
                 value={excerpt}
                 onChange={(e) => setExcerpt(e.target.value)}
-                placeholder="Brief summary of the post (optional)"
-              ></textarea>
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
             </div>
 
-            <div className="mb-6">
-              <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
-                Content <span className="text-red-500">*</span>
-              </label>
-              <div className={errors.content ? 'border border-red-500 rounded-md' : ''}>
-              <ReactQuill
-                theme="snow"
-                value={content}
-                onChange={setContent}
-                modules={modules}
-                formats={formats}
-                style={{ 
-               fontFamily: "'Noto Serif', serif",
-               fontSize: "20px"
-           }}
-          />
+            <div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Content
+                </label>
+                <RichTextEditor
+                  value={content}
+                  onChange={setContent}
+                  uploadImage={uploadImage}
+                />
+                {errors.content && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                    <AlertTriangle className="h-4 w-4 mr-1" />
+                    {errors.content}
+                  </p>
+                )}
               </div>
-              {errors.content && (
-                <p className="mt-1 text-sm text-red-600 flex items-center">
-                  <AlertTriangle className="h-4 w-4 mr-1" />
-                  {errors.content}
-                </p>
-              )}
             </div>
           </div>
         </div>
@@ -231,31 +262,41 @@ const formats = [
             <div className="px-6 py-4 bg-[#e94235] text-white">
               <h3 className="text-lg font-medium">Post Settings</h3>
             </div>
-            <div className="p-6">
-            <div className="mb-6">
-                <label htmlFor="category" className="flex items-center text-sm font-medium text-gray-700 mb-1">
-                  <Tag className="h-4 w-4 mr-1" />
-                  Category <span className="text-red-500 ml-1">*</span>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
+                  <Tag className="h-4 w-4 mr-1" /> Category
                 </label>
                 {loadingCategories ? (
                   <div className="animate-pulse py-2 bg-gray-200 rounded-md"></div>
                 ) : (
                   <>
                     <select
-                      id="category"
-                      className={`w-full px-3 py-2 border ${errors.category ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]`}
                       value={category}
-                      onChange={(e) => setCategory(e.target.value)}
+                      onChange={(e) => {
+                        setCategory(e.target.value);
+                        clearError("category");
+                      }}
+                      className={`w-full px-3 py-2 border ${errors.category ? "border-red-500" : "border-gray-300"} rounded-md`}
                       disabled={categories.length === 0}
                     >
                       <option value="">Select a category</option>
-                      {categories.map((cat, index) => (
-                        <option key={index} value={cat}>{cat}</option>
+                      {categories.map((cat, i) => (
+                        <option key={i} value={cat}>
+                          {cat}
+                        </option>
                       ))}
                     </select>
                     {categories.length === 0 && (
                       <p className="mt-2 text-sm text-yellow-600">
-                        No categories available. Please <a href="/categories" className="text-[#e94235] underline">add categories</a> first.
+                        No categories available. Please{" "}
+                        <a
+                          href="/categories"
+                          className="text-[#e94235] underline"
+                        >
+                          add categories
+                        </a>{" "}
+                        first.
                       </p>
                     )}
                     {errors.category && (
@@ -268,37 +309,27 @@ const formats = [
                 )}
               </div>
 
-              <div className="mb-6">
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Status
                 </label>
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center">
+                <div className="flex items-center gap-4">
+                  <label>
                     <input
-                      id="draft"
-                      name="status"
                       type="radio"
-                      checked={status === 'draft'}
-                      onChange={() => setStatus('draft')}
-                      className="h-4 w-4 text-[#e94235] border-gray-300 focus:ring-[#e94235]"
-                    />
-                    <label htmlFor="draft" className="ml-2 block text-sm text-gray-700">
-                      Draft
-                    </label>
-                  </div>
-                  <div className="flex items-center">
+                      checked={status === "draft"}
+                      onChange={() => setStatus("draft")}
+                    />{" "}
+                    Draft
+                  </label>
+                  <label>
                     <input
-                      id="published"
-                      name="status"
                       type="radio"
-                      checked={status === 'published'}
-                      onChange={() => setStatus('published')}
-                      className="h-4 w-4 text-[#e94235] border-gray-300 focus:ring-[#e94235]"
-                    />
-                    <label htmlFor="published" className="ml-2 block text-sm text-gray-700">
-                      Published
-                    </label>
-                  </div>
+                      checked={status === "published"}
+                      onChange={() => setStatus("published")}
+                    />{" "}
+                    Published
+                  </label>
                 </div>
               </div>
             </div>
@@ -308,74 +339,54 @@ const formats = [
             <div className="px-6 py-4 bg-[#e94235] text-white">
               <h3 className="text-lg font-medium">Featured Image</h3>
             </div>
-            <div className="p-6">
-              <div className="mb-4">
-                <label htmlFor="thumbnail" className="flex items-center text-sm font-medium text-gray-700 mb-1">
-                  <Image className="h-4 w-4 mr-1" />
-                  Thumbnail URL
-                </label>
-                <input
-                  type="text"
-                  id="thumbnail"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]"
-                  value={thumbnail}
-                  onChange={handleThumbnailChange}
-                  placeholder="Enter image URL"
+            <div className="p-6 space-y-4">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleThumbnailChange}
+              />
+              {thumbnailPreview && (
+                <img
+                  src={thumbnailPreview || "/default-blog-thumbnail.png"}
+                  className="w-full h-48 object-cover rounded-md"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/default-blog-thumbnail.png";
+                  }}
                 />
-              </div>
-              
-              <div className="mt-4 border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center">
-                {thumbnailPreview ? (
-                  <div className="relative w-full">
-                    <img
-                      src={thumbnailPreview}
-                      alt="Thumbnail preview"
-                      className="w-full h-48 object-cover rounded-lg"
-                      onError={() => setThumbnailPreview('')}
-                    />
-                    <button
-                      type="button"
-                      className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
-                      onClick={() => {
-                        setThumbnail('')
-                        setThumbnailPreview('')
-                      }}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <Image className="mx-auto h-12 w-12 text-gray-400" />
-                    <p className="mt-1 text-sm text-gray-500">Add a thumbnail image for your post</p>
-                    <p className="text-xs text-gray-400">Enter a URL in the field above</p>
-                  </div>
-                )}
-              </div>
+              )}
+              {errors.thumbnail && (
+                <p className="mt-2 text-sm text-red-600 flex items-center">
+                  <AlertTriangle className="h-4 w-4 mr-1" />
+                  {errors.thumbnail}
+                </p>
+              )}
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-end space-x-4">
+        <div className="flex items-center justify-end gap-4">
           <button
             type="button"
-            onClick={() => navigate('/posts')}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#e94235]"
+            onClick={() => navigate("/posts")}
+            className="px-4 py-2 border rounded-md"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-[#e94235] hover:bg-[#d23c30] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#e94235]"
+            disabled={isSubmitting}
+            className="px-4 py-2 bg-[#e94235] text-white rounded-md"
           >
-            {status === 'published' ? 'Update & Publish' : 'Update Draft'}
+            {isSubmitting ? (
+              <Loader2 className="animate-spin h-5 w-5 mr-2 inline-block" />
+            ) : null}
+            {isSubmitting ? "Updating..." : "Update Post"}
           </button>
         </div>
       </form>
     </Layout>
-  )
-}
+  );
+};
 
-export default EditPost
+export default EditPost;

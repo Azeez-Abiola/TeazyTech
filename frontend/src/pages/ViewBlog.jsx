@@ -8,41 +8,44 @@ const ViewBlog = () => {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-   useEffect(() => {
-        window.scroll({ top: 0,left: 0, behaviour: "smooth" })
-    }, [])
+  useEffect(() => {
+    window.scroll({ top: 0, left: 0, behaviour: "smooth" });
+  }, []);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await axios.post(
-          `/api/posts/${id}/view`,
-          {}, 
-          {
-            headers: { "Content-Type": "application/json" },
-            withCredentials: true
-          }
-        ).catch(e => console.warn("View tracking failed:", e.message));
+        await axios
+          .post(
+            `/api/posts/${id}/view`,
+            {},
+            {
+              headers: { "Content-Type": "application/json" },
+              withCredentials: true,
+            },
+          )
+          .catch((e) => console.warn("View tracking failed:", e.message));
 
-        const response = await axios.get(
-          `/api/admin/posts/${id}`,
-          {
-            headers: { "Content-Type": "application/json" }
-          }
-        );
+        const response = await axios.get(`/api/admin/posts/${id}`, {
+          headers: { "Content-Type": "application/json" },
+        });
 
         if (!response.data) throw new Error("Post data missing");
-        if (response.data.status !== "published") throw new Error("Post not published");
-        
+        if (response.data.status !== "published")
+          throw new Error("Post not published");
+
         setPost({
+          author: response.data.author || "Unauthored post",
           title: response.data.title || "Untitled Post",
           content: response.data.content || "<p>Content not available</p>",
           thumbnail: response.data.thumbnail || "",
           published_date: response.data.published_date || "date not available",
           category: response.data.category || "Uncategorized",
-          views: response.data.views || 0
+          views: response.data.views || 0,
         });
       } catch (err) {
-        setError(err.response?.data?.message || err.message || "Failed to load post");
+        setError(
+          err.response?.data?.message || err.message || "Failed to load post",
+        );
       } finally {
         setLoading(false);
       }
@@ -70,8 +73,9 @@ const ViewBlog = () => {
         <div className="header-content">
           <h1 className="blog-title">{post.title}</h1>
           <div className="blog-meta">
+            <h3 className="blog-author">Author: {post.author}</h3>
             <span className="publish-date">
-             {post?.published_date || "Date not available"}
+              {post?.published_date || "Date not available"}
             </span>
             <span className="category-tag">{post.category}</span>
             <span className="view-count">{post.views} views</span>
@@ -87,8 +91,9 @@ const ViewBlog = () => {
             alt={post.title}
             className="featured-image"
             onError={(e) => {
-              e.target.src = '/placeholder-image.jpg';
-              e.target.classList.add('error-image');
+              e.target.onerror = null;
+              e.target.src = "/default-blog-thumbnail.png";
+              e.target.classList.add("error-image");
             }}
           />
         </div>

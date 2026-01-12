@@ -44,7 +44,7 @@ Create a `.env` file in the `frontend` directory and add the backend domain:
 - **Run the Frontend:**
  ```bash
  npm run dev
- ```
+ ``` i
 
 ## 💻 Usage
 
