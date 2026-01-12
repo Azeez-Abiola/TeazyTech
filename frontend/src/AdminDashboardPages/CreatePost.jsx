@@ -107,66 +107,15 @@ const CreatePost = () => {
       return newErrors;
     });
   };
-  const compressImage = async (file) => {
-    if (!(file instanceof File)) return file;
-
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const url = URL.createObjectURL(file);
-
-      img.onload = () => {
-        URL.revokeObjectURL(url);
-        const canvas = document.createElement("canvas");
-        let width = img.width;
-        let height = img.height;
-
-        // Max dimensions 1200px
-        const MAX_WIDTH = 1200;
-        const MAX_HEIGHT = 1200;
-
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
-            height = MAX_HEIGHT;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, width, height);
-
-        canvas.toBlob((blob) => {
-          if (!blob) {
-            reject(new Error("Compression failed"));
-            return;
-          }
-          const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", { type: "image/jpeg" });
-          console.log(`Optimized: ${file.size / 1024}KB -> ${compressedFile.size / 1024}KB`);
-          resolve(compressedFile);
-        }, "image/jpeg", 0.7);
-      };
-
-      img.onerror = () => {
-        URL.revokeObjectURL(url);
-        reject(new Error("Failed to load image"));
-      };
-
-      img.src = url;
-    });
-  };
+  // No compression needed - Cloudinary handles up to 50MB
+  // The 4.5MB limit is only Vercel's serverless function, but Cloudinary 
+  // processes on their end after receiving the stream
 
   const uploadImage = async (file) => {
-    const loadingToastId = toast.loading("Optimizing and uploading image...");
+    const loadingToastId = toast.loading("Uploading image...");
     try {
-      const optimizedFile = await compressImage(file);
       const formData = new FormData();
-      formData.append("image", optimizedFile);
+      formData.append("image", file);
       const res = await axios.post("/api/admin/upload-image", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
@@ -175,7 +124,12 @@ const CreatePost = () => {
       return res.data.url;
     } catch (err) {
       console.error("Upload failed:", err);
-      toast.error("Image upload failed. Try a smaller image.", { id: loadingToastId });
+      const statusCode = err.response?.status;
+      if (statusCode === 413 || statusCode === 403) {
+        toast.error("Image too large for server. Max ~4.5MB per request.", { id: loadingToastId });
+      } else {
+        toast.error("Image upload failed.", { id: loadingToastId });
+      }
       return "";
     }
   };
@@ -225,27 +179,8 @@ const CreatePost = () => {
     });
 
     try {
-      let finalThumbnail = thumbnail;
-
-      // Compress thumbnail if it exists
-      if (thumbnail instanceof File) {
-        const loadingToastId = toast.loading("Optimizing thumbnail...");
-        try {
-          finalThumbnail = await compressImage(thumbnail);
-          toast.success("Thumbnail optimized!", { id: loadingToastId });
-        } catch (e) {
-          console.error("Compression failed:", e);
-          toast.error("Could not optimize thumbnail, trying original...", { id: loadingToastId });
-          finalThumbnail = thumbnail;
-        }
-      }
-
-      // Final sanity check for size (Vercel limit is 4.5MB)
-      if (finalThumbnail && finalThumbnail.size > 4.2 * 1024 * 1024) {
-        toast.error("Thumbnail is too large even after optimization. Please use a smaller file.");
-        setIsSubmitting(false);
-        return;
-      }
+      // Use thumbnail directly - Cloudinary handles up to 50MB
+      const finalThumbnail = thumbnail;
 
       const formData = new FormData();
       formData.append("title", trimmedTitle);
@@ -274,10 +209,16 @@ const CreatePost = () => {
       }
     } catch (error) {
       console.error("Create post error:", error);
+      console.error("Response data:", error.response?.data);
       const statusCode = error.response?.status;
 
       if (statusCode === 413 || statusCode === 403) {
         toast.error("Upload failed: The image or content is too large (Vercel 4.5MB limit). Try a smaller image.");
+      } else if (statusCode === 400 && error.response?.data?.errors) {
+        // Validation errors from server
+        const validationErrors = error.response.data.errors;
+        const errorMessages = validationErrors.map(e => `${e.field}: ${e.message}`).join(", ");
+        toast.error(`Validation failed: ${errorMessages}`);
       } else {
         const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to create post";
         const reason = error.response?.data?.reason ? ` (Reason: ${error.response.data.reason})` : "";
@@ -303,7 +244,7 @@ const CreatePost = () => {
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <div className="px-6 py-4 bg-[#e94235] text-white flex justify-between items-center">
             <h3 className="text-lg font-medium">Post Details</h3>
-            <span className="text-xs bg-white/20 px-2 py-1 rounded">Update: v2 (Compression Active)</span>
+            <span className="text-xs bg-white/20 px-2 py-1 rounded">v3 (Direct Upload)</span>
           </div>
           <div className="p-6 space-y-6">
             <div>
@@ -408,7 +349,7 @@ const CreatePost = () => {
                   className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
                 />
                 <p className="text-[10px] text-gray-500 italic">
-                  * Max payload 4.5MB. Large images will be auto-optimized.
+                  * Cloudinary limit: 50MB. Vercel proxy limit: ~4.5MB.
                 </p>
               </div>
               {thumbnailPreview && (
