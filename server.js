@@ -177,9 +177,9 @@ logger.info("Calculating __dirname for static serving");
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-logger.info("Serving static files from dist directory");
+logger.info("Serving static files from frontend/dist directory");
 // Serve static files with proper cache headers
-app.use(express.static(path.join(__dirname, "dist"), {
+app.use(express.static(path.join(__dirname, "frontend", "dist"), {
   maxAge: '1h', // Reduced cache time to help with updates
   etag: true,
   lastModified: true,
@@ -191,7 +191,7 @@ app.use(express.static(path.join(__dirname, "dist"), {
       res.setHeader('Expires', '0');
     }
     // Also force fresh assets for js files
-    if (path.endsWith('.js')) {
+    if (path.endsWith('.js') || path.endsWith('.css')) {
       res.setHeader('Cache-Control', 'public, max-age=3600');
     }
   }
@@ -1376,7 +1376,9 @@ app.get("*", (req, res) => {
   logger.info("Serving SPA index.html for catch-all route", {
     path: req.originalUrl,
   });
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
+  // Add no-cache for the fallback HTML as well
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
 });
 
 logger.info("Defining global error handler middleware");
