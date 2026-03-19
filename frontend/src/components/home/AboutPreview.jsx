@@ -10,7 +10,7 @@ const AboutPreview = () => {
             <p>
               At Teazy Tech, we believe that in this digital age, every teacher should have access to resources that
               help make learning more dynamic, engaging, and impactful.
-            </p>
+            </p> 
             <p>
               Our mission is to equip teachers with the knowledge of educational technology, helping them thrive and
               adapt confidently within the modern, technology, helping them thrive and adapt confidently within the

@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Logo from "../components/Logo";
 import "../styles/Blog.css";
 
 const Blog = () => {
@@ -95,14 +96,8 @@ const Blog = () => {
 
   if (loading) {
     return (
-      <div className="blog-page">
-        <section className="blog-hero">
-          <div className="container">
-            <div className="blog-hero-content">
-              <h1>Loading Blog...</h1>
-            </div>
-          </div>
-        </section>
+      <div className="blog-preloader">
+        <Logo />
       </div>
     );
   }

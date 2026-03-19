@@ -1,6 +1,7 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Logo from "../components/Logo";
 import "../styles/ViewBlog.css";
 
 const ViewBlog = () => {
@@ -62,13 +63,21 @@ const ViewBlog = () => {
     }
   };
 
-  if (loading) return <div className="loading-spinner"></div>;
+  if (loading) return (
+    <div className="blog-preloader">
+      <Logo />
+    </div>
+  );
   if (error) return <div className="error-message">{error}</div>;
   if (!post) return <div className="not-found">Post not found</div>;
 
   return (
     <div className="blog-container">
+      <Link to="/blog" className="back-arrow">
+        <i className="fas fa-arrow-left"></i> Back to Blogs
+      </Link>
       {/* Hero Section */}
+
       <header className="blog-header">
         <div className="header-content">
           <h1 className="blog-title">{post.title}</h1>

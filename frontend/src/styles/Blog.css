@@ -341,6 +341,31 @@
   opacity: 0.9;
 }
 
+/* Loading State */
+.blog-preloader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #fff;
+}
+
+.blog-preloader .logo img {
+  height: 80px;
+  animation: beat 1.5s ease-in-out infinite;
+}
+
+@keyframes beat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.8;
+  }
+}
+
 /* Responsive Styles */
 @media (max-width: 992px) {
   .blog-hero-content h1 {

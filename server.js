@@ -85,6 +85,8 @@ const getClientIp = (req) => {
 
 logger.info("Initializing Express app");
 const app = express();
+app.set("trust proxy", true);
+
 
 logger.info("Creating global rate limiter");
 const globalLimiter = rateLimit({
@@ -1570,35 +1572,24 @@ app.post("/api/posts/:id/view", endpointLimiter, async (req, res, next) => {
         return;
       }
 
-      const viewedIPs = postData.viewedIPs || [];
-      logger.trace("Existing viewed IPs", { count: viewedIPs.length });
+      logger.info("View recorded", { postId, clientIp });
 
-      if (!viewedIPs.includes(clientIp)) {
-        logger.info("New unique view recorded", { postId, clientIp });
+      transaction.update(postRef, {
+        views: admin.firestore.FieldValue.increment(1),
+        updated_at: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      logger.debug("Post view count updated in transaction");
 
-        transaction.update(postRef, {
-          views: (postData.views || 0) + 1,
-          viewedIPs: [...viewedIPs, clientIp],
+      if (postData.author_id) {
+        logger.debug("Updating author's total view count", {
+          authorId: postData.author_id,
+        });
+        const adminRef = db.collection("user").doc(postData.author_id);
+        transaction.update(adminRef, {
+          total_views: admin.firestore.FieldValue.increment(1),
           updated_at: admin.firestore.FieldValue.serverTimestamp(),
         });
-        logger.debug("Post view count and IP updated in transaction");
-
-        if (postData.author_id) {
-          logger.debug("Updating author's total view count", {
-            authorId: postData.author_id,
-          });
-          const adminRef = db.collection("user").doc(postData.author_id);
-          transaction.update(adminRef, {
-            total_views: admin.firestore.FieldValue.increment(1),
-            updated_at: admin.firestore.FieldValue.serverTimestamp(),
-          });
-          logger.trace("Author stats update queued in transaction");
-        }
-      } else {
-        logger.debug("Duplicate view from IP, skipping count increment", {
-          postId,
-          clientIp,
-        });
+        logger.trace("Author stats update queued in transaction");
       }
     });
 

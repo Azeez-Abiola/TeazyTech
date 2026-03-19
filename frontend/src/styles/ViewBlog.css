@@ -3,7 +3,7 @@
 /* Base Styles */
 .blog-container {
     max-width: 1200px;
-    margin: 50px auto;
+    margin: 120px auto 50px;
     padding: 0 20px;
     font-family:
         "Inter",
@@ -18,23 +18,52 @@
     line-height: 1.6;
     color: #333;
 }
+ 
+ .back-arrow {
+     display: inline-flex;
+     align-items: center;
+     gap: 8px;
+     color: #666;
+     text-decoration: none;
+     font-size: 16px;
+     font-weight: 500;
+     margin-bottom: 20px;
+     padding: 8px 12px;
+     border-radius: 6px;
+     transition: all 0.2s ease;
+ }
+ 
+ .back-arrow:hover {
+     color: #2563eb;
+     background-color: #f3f4f6;
+ }
+ 
+ .back-arrow i {
+     font-size: 14px;
+ }
 
 /* Loading State */
-.loading-spinner {
+.blog-preloader {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    background-color: #fff;
 }
 
-.loading-spinner::after {
-    content: "";
-    width: 40px;
-    height: 40px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+.blog-preloader .logo img {
+    height: 80px;
+    animation: beat 1.5s ease-in-out infinite;
+}
+
+@keyframes beat {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+        opacity: 0.8;
+    }
 }
 
 @keyframes spin {
@@ -68,7 +97,7 @@
 .blog-header {
     text-align: center;
     padding: 30px;
-    margin: 80px 0 40px;
+    margin: 20px 0 40px;
 }
 
 .blog-title {
