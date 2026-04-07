@@ -265,14 +265,14 @@ const CreatePost = () => {
     <Layout title="Create Post">
       <Toaster richColors position="top-right" />
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="bg-white dark:bg-[#1a1a1a] shadow-md rounded-lg overflow-hidden transition-colors duration-300">
           <div className="px-6 py-4 bg-[#e94235] text-white flex justify-between items-center">
             <h3 className="text-lg font-medium">Post Details</h3>
             <span className="text-xs bg-white/20 px-2 py-1 rounded">v3 (Direct Upload)</span>
           </div>
           <div className="p-6 space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Title
               </label>
               <input
@@ -282,11 +282,12 @@ const CreatePost = () => {
                   setTitle(e.target.value);
                   clearError("title");
                 }}
-                className={`w-full px-3 py-2 border ${errors.title ? "border-red-500" : "border-gray-300"} rounded-md`}
+                placeholder="Enter post title"
+                className={`w-full px-4 py-2.5 bg-white dark:bg-[#242424] border ${errors.title ? "border-red-500" : "border-gray-300 dark:border-gray-700"} rounded-lg text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#e94235]/20 focus:border-[#e94235] transition-all outline-none`}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Author
               </label>
               <input
@@ -296,11 +297,12 @@ const CreatePost = () => {
                   setAuthor(e.target.value);
                   clearError("author");
                 }}
-                className={`w-full px-3 py-2 border ${errors.author ? "border-red-500" : "border-gray-300"} rounded-md`}
+                placeholder="Author name"
+                className={`w-full px-4 py-2.5 bg-white dark:bg-[#242424] border ${errors.author ? "border-red-500" : "border-gray-300 dark:border-gray-700"} rounded-lg text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#e94235]/20 focus:border-[#e94235] transition-all outline-none`}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Excerpt
               </label>
               <textarea
@@ -309,35 +311,39 @@ const CreatePost = () => {
                   setExcerpt(e.target.value);
                   clearError("excerpt");
                 }}
-                className={`w-full px-3 py-2 border ${errors.excerpt ? "border-red-500" : "border-gray-300"} rounded-md`}
+                placeholder="Short summary of the post"
+                rows={3}
+                className={`w-full px-4 py-2.5 bg-white dark:bg-[#242424] border ${errors.excerpt ? "border-red-500" : "border-gray-300 dark:border-gray-700"} rounded-lg text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#e94235]/20 focus:border-[#e94235] transition-all outline-none resize-none`}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Content
               </label>
-              <RichTextEditor
-                value={content}
-                onChange={setContent}
-                uploadImage={uploadImage}
-              />
+              <div className="rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700">
+                <RichTextEditor
+                  value={content}
+                  onChange={setContent}
+                  uploadImage={uploadImage}
+                />
+              </div>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="bg-white dark:bg-[#1a1a1a] shadow-md rounded-lg overflow-hidden transition-colors duration-300 text-gray-900 dark:text-gray-100">
             <div className="px-6 py-4 bg-[#e94235] text-white">
               <h3 className="text-lg font-medium">Post Settings</h3>
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
+                <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <Tag className="h-4 w-4 mr-1" />
                   Category
                 </label>
                 {loadingCategories ? (
-                  <div className="animate-pulse py-2 bg-gray-200 rounded-md"></div>
+                  <div className="animate-pulse h-10 bg-gray-200 dark:bg-gray-800 rounded-md"></div>
                 ) : (
                   <select
                     value={category}
@@ -345,7 +351,7 @@ const CreatePost = () => {
                       setCategory(e.target.value);
                       clearError("category");
                     }}
-                    className={`w-full px-4 py-2 bg-white border ${errors.category ? "border-red-500" : "border-gray-200"} rounded-lg shadow-sm focus:ring-2 focus:ring-[#e94235] focus:border-transparent transition-all outline-none appearance-none`}
+                    className={`w-full px-4 py-2.5 bg-white dark:bg-[#242424] border ${errors.category ? "border-red-500" : "border-gray-300 dark:border-gray-700"} rounded-lg text-gray-900 dark:text-gray-100 shadow-sm focus:ring-2 focus:ring-[#e94235]/20 focus:border-[#e94235] transition-all outline-none appearance-none`}
                     style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundPosition: 'right 0.75rem center', backgroundSize: '1.25rem', backgroundRepeat: 'no-repeat' }}
                   >
                     <option value="">Select a category</option>
@@ -360,7 +366,7 @@ const CreatePost = () => {
             </div>
           </div>
 
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="bg-white dark:bg-[#1a1a1a] shadow-md rounded-lg overflow-hidden transition-colors duration-300">
             <div className="px-6 py-4 bg-[#e94235] text-white">
               <h3 className="text-lg font-medium">Featured Image</h3>
             </div>
@@ -370,15 +376,25 @@ const CreatePost = () => {
                   type="file"
                   accept="image/*"
                   onChange={handleThumbnailChange}
-                  className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
+                  className="text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 dark:file:bg-red-900/20 file:text-red-700 dark:file:text-red-400 hover:file:bg-red-100 dark:hover:file:bg-red-900/30 transition-all cursor-pointer"
                 />
-
               </div>
-              {thumbnailPreview && (
-                <img
-                  src={thumbnailPreview}
-                  className="w-full h-48 object-cover rounded-md"
-                />
+              {thumbnailPreview ? (
+                <div className="relative group">
+                  <img
+                    src={thumbnailPreview}
+                    className="w-full h-48 object-cover rounded-lg border border-gray-200 dark:border-gray-800"
+                    alt="Preview"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                    <p className="text-white text-sm font-medium">Change Image</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="w-full h-48 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
+                  <Image className="h-10 w-10 mb-2 opacity-50" />
+                  <p className="text-sm">Upload a featured image</p>
+                </div>
               )}
             </div>
           </div>
@@ -391,14 +407,14 @@ const CreatePost = () => {
               localStorage.removeItem("teazy_autosave_post");
               navigate("/posts");
             }}
-            className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            className="px-6 py-2.5 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting || !isFormValid}
-            className="px-6 py-2.5 bg-[#e94235] text-white rounded-lg hover:bg-[#d23c30] transition-colors font-medium shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-8 py-2.5 bg-[#e94235] text-white rounded-lg hover:bg-[#d23c30] transition-all font-medium shadow-md shadow-red-500/20 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>

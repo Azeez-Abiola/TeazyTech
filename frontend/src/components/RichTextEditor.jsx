@@ -67,7 +67,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl max-w-full focus:outline-none p-4 min-h-[150px]",
+          "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl dark:prose-invert max-w-full focus:outline-none p-4 min-h-[300px] text-gray-900 dark:text-gray-100 transition-colors duration-300",
       },
       handleDrop: (view, event, slice, moved) => {
         if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) {
@@ -148,18 +148,18 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
   };
 
   const btnClass = (isActive) =>
-    `p-1.5 rounded hover:bg-gray-200 transition-colors ${isActive ? "bg-gray-300 text-black" : "text-gray-600"
+    `p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors ${isActive ? "bg-gray-300 dark:bg-gray-700 text-black dark:text-white" : "text-gray-600 dark:text-gray-400"
     }`;
 
   return (
-    <div className="relative border rounded-md bg-white shadow-sm">
-      <div className="flex flex-wrap gap-1 bg-gray-50 p-2 border-b rounded-t-md sticky top-0 z-10">
-        <div className="flex items-center gap-1 border-r pr-2 mr-1">
+    <div className="relative border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-[#1a1a1a] shadow-sm overflow-hidden transition-colors duration-300">
+      <div className="flex flex-wrap gap-1 bg-gray-50 dark:bg-[#141414] p-2 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
+        <div className="flex items-center gap-1 border-r border-gray-200 dark:border-gray-700 pr-2 mr-1">
           <button
             type="button"
             onClick={() => editor.chain().focus().undo().run()}
             disabled={!editor.can().undo()}
-            className="p-1.5 rounded hover:bg-gray-200 disabled:opacity-30"
+            className="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-800 disabled:opacity-30 dark:text-gray-400"
             title="Undo"
           >
             <Undo className="h-4 w-4" />
@@ -168,14 +168,14 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             type="button"
             onClick={() => editor.chain().focus().redo().run()}
             disabled={!editor.can().redo()}
-            className="p-1.5 rounded hover:bg-gray-200 disabled:opacity-30"
+            className="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-800 disabled:opacity-30 dark:text-gray-400"
             title="Redo"
           >
             <Redo className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="flex items-center gap-1 border-r pr-2 mr-1">
+        <div className="flex items-center gap-1 border-r border-gray-200 dark:border-gray-700 pr-2 mr-1">
           <button
             type="button"
             onClick={() =>
@@ -208,7 +208,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
           </button>
         </div>
 
-        <div className="flex items-center gap-1 border-r pr-2 mr-1">
+        <div className="flex items-center gap-1 border-r border-gray-200 dark:border-gray-700 pr-2 mr-1">
           <button
             type="button"
             onClick={() => editor.chain().focus().setFontFamily("Inter").run()}
@@ -243,7 +243,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
           </button>
         </div>
 
-        <div className="flex items-center gap-1 border-r pr-2 mr-1">
+        <div className="flex items-center gap-1 border-r border-gray-200 dark:border-gray-700 pr-2 mr-1">
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleBold().run()}
@@ -286,7 +286,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
           </button>
         </div>
 
-        <div className="flex items-center gap-1 border-r pr-2 mr-1">
+        <div className="flex items-center gap-1 border-r border-gray-200 dark:border-gray-700 pr-2 mr-1">
           <button
             type="button"
             onClick={() => editor.chain().focus().setTextAlign("left").run()}
@@ -347,7 +347,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             <LinkIcon className="h-4 w-4" />
           </button>
           <label
-            className="p-1.5 rounded hover:bg-gray-200 cursor-pointer text-gray-600"
+            className="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-800 cursor-pointer text-gray-600 dark:text-gray-400"
             title="Upload Image"
           >
             <ImgIcon className="h-4 w-4" />
@@ -361,7 +361,9 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
         </div>
       </div>
 
-      <EditorContent editor={editor} />
+      <div className="bg-white dark:bg-[#1a1a1a] min-h-[300px]">
+        <EditorContent editor={editor} />
+      </div>
     </div>
   );
 };

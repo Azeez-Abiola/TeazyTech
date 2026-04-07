@@ -651,7 +651,16 @@ app.get("/api/admin/posts", async (req, res, next) => {
     const posts = postsSnapshot.docs.map((doc) => {
       const data = doc.data();
       logger.trace("Processing post data", { id: doc.id });
-      const publishedDate = data.updated_at?.toDate?.() || null;
+      
+      // Prioritize published_date (handle Timestamp or string), then fallback
+      let publishedDate = null;
+      if (data.published_date) {
+        publishedDate = typeof data.published_date.toDate === 'function' 
+          ? data.published_date.toDate() 
+          : new Date(data.published_date);
+      } else {
+        publishedDate = data.updated_at?.toDate?.() || data.created_at?.toDate?.() || null;
+      }
       const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 
       const getTimeUnit = (seconds) => {
@@ -745,7 +754,15 @@ app.get("/api/admin/posts/pagination", async (req, res, next) => {
     const posts = postsSnapshot.docs.map((doc) => {
       const data = doc.data();
       logger.trace("Processing paginated post", { id: doc.id });
-      const publishedDate = data.updated_at?.toDate?.() || null;
+      
+      let publishedDate = null;
+      if (data.published_date) {
+        publishedDate = typeof data.published_date.toDate === 'function' 
+          ? data.published_date.toDate() 
+          : new Date(data.published_date);
+      } else {
+        publishedDate = data.updated_at?.toDate?.() || data.created_at?.toDate?.() || null;
+      }
 
       const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 
@@ -839,13 +856,20 @@ app.get("/api/admin/posts/:postId", async (req, res, next) => {
     const postData = postDoc.data();
     logger.debug("Post data retrieved");
 
-    const dateToFormat = postData.updated_at || postData.created_at;
+    let publishedDate = null;
+    if (postData.published_date) {
+      publishedDate = typeof postData.published_date.toDate === 'function' 
+        ? postData.published_date.toDate() 
+        : new Date(postData.published_date);
+    } else {
+      publishedDate = postData.updated_at?.toDate?.() || postData.created_at?.toDate?.() || null;
+    }
+
     let formattedDate = "Date not available";
 
-    if (dateToFormat) {
+    if (publishedDate && !isNaN(publishedDate.getTime())) {
       logger.trace("Formatting post date");
       try {
-        const publishedDate = dateToFormat.toDate();
         formattedDate = new Intl.DateTimeFormat("en-GB", {
           day: "numeric",
           month: "long",
@@ -855,7 +879,7 @@ app.get("/api/admin/posts/:postId", async (req, res, next) => {
       } catch (e) {
         logger.warn(
           { error: e },
-          "Failed to format date from Firestore timestamp",
+          "Failed to format date",
         );
       }
     }
@@ -1608,6 +1632,83 @@ app.post("/api/posts/:id/view", endpointLimiter, async (req, res, next) => {
   }
 });
 
+logger.info("Defining /api/admin/analytics GET route");
+app.get("/api/admin/analytics", async (req, res, next) => {
+  logger.info("Received request for admin analytics");
+  try {
+    const token = req.cookies.accessToken;
+    if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+    const decoded = await admin.auth().verifyIdToken(token).catch(() => null);
+    if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+
+    const isAdmin = await checkAdmin(admin, db, decoded);
+    if (!isAdmin) return res.status(403).json({ error: "Unauthorized" });
+
+    // 1. Fetch all posts to calculate totals and category distribution
+    const postsSnapshot = await db.collection("posts").get();
+    const posts = [];
+    let totalViews = 0;
+    const categoryCounts = {};
+
+    postsSnapshot.forEach(doc => {
+      const data = doc.data();
+      const postViews = parseInt(data.views) || 0;
+      totalViews += postViews;
+      
+      const cat = data.category || "Uncategorized";
+      categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+
+      let publishedDate = null;
+      if (data.published_date) {
+        publishedDate = typeof data.published_date.toDate === 'function' 
+          ? data.published_date.toDate() 
+          : new Date(data.published_date);
+      } else {
+        publishedDate = data.updated_at?.toDate?.() || data.created_at?.toDate?.() || null;
+      }
+      
+      posts.push({ 
+        id: doc.id, 
+        title: data.title, 
+        views: postViews, 
+        category: data.category, 
+        author: data.author,
+        published_date: publishedDate ? publishedDate.toISOString() : null
+      });
+    });
+
+    // 2. Sort for top viewed posts
+    const topPosts = [...posts]
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 5);
+
+    // 3. Category data for summaries
+    const categories = Object.keys(categoryCounts).map(name => ({
+      name,
+      count: categoryCounts[name],
+      percentage: ((categoryCounts[name] / (posts.length || 1)) * 100).toFixed(1)
+    }));
+
+    // 4. Calculate total authors (from the user collection)
+    const usersSnapshot = await db.collection("user").get();
+    const totalAuthors = usersSnapshot.size;
+
+    logger.info("Analytics calculated successfully", { totalPosts: posts.length, totalViews });
+    return res.json({
+      totalPosts: posts.length,
+      totalViews,
+      totalAuthors,
+      topPosts,
+      categories,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    logger.error({ error }, "Failed to fetch analytics");
+    next(error);
+  }
+});
+
 logger.info("Defining catch-all route for SPA client-side routing");
 app.get("*", (req, res) => {
   // Check if the request is for an asset (contains a dot and extension)
@@ -1627,6 +1728,8 @@ app.get("*", (req, res) => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.sendFile(path.join(process.cwd(), "frontend", "dist", "index.html"));
 });
+
+
 
 logger.info("Defining global error handler middleware");
 app.use((err, req, res, next) => {

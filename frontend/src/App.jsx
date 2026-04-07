@@ -19,12 +19,15 @@ import Posts from "./AdminDashboardPages/Posts";
 import CreatePost from "./AdminDashboardPages/CreatePost";
 import EditPost from "./AdminDashboardPages/EditPost";
 import Categories from "./AdminDashboardPages/Categories";
+import Analytics from "./AdminDashboardPages/Analytics";
 import { AuthProvider } from "./Context/AuthContext.jsx";
+import { ThemeProvider } from "./Context/ThemeContext.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 const App = () => {
     return (
-        <AuthProvider>
+        <ThemeProvider>
+            <AuthProvider>
             <Routes>
                 {/* Admin Routes */}
                 <Route path="/login" element={<Login />} />
@@ -33,6 +36,14 @@ const App = () => {
                     element={
                         <ProtectedRoute>
                             <Dashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/analytics"
+                    element={
+                        <ProtectedRoute>
+                            <Analytics />
                         </ProtectedRoute>
                     }
                 />
@@ -108,7 +119,8 @@ const App = () => {
                     }
                 />
             </Routes>
-        </AuthProvider>
+            </AuthProvider>
+        </ThemeProvider>
     );
 };
 

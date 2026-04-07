@@ -186,13 +186,13 @@ const EditPost = () => {
     <Layout title="Edit Post">
       <Toaster richColors position="top-right" />
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
-          <div className="px-6 py-4 bg-[#e94235] text-white">
+        <div className="bg-white dark:bg-[#1a1a1a] shadow-md rounded-lg overflow-hidden transition-colors duration-300">
+          <div className="px-6 py-4 bg-[#e94235] text-white flex justify-between items-center">
             <h3 className="text-lg font-medium">Edit Post</h3>
           </div>
           <div className="p-6 space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Title
               </label>
               <input
@@ -202,7 +202,7 @@ const EditPost = () => {
                   setTitle(e.target.value);
                   clearError("title");
                 }}
-                className={`w-full px-3 py-2 border ${errors.title ? "border-red-500" : "border-gray-300"} rounded-md`}
+                className={`w-full px-4 py-2 bg-white dark:bg-[#242424] border ${errors.title ? "border-red-500" : "border-gray-300 dark:border-gray-700"} rounded-lg text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#e94235]/20 focus:border-[#e94235] transition-all outline-none`}
               />
               {errors.title && (
                 <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -213,7 +213,7 @@ const EditPost = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Author
               </label>
               <input
@@ -223,7 +223,7 @@ const EditPost = () => {
                   setAuthor(e.target.value);
                   clearError("author");
                 }}
-                className={`w-full px-3 py-2 border ${errors.author ? "border-red-500" : "border-gray-300"} rounded-md`}
+                className={`w-full px-4 py-2 bg-white dark:bg-[#242424] border ${errors.author ? "border-red-500" : "border-gray-300 dark:border-gray-700"} rounded-lg text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#e94235]/20 focus:border-[#e94235] transition-all outline-none`}
               />
               {errors.author && (
                 <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -234,49 +234,50 @@ const EditPost = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Excerpt
               </label>
               <textarea
                 value={excerpt}
                 onChange={(e) => setExcerpt(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                rows={3}
+                className="w-full px-4 py-2 bg-white dark:bg-[#242424] border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#e94235]/20 focus:border-[#e94235] transition-all outline-none resize-none"
               />
             </div>
 
             <div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Content
-                </label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Content
+              </label>
+              <div className="rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700">
                 <RichTextEditor
                   value={content}
                   onChange={setContent}
                   uploadImage={uploadImage}
                 />
-                {errors.content && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    <AlertTriangle className="h-4 w-4 mr-1" />
-                    {errors.content}
-                  </p>
-                )}
               </div>
+              {errors.content && (
+                <p className="mt-1 text-sm text-red-600 flex items-center">
+                  <AlertTriangle className="h-4 w-4 mr-1" />
+                  {errors.content}
+                </p>
+              )}
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="bg-white dark:bg-[#1a1a1a] shadow-md rounded-lg overflow-hidden transition-colors duration-300">
             <div className="px-6 py-4 bg-[#e94235] text-white">
               <h3 className="text-lg font-medium">Post Settings</h3>
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
+                <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <Tag className="h-4 w-4 mr-1" /> Category
                 </label>
                 {loadingCategories ? (
-                  <div className="animate-pulse py-2 bg-gray-200 rounded-md"></div>
+                  <div className="animate-pulse h-10 bg-gray-200 dark:bg-gray-800 rounded-md"></div>
                 ) : (
                   <>
                     <select
@@ -285,7 +286,7 @@ const EditPost = () => {
                         setCategory(e.target.value);
                         clearError("category");
                       }}
-                      className={`w-full px-4 py-2 bg-white border ${errors.category ? "border-red-500" : "border-gray-200"} rounded-lg shadow-sm focus:ring-2 focus:ring-[#e94235] focus:border-transparent transition-all outline-none appearance-none cursor-pointer`}
+                      className={`w-full px-4 py-2 bg-white dark:bg-[#242424] border ${errors.category ? "border-red-500" : "border-gray-300 dark:border-gray-700"} rounded-lg text-gray-900 dark:text-gray-100 shadow-sm focus:ring-2 focus:ring-[#e94235]/20 focus:border-[#e94235] transition-all outline-none appearance-none cursor-pointer`}
                       style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundPosition: 'right 0.75rem center', backgroundSize: '1.25rem', backgroundRepeat: 'no-repeat' }}
                       disabled={categories.length === 0}
                     >
@@ -297,11 +298,11 @@ const EditPost = () => {
                       ))}
                     </select>
                     {categories.length === 0 && (
-                      <p className="mt-2 text-sm text-yellow-600">
+                      <p className="mt-2 text-sm text-yellow-600 dark:text-yellow-500">
                         No categories available. Please{" "}
                         <a
                           href="/categories"
-                          className="text-[#e94235] underline"
+                          className="text-[#e94235] underline hover:text-[#d23c30]"
                         >
                           add categories
                         </a>{" "}
@@ -317,11 +318,10 @@ const EditPost = () => {
                   </>
                 )}
               </div>
-
             </div>
           </div>
 
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="bg-white dark:bg-[#1a1a1a] shadow-md rounded-lg overflow-hidden transition-colors duration-300">
             <div className="px-6 py-4 bg-[#e94235] text-white">
               <h3 className="text-lg font-medium">Featured Image</h3>
             </div>
@@ -330,16 +330,22 @@ const EditPost = () => {
                 type="file"
                 accept="image/*"
                 onChange={handleThumbnailChange}
+                className="text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 dark:file:bg-red-900/20 file:text-red-700 dark:file:text-red-400 hover:file:bg-red-100 dark:hover:file:bg-red-900/30 transition-all cursor-pointer"
               />
               {thumbnailPreview && (
-                <img
-                  src={thumbnailPreview || "/default-blog-thumbnail.png"}
-                  className="w-full h-48 object-cover rounded-md"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/default-blog-thumbnail.png";
-                  }}
-                />
+                <div className="relative group mt-4">
+                  <img
+                    src={thumbnailPreview || "/default-blog-thumbnail.png"}
+                    className="w-full h-48 object-cover rounded-lg border border-gray-200 dark:border-gray-800"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/default-blog-thumbnail.png";
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                    <p className="text-white text-sm font-medium">Change Image</p>
+                  </div>
+                </div>
               )}
               {errors.thumbnail && (
                 <p className="mt-2 text-sm text-red-600 flex items-center">
@@ -355,19 +361,23 @@ const EditPost = () => {
           <button
             type="button"
             onClick={() => navigate("/posts")}
-            className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            className="px-6 py-2.5 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting || !isFormValid}
-            className="px-6 py-2.5 bg-[#e94235] text-white rounded-lg hover:bg-[#d23c30] transition-colors font-medium shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-8 py-2.5 bg-[#e94235] text-white rounded-lg hover:bg-[#d23c30] transition-all font-medium shadow-md shadow-red-500/20 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
-              <Loader2 className="animate-spin h-5 w-5" />
-            ) : null}
-            {isSubmitting ? "Updating..." : "Update Post"}
+              <>
+                <Loader2 className="animate-spin h-5 w-5" />
+                Updating...
+              </>
+            ) : (
+              "Update Post"
+            )}
           </button>
         </div>
       </form>

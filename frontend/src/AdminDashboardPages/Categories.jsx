@@ -113,7 +113,7 @@ const Categories = () => {
   return (
     <Layout title="Manage Categories">
       <div className="mb-6 flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-800">Blog Categories</h2>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Blog Categories</h2>
         <button
           onClick={startAddingCategory}
           className="inline-flex items-center px-4 py-2 bg-[#e94235] text-white rounded-lg hover:bg-[#d23c30] transition-colors duration-300"
@@ -123,32 +123,32 @@ const Categories = () => {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white dark:bg-[#1a1a1a] rounded-lg shadow overflow-hidden transition-colors duration-300">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+            <thead className="bg-gray-50 dark:bg-[#141414]">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Name
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Description
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Post Count
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-[#1a1a1a] divide-y divide-gray-200 dark:divide-gray-800">
               {isAdding && (
-                <tr className="bg-blue-50">
+                <tr className="bg-blue-50/50 dark:bg-blue-900/10">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]"
+                      className="w-full px-3 py-2 bg-white dark:bg-[#242424] border border-gray-300 dark:border-gray-700 rounded-md text-gray-900 dark:text-gray-100 focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]"
                       placeholder="Category name"
                       value={newCategory.name}
                       onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
@@ -157,27 +157,27 @@ const Categories = () => {
                   <td className="px-6 py-4">
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]"
+                      className="w-full px-3 py-2 bg-white dark:bg-[#242424] border border-gray-300 dark:border-gray-700 rounded-md text-gray-900 dark:text-gray-100 focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]"
                       placeholder="Category description"
                       value={newCategory.description}
                       onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
                     />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-500">
                     0
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end space-x-2">
                       <button
                         onClick={addCategory}
-                        className="text-green-600 hover:text-green-800 p-1"
+                        className="text-green-600 dark:text-green-500 hover:text-green-800 dark:hover:text-green-400 p-1"
                         disabled={!newCategory.name.trim()}
                       >
                         <Save className="h-5 w-5" />
                       </button>
                       <button
                         onClick={cancelAddingCategory}
-                        className="text-gray-600 hover:text-gray-800 p-1"
+                        className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 p-1"
                       >
                         <X className="h-5 w-5" />
                       </button>
@@ -187,19 +187,19 @@ const Categories = () => {
               )}
 
               {categories.map((category) => (
-                <tr key={category.id} className="hover:bg-gray-50">
+                <tr key={category.id} className="hover:bg-gray-50 dark:hover:bg-[#242424] transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     {editingId === category.id ? (
                       <input
                         type="text"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]"
+                        className="w-full px-3 py-2 bg-white dark:bg-[#242424] border border-gray-300 dark:border-gray-700 rounded-md text-gray-900 dark:text-gray-100 focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]"
                         value={editedCategory.name}
                         onChange={(e) => setEditedCategory({ ...editedCategory, name: e.target.value })}
                       />
                     ) : (
                       <div className="flex items-center">
                         <Tag className="h-5 w-5 mr-2 text-[#e94235]" />
-                        <span className="font-medium text-gray-900">{category.name}</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{category.name}</span>
                       </div>
                     )}
                   </td>
@@ -207,16 +207,16 @@ const Categories = () => {
                     {editingId === category.id ? (
                       <input
                         type="text"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]"
+                        className="w-full px-3 py-2 bg-white dark:bg-[#242424] border border-gray-300 dark:border-gray-700 rounded-md text-gray-900 dark:text-gray-100 focus:outline-none focus:ring focus:ring-[#e94235]/20 focus:border-[#e94235]"
                         value={editedCategory.description}
                         onChange={(e) => setEditedCategory({ ...editedCategory, description: e.target.value })}
                       />
                     ) : (
-                      <span className="text-sm text-gray-700">{category.description}</span>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{category.description}</span>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300">
                       {category.postCount || 0} posts
                     </span>
                   </td>
@@ -225,14 +225,14 @@ const Categories = () => {
                       <div className="flex items-center justify-end space-x-2">
                         <button
                           onClick={() => saveEdit(category.id)}
-                          className="text-green-600 hover:text-green-800 p-1"
+                          className="text-green-600 dark:text-green-500 hover:text-green-800 dark:hover:text-green-400 p-1"
                           disabled={!editedCategory.name.trim()}
                         >
                           <Save className="h-5 w-5" />
                         </button>
                         <button
                           onClick={cancelEditing}
-                          className="text-gray-600 hover:text-gray-800 p-1"
+                          className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 p-1"
                         >
                           <X className="h-5 w-5" />
                         </button>
@@ -241,13 +241,13 @@ const Categories = () => {
                       <div className="flex items-center justify-end space-x-2">
                         <button
                           onClick={() => startEditing(category)}
-                          className="text-blue-600 hover:text-blue-800 p-1"
+                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 p-1"
                         >
                           <Edit2 className="h-5 w-5" />
                         </button>
                         <button
                           onClick={() => deleteCategory(category.id)}
-                          className="text-red-600 hover:text-red-800 p-1"
+                          className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 p-1"
                           disabled={category.postCount > 0}
                         >
                           <Trash2 className="h-5 w-5" />
@@ -260,7 +260,7 @@ const Categories = () => {
 
               {categories.length === 0 && !isAdding && !loading && (
                 <tr>
-                  <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan={4} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                     No categories found. Click "Add Category" to create one.
                   </td>
                 </tr>
@@ -270,7 +270,7 @@ const Categories = () => {
         </div>
       </div>
 
-      <div className="mt-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+      <div className="mt-6 bg-blue-50 dark:bg-blue-950/20 border-l-4 border-blue-500 p-4 rounded transition-colors duration-300">
         <div className="flex">
           <div className="flex-shrink-0">
             <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
@@ -278,7 +278,7 @@ const Categories = () => {
             </svg>
           </div>
           <div className="ml-3">
-            <p className="text-sm text-blue-700">
+            <p className="text-sm text-blue-700 dark:text-blue-400">
               Categories with posts cannot be deleted. You must first reassign or delete all posts in that category.
             </p>
           </div>
