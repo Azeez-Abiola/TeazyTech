@@ -638,10 +638,9 @@ logger.info("Defining /api/admin/posts GET route");
 app.get("/api/admin/posts", async (req, res, next) => {
   logger.info("Received request for all admin posts");
   try {
-    logger.debug("Fetching all posts, ordered by created_at");
+    logger.debug("Fetching all posts to sort by display date");
     const postsSnapshot = await db
       .collection("posts")
-      .orderBy("created_at", "desc")
       .get();
     logger.info("Posts snapshot fetched successfully", {
       count: postsSnapshot.size,
@@ -704,8 +703,12 @@ app.get("/api/admin/posts", async (req, res, next) => {
         ...data,
         published_date: formattedDate,
         timeAgo,
+        _sortDate: publishedDate ? publishedDate.getTime() : 0,
       };
     });
+
+    posts.sort((a, b) => b._sortDate - a._sortDate);
+    posts.forEach(p => delete p._sortDate);
 
     logger.info("Returning all posts data");
     return res.json(posts);
@@ -738,20 +741,15 @@ app.get("/api/admin/posts/pagination", async (req, res, next) => {
     const totalCount = totalCountSnapshot.size;
     logger.trace("Total post count fetched", { totalCount });
 
-    logger.debug("Fetching paginated posts from Firestore");
-    const postsSnapshot = await db
-      .collection("posts")
-      .orderBy("created_at", "desc")
-      .offset(offset)
-      .limit(limit)
-      .get();
+    logger.debug("Reusing snapshot to paginate in memory");
+    const postsSnapshot = totalCountSnapshot;
 
     logger.info("Paginated posts fetched successfully", {
       count: postsSnapshot.size,
     });
 
     logger.debug("Mapping and formatting paginated post data");
-    const posts = postsSnapshot.docs.map((doc) => {
+    let allPosts = postsSnapshot.docs.map((doc) => {
       const data = doc.data();
       logger.trace("Processing paginated post", { id: doc.id });
       
@@ -807,8 +805,14 @@ app.get("/api/admin/posts/pagination", async (req, res, next) => {
         ...data,
         published_date: formattedDate,
         timeAgo,
+        _sortDate: publishedDate ? publishedDate.getTime() : 0,
       };
     });
+
+    allPosts.sort((a, b) => b._sortDate - a._sortDate);
+    allPosts.forEach(p => delete p._sortDate);
+    
+    const posts = allPosts.slice(offset, offset + limit);
 
     const totalPages = Math.ceil(totalCount / limit);
     logger.info("Returning paginated results", {
