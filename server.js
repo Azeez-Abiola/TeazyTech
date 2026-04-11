@@ -634,6 +634,30 @@ app.post(
   },
 );
 
+// Helper: robustly parse a date from Firestore data (handles Timestamp, ISO string, formatted string, or seconds)
+function parseFirestoreDate(field) {
+  if (!field) return null;
+  // Firestore Timestamp object
+  if (typeof field.toDate === 'function') return field.toDate();
+  // Plain object with _seconds (serialized Timestamp)
+  if (typeof field === 'object' && field._seconds != null) return new Date(field._seconds * 1000);
+  // Number (epoch ms or seconds)
+  if (typeof field === 'number') return new Date(field > 1e12 ? field : field * 1000);
+  // String (ISO or human-readable)
+  if (typeof field === 'string') {
+    const d = new Date(field);
+    if (!isNaN(d.getTime())) return d;
+  }
+  return null;
+}
+
+function resolvePostDate(data) {
+  return parseFirestoreDate(data.published_date)
+    || parseFirestoreDate(data.updated_at)
+    || parseFirestoreDate(data.created_at)
+    || null;
+}
+
 logger.info("Defining /api/admin/posts GET route");
 app.get("/api/admin/posts", async (req, res, next) => {
   logger.info("Received request for all admin posts");
@@ -651,15 +675,8 @@ app.get("/api/admin/posts", async (req, res, next) => {
       const data = doc.data();
       logger.trace("Processing post data", { id: doc.id });
       
-      // Prioritize published_date (handle Timestamp or string), then fallback
-      let publishedDate = null;
-      if (data.published_date) {
-        publishedDate = typeof data.published_date.toDate === 'function' 
-          ? data.published_date.toDate() 
-          : new Date(data.published_date);
-      } else {
-        publishedDate = data.updated_at?.toDate?.() || data.created_at?.toDate?.() || null;
-      }
+      const publishedDate = resolvePostDate(data);
+      const sortDate = publishedDate ? publishedDate.getTime() : 0;
       const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 
       const getTimeUnit = (seconds) => {
@@ -703,7 +720,7 @@ app.get("/api/admin/posts", async (req, res, next) => {
         ...data,
         published_date: formattedDate,
         timeAgo,
-        _sortDate: publishedDate ? publishedDate.getTime() : 0,
+        _sortDate: sortDate,
       };
     });
 
@@ -753,14 +770,8 @@ app.get("/api/admin/posts/pagination", async (req, res, next) => {
       const data = doc.data();
       logger.trace("Processing paginated post", { id: doc.id });
       
-      let publishedDate = null;
-      if (data.published_date) {
-        publishedDate = typeof data.published_date.toDate === 'function' 
-          ? data.published_date.toDate() 
-          : new Date(data.published_date);
-      } else {
-        publishedDate = data.updated_at?.toDate?.() || data.created_at?.toDate?.() || null;
-      }
+      const publishedDate = resolvePostDate(data);
+      const sortDate = publishedDate ? publishedDate.getTime() : 0;
 
       const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 
@@ -805,7 +816,7 @@ app.get("/api/admin/posts/pagination", async (req, res, next) => {
         ...data,
         published_date: formattedDate,
         timeAgo,
-        _sortDate: publishedDate ? publishedDate.getTime() : 0,
+        _sortDate: sortDate,
       };
     });
 
@@ -860,18 +871,11 @@ app.get("/api/admin/posts/:postId", async (req, res, next) => {
     const postData = postDoc.data();
     logger.debug("Post data retrieved");
 
-    let publishedDate = null;
-    if (postData.published_date) {
-      publishedDate = typeof postData.published_date.toDate === 'function' 
-        ? postData.published_date.toDate() 
-        : new Date(postData.published_date);
-    } else {
-      publishedDate = postData.updated_at?.toDate?.() || postData.created_at?.toDate?.() || null;
-    }
+    const publishedDate = resolvePostDate(postData);
 
     let formattedDate = "Date not available";
 
-    if (publishedDate && !isNaN(publishedDate.getTime())) {
+    if (publishedDate) {
       logger.trace("Formatting post date");
       try {
         formattedDate = new Intl.DateTimeFormat("en-GB", {
@@ -1663,20 +1667,13 @@ app.get("/api/admin/analytics", async (req, res, next) => {
       const cat = data.category || "Uncategorized";
       categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
 
-      let publishedDate = null;
-      if (data.published_date) {
-        publishedDate = typeof data.published_date.toDate === 'function' 
-          ? data.published_date.toDate() 
-          : new Date(data.published_date);
-      } else {
-        publishedDate = data.updated_at?.toDate?.() || data.created_at?.toDate?.() || null;
-      }
-      
-      posts.push({ 
-        id: doc.id, 
-        title: data.title, 
-        views: postViews, 
-        category: data.category, 
+      const publishedDate = resolvePostDate(data);
+
+      posts.push({
+        id: doc.id,
+        title: data.title,
+        views: postViews,
+        category: data.category,
         author: data.author,
         published_date: publishedDate ? publishedDate.toISOString() : null
       });

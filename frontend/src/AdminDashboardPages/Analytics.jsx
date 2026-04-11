@@ -235,7 +235,7 @@ const Analytics = () => {
                         <span className="flex items-center justify-center h-6 w-6 rounded-full bg-gray-100 dark:bg-gray-800 text-xs font-bold text-gray-500 dark:text-gray-400">
                           {index + 1}
                         </span>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[200px] sm:max-w-xs ring-offset-background transition-colors hover:text-[#e94235] cursor-pointer">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[200px] sm:max-w-xs transition-colors hover:text-[#e94235] cursor-pointer">
                           {post.title}
                         </p>
                       </div>

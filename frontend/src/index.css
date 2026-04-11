@@ -41,6 +41,11 @@ body {
   line-height: 1.6;
 }
 
+.dark body {
+  background-color: #121212;
+  color: #ffffff;
+}
+
 /* Ensure all containers don't exceed viewport width */
 * {
   max-width: 100%;

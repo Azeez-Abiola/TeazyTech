@@ -41,10 +41,8 @@
         const theme = localStorage.getItem('theme');
         if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
           document.documentElement.classList.add('dark');
-          document.documentElement.style.backgroundColor = '#121212';
         } else {
           document.documentElement.classList.remove('dark');
-          document.documentElement.style.backgroundColor = '#ffffff';
         }
       })();
     </script>
