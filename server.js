@@ -638,10 +638,10 @@ logger.info("Defining /api/admin/posts GET route");
 app.get("/api/admin/posts", async (req, res, next) => {
   logger.info("Received request for all admin posts");
   try {
-    logger.debug("Fetching all posts, ordered by updated_at");
+    logger.debug("Fetching all posts, ordered by created_at");
     const postsSnapshot = await db
       .collection("posts")
-      .orderBy("updated_at", "desc")
+      .orderBy("created_at", "desc")
       .get();
     logger.info("Posts snapshot fetched successfully", {
       count: postsSnapshot.size,
@@ -741,7 +741,7 @@ app.get("/api/admin/posts/pagination", async (req, res, next) => {
     logger.debug("Fetching paginated posts from Firestore");
     const postsSnapshot = await db
       .collection("posts")
-      .orderBy("updated_at", "desc")
+      .orderBy("created_at", "desc")
       .offset(offset)
       .limit(limit)
       .get();
