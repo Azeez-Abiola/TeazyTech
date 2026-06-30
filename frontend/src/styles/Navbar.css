@@ -1,7 +1,7 @@
 :root {
   --primary-blue: #2F6FCC;
   --primary-dark-blue: #233463;
-  --bg-color: #fff;
+  --bg-color: rgba(255, 255, 255);
   --text-color: #343a40;
   --menu-bg: #f8faff;
   --navbar-height: 80px;
@@ -12,13 +12,18 @@
 .navbar {
   position: fixed;
   top: 0;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   width: 100%;
   height: var(--navbar-height);
-  background-color: var(--bg-color);
+  /* background-color: var(--bg-color); */
   z-index: 1000;
   transition: all var(--transition-speed) ease;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); */
+  /* margin: 20px 0px; */
+  /* border-radius: 40px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px); */
 }
 
 .navbar-scrolled {
@@ -31,7 +36,7 @@
   align-items: center;
   justify-content: space-between;
   height: 100%;
-  padding: 0 1.5rem;
+  /* padding: 0 1.5rem; */
 }
 
 .navbar-logo {
@@ -89,6 +94,7 @@
   display: flex;
   align-items: center;
   height: 100%;
+  
 }
 
 .navbar-menu-header,
@@ -114,42 +120,21 @@
   align-items: center;
   color: var(--primary-blue);
   text-decoration: none;
-  font-weight: 700;
+  font-weight: 300;
   transition: color 0.2s ease;
-  padding: 0.5rem 0;
+  padding: 0.3rem 0.8rem;
+  font-size: 13px;
 }
 
 .nav-links li.active a,
 .nav-links li a:hover {
-  color: var(--primary-dark-blue);
+  color:#e1edff;
 }
 
-.nav-links li.active::after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background-color: var(--primary-blue);
-  border-radius: 3px;
-  transform: scaleX(1);
-  transform-origin: left;
-  transition: transform 0.3s ease;
-}
-
-.nav-links li::after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background-color: var(--primary-blue);
-  border-radius: 3px;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s ease;
+.nav-links li.active {
+  background-color: var(--primary-dark-blue);
+  /* padding: 0px 12px; */
+  border-radius: 20px;
 }
 
 .nav-links li:hover::after {

@@ -1,13 +1,12 @@
 import React from 'react'
 
-
 const FeaturesSection = () => {
   return (
     <section className="section features-section">
       <div className="container">
-        <div className="section-header text-center">
-          <h2>Why Choose Teazy Tech</h2>
-          <p>What sets our educational technology services apart</p>
+        <div className="text-center">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-blue-400">Why Choose Teazy Tech</h2>
+          <p className="mt-3 font-display text-3xl font-bold text-brand tracking-tight font-font md:text-2xl">What sets our educational technology services apart</p>
         </div>
         <div className="features-grid">
           <div className="feature-card">
