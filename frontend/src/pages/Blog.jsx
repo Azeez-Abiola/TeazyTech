@@ -5,16 +5,16 @@ import Logo from "../components/Logo";
 import "../styles/Blog.css";
 
 const Blog = () => {
-  const [blogPosts, setBlogPosts] = useState([])
-  const [categories, setCategories] = useState(["All Categories"])
-  const [loading, setLoading] = useState(true)
-  const [selectedCategory, setSelectedCategory] = useState("All Categories")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [totalPosts, setTotalPosts] = useState(0)
-  const postsPerPage = 10
-  const navigate = useNavigate()
+  const [blogPosts, setBlogPosts] = useState([]);
+  const [categories, setCategories] = useState(["All Categories"]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState("All Categories");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalPosts, setTotalPosts] = useState(0);
+  const postsPerPage = 10;
+  const navigate = useNavigate();
 
   const fetchPosts = async (page = 1) => {
     setLoading(true);
@@ -329,6 +329,7 @@ const Blog = () => {
         </div>
       </section>
     </div>
+  
   );
 };
 
