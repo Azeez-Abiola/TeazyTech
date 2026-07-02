@@ -28,6 +28,7 @@
 
 .navbar-scrolled {
   height: calc(var(--navbar-height) - 10px);
+  background-color: var(--bg-color);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
@@ -118,12 +119,12 @@
 .nav-links li a {
   display: flex;
   align-items: center;
-  color: var(--primary-blue);
+  /* color: white; */
   text-decoration: none;
   font-weight: 300;
   transition: color 0.2s ease;
   padding: 0.3rem 0.8rem;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .nav-links li.active a,
@@ -132,7 +133,7 @@
 }
 
 .nav-links li.active {
-  background-color: var(--primary-dark-blue);
+  background-color: #2F6FCC;
   /* padding: 0px 12px; */
   border-radius: 20px;
 }

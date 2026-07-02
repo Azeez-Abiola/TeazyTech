@@ -24,7 +24,7 @@ const ServicesPreview = () => {
 //   }, []);
   return (
    <section>
-      <div className="container-page section-y p-20 !bg-[#f8faff]">
+      <div className="container-page border-t border-[#2F6FCC]/10 section-y p-20 !bg-[#f8faff]">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-wider text-brand">

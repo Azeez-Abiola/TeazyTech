@@ -91,20 +91,20 @@
 }
 
 .hero-heading {
-  font-size: 2rem;
+  font-size: 2.5rem;
   line-height: 1.2;
   margin-bottom: 0.5rem;
   text-align: center;
   color: var(--primary-dark-blue);
   font-weight: 800;
   animation: fadeInLeft 0.8s ease 0.3s both;
-  background: linear-gradient(90deg, var(--primary-blue), var(--brand));
+  /* background: linear-gradient(90deg, var(--primary-blue), var(--brand));
 
   -webkit-background-clip: text;
   background-clip: text;
 
   -webkit-text-fill-color: transparent;
-  color: transparent;
+  color: transparent; */
   font-family:
     "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans",
     Arial, sans-serif;
@@ -254,7 +254,6 @@
   );
   animation: float 18s ease-in-out infinite reverse;
 }
-
 .hero-shape-3 {
   width: 100px;
   height: 100px;
@@ -499,6 +498,7 @@
   max-width: 100%;
 }
 
+
 .section-header {
   margin-bottom: 3rem;
 }
@@ -613,7 +613,7 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 .service{
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-family: var(--font-family);
 }
 .service-card img {
   width: 100%;

@@ -59,7 +59,7 @@ const Navbar = () => {
 
   return (
     <header
-      className={`navbar !b-transparent ${scrolled ? "navbar-scrolled" : ""} ${isMenuOpen ? "menu-open" : ""}`}
+      className={`navbar ${scrolled ? "navbar-scrolled" : ""} ${isMenuOpen ? "menu-open" : ""}`}
     >
       <div className="md:px-20 navbar-container">
         <div className="navbar-logo">
@@ -120,7 +120,7 @@ const Navbar = () => {
             </button>
           </div>
 
-          <nav className="nav-links">
+          <nav className={`nav-links ${scrolled ? "!text-brand" : "text-white"}`}>
             <ul>
               <li className={location.pathname === "/" ? "active" : ""}>
                 <Link to="/">
@@ -209,7 +209,7 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-        <button className="bg-brand rounded-[30px] px-4 py-2 text-sm">
+        <button className="bg-[#2F6FCC] rounded-[30px] px-4 py-2 text-sm">
           Contact us
         </button>
       </div>

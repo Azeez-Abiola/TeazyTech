@@ -1,60 +1,97 @@
-import React from 'react'
+import React from "react";
+import BorderGlow from "../ui/BorderGlow"
+
+export const features = [
+  {
+    title: "Expert Educators",
+    description:
+      "Our team combines decades of classroom experience with technical expertise",
+    icon: "fas fa-graduation-cap",
+    iconColor: "var(--primary-blue)",
+    backgroundColor: "rgba(47, 111, 204, 0.1)",
+  },
+  {
+    title: "Teacher-Centered Approach",
+    description: "Solutions designed with real teaching challenges in mind",
+    icon: "fas fa-hand-holding-heart",
+    iconColor: "var(--secondary-teal)",
+    backgroundColor: "rgba(68, 187, 164, 0.1)",
+  },
+  {
+    title: "Practical Applications",
+    description:
+      "Focus on implementable strategies that work in real classrooms",
+    icon: "fas fa-tools",
+    iconColor: "var(--secondary-red)",
+    backgroundColor: "rgba(233, 79, 55, 0.1)",
+  },
+  {
+    title: "Ongoing Support",
+    description:
+      "We don't just train and leave - we partner with you for continued success",
+    icon: "fas fa-sync-alt",
+    iconColor: "var(--accent-orange)",
+    backgroundColor: "rgba(243, 160, 77, 0.1)",
+  },
+  {
+    title: "Customized Solutions",
+    description:
+      "Programs tailored to your specific school, subject, and student needs",
+    icon: "fas fa-users",
+    iconColor: "var(--primary-dark-blue)",
+    backgroundColor: "rgba(35, 52, 99, 0.1)",
+  },
+  {
+    title: "Comprehensive Resources",
+    description: "Access to a wide range of tools, templates, and materials",
+    icon: "fas fa-puzzle-piece",
+    iconColor: "var(--accent-purple)",
+    backgroundColor: "rgba(157, 108, 198, 0.1)",
+  },
+];
 
 const FeaturesSection = () => {
   return (
     <section className="section features-section">
       <div className="container">
-        <div className="text-center">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-blue-400">Why Choose Teazy Tech</h2>
-          <p className="mt-3 font-display text-3xl font-bold text-brand tracking-tight font-font md:text-2xl">What sets our educational technology services apart</p>
+        <div className="text-left feature-text">
+          <div className="w-[100%] flex mx-auto h-[1px] bg-gradient-to-r from-brand mb-4 via-white to-brand"></div>
+
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-blue-400">
+            Why Choose Teazy Tech
+          </h2>
+          <p className="mt-3 font-display text-3xl font-bold text-black tracking-tight font-font md:text-2xl">
+            What sets our educational technology services apart
+          </p>
         </div>
         <div className="features-grid">
-          <div className="feature-card">
-            <div className="feature-icon" style={{ backgroundColor: "rgba(47, 111, 204, 0.1)" }}>
-              <i className="fas fa-graduation-cap" style={{ color: "var(--primary-blue)" }}></i>
-            </div>
-            <h3>Expert Educators</h3>
-            <p>Our team combines decades of classroom experience with technical expertise</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon" style={{ backgroundColor: "rgba(68, 187, 164, 0.1)" }}>
-              <i className="fas fa-hand-holding-heart" style={{ color: "var(--secondary-teal)" }}></i>
-            </div>
-            <h3>Teacher-Centered Approach</h3>
-            <p>Solutions designed with real teaching challenges in mind</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon" style={{ backgroundColor: "rgba(233, 79, 55, 0.1)" }}>
-              <i className="fas fa-tools" style={{ color: "var(--secondary-red)" }}></i>
-            </div>
-            <h3>Practical Applications</h3>
-            <p>Focus on implementable strategies that work in real classrooms</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon" style={{ backgroundColor: "rgba(243, 160, 77, 0.1)" }}>
-              <i className="fas fa-sync-alt" style={{ color: "var(--accent-orange)" }}></i>
-            </div>
-            <h3>Ongoing Support</h3>
-            <p>We don't just train and leave - we partner with you for continued success</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon" style={{ backgroundColor: "rgba(35, 52, 99, 0.1)" }}>
-              <i className="fas fa-users" style={{ color: "var(--primary-dark-blue)" }}></i>
-            </div>
-            <h3>Customized Solutions</h3>
-            <p>Programs tailored to your specific school, subject, and student needs</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon" style={{ backgroundColor: "rgba(157, 108, 198, 0.1)" }}>
-              <i className="fas fa-puzzle-piece" style={{ color: "var(--accent-purple)" }}></i>
-            </div>
-            <h3>Comprehensive Resources</h3>
-            <p>Access to a wide range of tools, templates, and materials</p>
-          </div>
+          {features.map((feature, index) => (
+              <div
+                key={index}
+                className="bg-gray-100 border rounded-[20px] p-10 h-[400px] flex flex-col justify-between shadow"
+              >
+                <div className="">
+                  <div
+                    className="feature-icon"
+                    // style={{ backgroundColor: feature.backgroundColor }}
+                  >
+                    <i
+                      className={feature.icon}
+                      style={{ color: feature.iconColor }}
+                    ></i>
+                  </div>
+                  <div className="w-[50%] h-[1px] bg-gradient-to-r from-brand mb-4 to-white"></div>
+                </div>
+                <div className="">
+                  <h3 className="text-[#0e0042]">{feature.title}</h3>
+                  <p className="text-gray-500">{feature.description}</p>
+                </div>
+              </div>
+          ))}
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default FeaturesSection 
+export default FeaturesSection;
