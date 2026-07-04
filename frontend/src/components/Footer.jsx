@@ -83,7 +83,7 @@ const Footer = () => {
           {[...Array(8)].map((_, i) => (
             <span
               key={i}
-              className="mx-8 text-8xl font-bold text-brand uppercase font-orbitron"
+              className="mx-8 text-8xl font-bold flex-nowrap text-brand uppercase font-orbitron"
             >
              TEAZY TECH
             </span>

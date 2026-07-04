@@ -355,7 +355,7 @@ const Services = () => {
             {/* Slider */}
             <div className="overflow-hidden">
               <div
-                className="flex transition-transform duration-500 ease-in-out"
+                className="!flex !flex-nowrap transition-transform duration-500 ease-in-out"
                 style={{
                   transform: `translateX(-${currentTestimonial * 100}%)`,
                 }}
