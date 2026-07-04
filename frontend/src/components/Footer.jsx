@@ -79,11 +79,11 @@ const Footer = () => {
         </div>
       </div>
       <div className="overflow-hidden whitespace-nowrap -mb-24 py-6">
-        <div className="flex w-max animate-marquee">
+        <div className="!flex !flex-nowrap w-max animate-marquee">
           {[...Array(8)].map((_, i) => (
             <span
               key={i}
-              className="mx-8 text-8xl font-bold flex-nowrap text-brand uppercase font-orbitron"
+              className="mx-8 text-8xl font-bold  text-brand uppercase font-orbitron"
             >
              TEAZY TECH
             </span>

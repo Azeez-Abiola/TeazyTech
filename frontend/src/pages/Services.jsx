@@ -330,7 +330,7 @@ const Services = () => {
       </section>
 
       {/* Testimonials */}
-      <div className="relative z-10 mx-auto flex min-h-fit max-w-7xl items-center px-5 py-16 lg:px-10">
+      <div className="relative z-10 mx-auto flex min-h-fit max-w-7xl items-center px-0 py-16 lg:px-10">
         <div className="grid w-full items-center gap-10 lg:grid-cols-2">
           {/* LEFT */}
           <div className="text-brand text-center lg:text-left">
@@ -347,7 +347,7 @@ const Services = () => {
           {/* RIGHT */}
 
           <div
-            className="rounded-3xl border border-white/20 bg-white/10 backdrop-blur-xl"
+            className="rounded-3xl border border-white/20 bg-gray-200/10 backdrop-blur-xl"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
