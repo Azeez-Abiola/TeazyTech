@@ -150,7 +150,7 @@ const Gallery = () => {
   return (
     <main className="gallery-page">
       {/* ================= HERO ================= */}
-      <div style={{ height: "100vh", position: "relative", backgroundColor: "#849abb" }}>
+      <div className="lg:flex hidden" style={{ height: "100vh", position: "relative", backgroundColor: "#849abb" }}>
         <CircularGallery
           bend={1}
           textColor="#000000"

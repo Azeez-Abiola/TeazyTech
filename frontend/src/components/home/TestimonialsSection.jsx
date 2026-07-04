@@ -93,7 +93,7 @@ export default function TestimonialsSection(place) {
   };
 
   return (
-    <section className="relative overflow-hidden min-h-screen">
+    <section className="relative overflow-hidden">
       {/* Background */}
 
       {/* {place !== "services" && } */}
@@ -108,11 +108,11 @@ export default function TestimonialsSection(place) {
 
       {/* Content */}
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl items-center px-5 py-16 lg:px-10">
+      <div className="relative z-10 mx-auto flex min-h-[60vh] w-full lg:max-w-7xl items-center px-0 py-16 lg:px-10">
         <div className="grid w-full items-center gap-10 lg:grid-cols-2">
           {/* LEFT */}
 
-          <div className="text-white text-center lg:text-left">
+          <div className="text-white p-4 lg:p-0 text-center lg:text-left">
             <p className="uppercase tracking-[0.3em] text-sm text-white/70">
               Testimonials
             </p>
@@ -137,15 +137,15 @@ export default function TestimonialsSection(place) {
           >
             {/* Slider */}
 
-            <div className="overflow-hidden">
+            <div className="overflow-hidden flex-nowrap">
               <div
-                className="flex transition-transform duration-500 ease-in-out"
+                className="!flex !flex-nowrap transition-transform duration-500 ease-in-out"
                 style={{
                   transform: `translateX(-${currentTestimonial * 100}%)`,
                 }}
               >
                 {testimonials.map((item, index) => (
-                  <div key={index} className="w-full shrink-0 px-5 py-6 sm:p-8">
+                  <div key={index} className="w-full basis-full shrink-0 grow-0 px-5 py-6 sm:p-8">
                     <div className="flex flex-col gap-6">
                       <div className="flex items-center gap-4">
                         <img

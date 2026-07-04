@@ -1,5 +1,6 @@
 import React from "react";
 import BorderGlow from "../ui/BorderGlow"
+import 'animate.css';
 
 export const features = [
   {
@@ -68,7 +69,7 @@ const FeaturesSection = () => {
           {features.map((feature, index) => (
               <div
                 key={index}
-                className="bg-gray-100 border rounded-[20px] p-10 h-[400px] flex flex-col justify-between shadow"
+                className={`animate__animated animate__fadeInDown bg-gray-100 border rounded-[20px] p-10 h-[300px] lg:h-[400px] flex flex-col !gap-4 shadow`}
               >
                 <div className="">
                   <div
