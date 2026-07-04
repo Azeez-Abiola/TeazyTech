@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../styles/Services.css";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { FaPlus, FaMinus, FaCheck } from "react-icons/fa";
-import TestimonialsSection from "../components/home/TestimonialsSection";
+import { motion, AnimatePresence } from "framer-motion";
 
 const faqs = [
   {
@@ -106,19 +107,137 @@ const services = [
     ],
   },
 ];
+
+const bgImages = [
+  'url("/images/Gallery Kaduna Training/IMG_5706.jpg")',
+  'url("/images/Gallery Kaduna Training/IMG_5756.jpg")',
+  'url("/images/Gallery Kaduna Training/IMG_5799.jpg")',
+];
+
+const testimonials = [
+  {
+    name: "Abimbola Abiodun",
+    title: "Maths Teacher",
+    src: "/images/Teazy tech teachers/abimbola adiodun akanbi.jpg",
+    description:
+      "Teazy Tech has really helped me in my online teaching. Teazy Tech always sends some really amazing EdTech tools like Photomath that I never knew existed. The community is so engaging, and we're always sent resources to ease our work for free.",
+  },
+  {
+    name: "Wua Msughve Issac",
+    title: "Teacher",
+    src: "/images/Teazy tech teachers/wua msughve issac.jpg",
+    description:
+      "Teazytech has become a quick go to platform for me, the short demos and introduction of important edtch tools that I never knew existed before now has made my work better as an educator. Teazy tech absolutely qualifies for every passionate teacher's companion. The demos and illustration videos are short and easy guides even for teachers that have no prior EdTech experience. With teazy tech I've come to appreciate that EdTech isn't as far fetched as I thought.",
+  },
+  {
+    name: "Florence Imhande",
+    title: "Teacher",
+    src: "/images/Teazy tech teachers/Florence imhande.jpg",
+    description:
+      "I am now a Canva 'Guru' in my school thanks to Teazy tech training a while back. I'm able to develop any resource for my lesson that I'm not able to find online myself and I'm working on creating my portfolio because I'm hoping to sell some of the educational resources I've been developing online. I'm sure it will be useful to others as well. Thanks so very much.",
+  },
+];
+const minSwipeDistance = 50;
+
+const processSteps = [
+  {
+    id: "01",
+    title: "Assessment",
+    desc: "We evaluate your current teaching environment, technology infrastructure, and learning objectives to identify opportunities for improvement.",
+  },
+  {
+    id: "02",
+    title: "Planning",
+    desc: "We design a customized implementation strategy tailored to your school's goals, budget, and timeline.",
+  },
+  {
+    id: "03",
+    title: "Implementation",
+    desc: "Through practical workshops and guided support, we introduce tools and workflows that teachers can immediately apply.",
+  },
+  {
+    id: "04",
+    title: "Support",
+    desc: "Our team stays with you after implementation to answer questions, provide coaching, and ensure long-term success.",
+  },
+  {
+    id: "05",
+    title: "Evaluation",
+    desc: "We monitor outcomes, gather feedback, and continuously refine the strategy to maximize classroom impact.",
+  },
+];
+
 const Services = () => {
   useEffect(() => {
     window.scroll({ top: 0, left: 0, behaviour: "smooth" });
+
+    const timer = setInterval(() => {
+      setCurrentBg((prev) => (prev + 1) % bgImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
   }, []);
 
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
   const [open, setOpen] = useState(0);
+  const [currentBg, setCurrentBg] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      nextTestimonial();
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, [currentTestimonial]);
+
+  const nextTestimonial = () => {
+    setCurrentTestimonial((prev) =>
+      prev === testimonials.length - 1 ? 0 : prev + 1,
+    );
+  };
+
+  const prevTestimonial = () => {
+    setCurrentTestimonial((prev) =>
+      prev === 0 ? testimonials.length - 1 : prev - 1,
+    );
+  };
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+
+    if (distance > minSwipeDistance) nextTestimonial();
+
+    if (distance < -minSwipeDistance) prevTestimonial();
+  };
+
   return (
     <div className="services-page">
       {/* Services Overview */}
       <section className="services-overview">
         <div className="services-overview-overlay"></div>
+        <div className="hero-bg-container">
+          {bgImages.map((bg, index) => (
+            <div
+              key={index}
+              className={`hero-bg-slide ${index === currentBg ? "active" : ""}`}
+              style={{ backgroundImage: bg }}
+            />
+          ))}
+        </div>
 
-        <div className="container">
+        <div className="container hero-content">
           <div className="services-overview-content">
             <span className="overview-badge">
               Empowering Educators Worldwide
@@ -140,7 +259,10 @@ const Services = () => {
                 Book a Training
               </Link>
 
-              <Link to="/resources" className="btn !rounded-[30px] btn-outline-light">
+              <Link
+                to="/resources"
+                className="btn !rounded-[30px] btn-outline-light"
+              >
                 Explore Resources
               </Link>
             </div>
@@ -189,7 +311,7 @@ const Services = () => {
                   <div className="service-features">
                     {service.features.map((feature, i) => (
                       <div key={i} className="feature-pill">
-                        <FaCheck className="fas fa-check" color="white" />
+                        <FaCheck className="fas fa-check text-brand" color="" />
 
                         <span>{feature}</span>
                       </div>
@@ -208,7 +330,102 @@ const Services = () => {
       </section>
 
       {/* Testimonials */}
-      <TestimonialsSection place={"services"} />
+      <div className="relative z-10 mx-auto flex min-h-fit max-w-7xl items-center px-5 py-16 lg:px-10">
+        <div className="grid w-full items-center gap-10 lg:grid-cols-2">
+          {/* LEFT */}
+          <div className="text-brand text-center lg:text-left">
+            <h2 className="mt-4 text-4xl font-bold leading-tight sm:text-4xl lg:text-4xl">
+              What Our Clients Say
+            </h2>
+
+            <p className="mt-6 max-w-xl mx-auto lg:mx-0 text-base sm:text-lg leading-8 text-gray-500/80">
+              Feedback from educators who have transformed their teaching with
+              our services
+            </p>
+          </div>
+
+          {/* RIGHT */}
+
+          <div
+            className="rounded-3xl border border-white/20 bg-white/10 backdrop-blur-xl"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+          >
+            {/* Slider */}
+            <div className="overflow-hidden">
+              <div
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{
+                  transform: `translateX(-${currentTestimonial * 100}%)`,
+                }}
+              >
+                {testimonials.map((item, index) => (
+                  <div key={index} className="w-full shrink-0 px-5 py-6 sm:p-8">
+                    <div className="flex flex-col gap-6">
+                      <div className="flex items-center gap-4">
+                        <img
+                          src={item.src}
+                          alt={item.name}
+                          className="h-14 w-14 sm:h-16 sm:w-16 rounded-full object-cover border-2 border-white/20"
+                        />
+
+                        <div className="min-w-0">
+                          <h3 className="text-lg sm:text-xl font-semibold text-gray-600">
+                            {item.name}
+                          </h3>
+
+                          <p className="text-sm sm:text-base text-gray-600/60">
+                            {item.title}
+                          </p>
+                        </div>
+                      </div>
+
+                      <p className="text-base sm:text-lg leading-7 sm:leading-8 text-gray-500/80">
+                        "{item.description}"
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-5 border-t border-gray-500 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+              {/* Dots */}
+              <div className="flex justify-center gap-2">
+                {testimonials.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentTestimonial(index)}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      currentTestimonial === index
+                        ? "w-8 bg-gray-500"
+                        : "w-2 bg-gray-100"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              {/* Arrows */}
+              <div className="flex justify-center gap-3">
+                <button
+                  onClick={prevTestimonial}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 transition hover:bg-blue-500/20"
+                >
+                  <ChevronLeft className="text-white" />
+                </button>
+
+                <button
+                  onClick={nextTestimonial}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 transition hover:bg-blue-500/20"
+                >
+                  <ChevronRight className="text-white" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Process */}
       <section className="section services-process">
@@ -218,78 +435,42 @@ const Services = () => {
 
             <h2>How We Transform Classrooms</h2>
 
-            <p>
+            <p className="!text-black">
               Every partnership follows a proven roadmap designed to make
               technology adoption simple, practical, and sustainable.
             </p>
           </div>
 
-          <div className="process-timeline">
-            <div className="process-step">
-              <div className="process-number">01</div>
-
-              <div className="process-card">
-                <h3>Assessment</h3>
-
-                <p>
-                  We evaluate your current teaching environment, technology
-                  infrastructure, and learning objectives to identify
-                  opportunities for improvement.
-                </p>
-              </div>
-            </div>
-
-            <div className="process-step">
-              <div className="process-number">02</div>
-
-              <div className="process-card">
-                <h3>Planning</h3>
-
-                <p>
-                  We design a customized implementation strategy tailored to
-                  your school's goals, budget, and timeline.
-                </p>
-              </div>
-            </div>
-
-            <div className="process-step">
-              <div className="process-number">03</div>
-
-              <div className="process-card">
-                <h3>Implementation</h3>
-
-                <p>
-                  Through practical workshops and guided support, we introduce
-                  tools and workflows that teachers can immediately apply.
-                </p>
-              </div>
-            </div>
-
-            <div className="process-step">
-              <div className="process-number">04</div>
-
-              <div className="process-card">
-                <h3>Support</h3>
-
-                <p>
-                  Our team stays with you after implementation to answer
-                  questions, provide coaching, and ensure long-term success.
-                </p>
-              </div>
-            </div>
-
-            <div className="process-step">
-              <div className="process-number">05</div>
-
-              <div className="process-card">
-                <h3>Evaluation</h3>
-
-                <p>
-                  We monitor outcomes, gather feedback, and continuously refine
-                  the strategy to maximize classroom impact.
-                </p>
-              </div>
-            </div>
+          <div
+            className="services-grid-two"
+            style={{ borderColor: "#e5e5e5", overflow: "hidden" }}
+          >
+            {processSteps.map((service, index) => (
+              <motion.div
+                key={service.id}
+                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                whileHover={{ y: -5 }}
+                viewport={{ once: false, margin: "-50px" }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="service-card-two"
+                style={{
+                  backgroundColor: "#ffffff",
+                  color: "#121212",
+                  borderColor: "#f0f0f0",
+                  boxShadow: "0 4px 15px rgba(0,0,0,0.03)",
+                }}
+              >
+                <span
+                  className="service-number"
+                  style={{ color: "black", fontWeight: "700" }}
+                >
+                  [{service.id}]
+                </span>
+                <h1 className="service-title">{service.title}</h1>
+                <p className="service-desc">{service.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
@@ -332,27 +513,6 @@ const Services = () => {
           </div>
         </div>
       </section>
-
-      {/* CTA */}
-      {/* <section className="section services-cta">
-        <div className="container">
-          <div className="services-cta-content text-center">
-            <h2>Ready to Transform Your Teaching?</h2>
-            <p>
-              Contact us today to discuss how our services can help you enhance
-              your teaching with educational technology.
-            </p>
-            <div className="services-cta-buttons">
-              <Link to="/contact" className="btn btn-accent">
-                Schedule a Consultation
-              </Link>
-              <Link to="/resources" className="btn btn-outline">
-                Explore Free Resources
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section> */}
     </div>
   );
 };

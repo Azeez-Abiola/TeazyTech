@@ -93,9 +93,10 @@ export default function TestimonialsSection(place) {
   };
 
   return (
-    <section className={`relative overflow-hidden ${place !== "services" ? "min-h-screen" : "min-h-fit"}`}>
+    <section className="relative overflow-hidden min-h-screen">
       {/* Background */}
 
+      {/* {place !== "services" && } */}
       <img
         key={currentTestimonial}
         src={testimonials[currentTestimonial].src}

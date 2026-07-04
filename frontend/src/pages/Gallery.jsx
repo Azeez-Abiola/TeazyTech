@@ -4,30 +4,31 @@ import { useEffect, useMemo, useState } from "react";
 import "../styles/Gallery.css";
 import galleryData from "../lib/galleryData";
 import LazyImage from "../components/LazyImage";
+import CircularGallery from "../components/ui/CircularGallery";
 
- const filters = [
-    {
-      id: "all",
-      name: "All",
-    },
-    {
-      id: "events",
-      name: "Events",
-    },
-    {
-      id: "volunteers",
-      name: "Volunteers",
-    },
-    {
-      id: "testimonials",
-      name: "Testimonials",
-    },
-    {
-      id: "workshops",
-      name: "Workshops",
-    },
-  ];
-  const Gallery = () => {
+const filters = [
+  {
+    id: "all",
+    name: "All",
+  },
+  {
+    id: "events",
+    name: "Events",
+  },
+  {
+    id: "volunteers",
+    name: "Volunteers",
+  },
+  {
+    id: "testimonials",
+    name: "Testimonials",
+  },
+  {
+    id: "workshops",
+    name: "Workshops",
+  },
+];
+const Gallery = () => {
   const [activeFilter, setActiveFilter] = useState("all");
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -42,8 +43,6 @@ import LazyImage from "../components/LazyImage";
       behavior: "smooth",
     });
   }, []);
-
- 
 
   const filteredItems =
     activeFilter === "all"
@@ -146,8 +145,22 @@ import LazyImage from "../components/LazyImage";
   return (
     <main className="gallery-page">
       {/* ================= HERO ================= */}
+      <div style={{ height: "600px", position: "relative" }}>
+        <CircularGallery
+          bend={1}
+          textColor="#ffffff"
+          borderRadius={0.05}
+          scrollEase={0.05}
+          // Optionally load a custom font for the labels.
+          // Accepts a stylesheet URL (e.g. Google Fonts) or a direct font file.
+          fontUrl=""
+          font="bold 30px Orbitron"
+          scrollSpeed={2}
+          items={[]}
+        />
+      </div>
 
-      <section className="gallery-hero">
+      {/* <section className="gallery-hero">
         <div className="gallery-hero-bg"></div>
 
         <div className="gallery-overlay"></div>
@@ -169,7 +182,7 @@ import LazyImage from "../components/LazyImage";
             </p>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* ================= FILTER ================= */}
 

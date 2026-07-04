@@ -43,12 +43,51 @@
   background-position: center;
 
   transform: scale(1.08);
-  animation: overviewZoom 18s ease-in-out infinite alternate;
+  /* animation: overviewZoom 18s ease-in-out infinite alternate; */
 
   z-index: 1;
 }
 
 /* Dark Blurred Overlay */
+.hero-bg-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+}
+
+.hero-bg-slide::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(20, 20, 20, 0.3), rgba(20, 20, 20, 0.4));
+}
+
+.hero-bg-slide.active {
+  opacity: 1;
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  color: #fff;
+}
+.hero-bg-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
 
 .services-overview-overlay {
   position: absolute;
@@ -59,8 +98,8 @@
 
   background: linear-gradient(
     135deg,
-    rgba(15, 25, 55, 0.82),
-    rgba(25, 45, 95, 0.7)
+    rgba(15, 25, 55, 0.8),
+    rgba(25, 45, 95, 0.3)
   );
 
   z-index: 2;
@@ -559,9 +598,9 @@
 
 .services-process {
   padding: 7rem 0;
-  background:
-    radial-gradient(circle at top right, #eef6ff 0%, transparent 35%),
-    linear-gradient(to bottom, #ffffff, #f8fbff);
+  background: rgba(191, 191, 191, 0.574);
+    /* radial-gradient(circle at top right, #eef6ff 0%, transparent 35%),
+    linear-gradient(to bottom, #ffffff, #f8fbff); */
   overflow: hidden;
 }
 
@@ -827,6 +866,10 @@
   .process-card h3 {
     font-size: 1.3rem;
   }
+
+  .services-grid-two{
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 /* FAQ */
 /* ============================= */
@@ -1090,6 +1133,14 @@
   margin-top: 4rem;
 }
 
+.services-grid-two {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0;
+  background-color: #333;
+  border: 1px solid #333;
+}
+
 .service-card {
   background: #fff;
 
@@ -1234,36 +1285,20 @@
 }
 
 .service-features {
-  display: grid;
-
-  grid-template-columns: 1fr 1fr;
-
-  gap: 0.8rem;
-
-  margin-bottom: 2rem;
 }
 
 .feature-pill {
   display: flex;
-
   align-items: center;
-
   gap: 0.7rem;
-
   padding: 0.85rem 1rem;
-
-  background: #8bbaff;
-
   border-radius: 14px;
-
   font-size: 0.92rem;
-
+  color: #2f6fcc;
   transition: 0.3s;
 }
 
 .feature-pill:hover {
-  background: rgba(47, 111, 204, 0.08);
-
   transform: translateX(5px);
 }
 
@@ -1299,6 +1334,55 @@
   .services-grid {
     grid-template-columns: 1fr;
   }
+
+  .service-card-two,
+  .service-card-two:nth-child(4),
+  .service-card-two:nth-child(5) {
+    grid-column: span 1;
+    border-right: none;
+    /* Borders handled by container in mobile usually, or just ensure simpler look */
+  }
+}
+
+.service-card-two {
+  grid-column: span 2;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 400px;
+  border-right: 1px solid #333;
+  border-bottom: 1px solid #333;
+  transition:
+    background 0.4s ease,
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
+  background: transparent;
+}
+.service-title {
+  font-size: 30px;
+}
+
+/* 5-item Layout Adjustment */
+.service-card-two:nth-child(4),
+.service-card-two:nth-child(5) {
+  grid-column: span 3;
+}
+
+.service-card-two:nth-child(5) {
+  border-right: none;
+}
+
+.service-card-two:hover {
+  background: linear-gradient(135deg, #b6d3ff 0%, #2f6fcc 100%);
+  z-index: 10;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  border-color: #272727;
+  color: white !important;
+}
+
+.service-card-two:nth-child(3n) {
+  border-right: none;
 }
 
 @media (max-width: 768px) {
@@ -1312,5 +1396,28 @@
 
   .service-features {
     grid-template-columns: 1fr;
+  }
+}
+/* Tablet */
+@media (max-width: 992px) {
+  .services-grid-two {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .services-grid-two {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+  .services-grid-two {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
