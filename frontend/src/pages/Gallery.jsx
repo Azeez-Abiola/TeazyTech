@@ -1,405 +1,291 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "../styles/Gallery.css";
 import galleryData from "../lib/galleryData";
 import LazyImage from "../components/LazyImage";
-
+import CircularGallery from "../components/ui/CircularGallery";
+const galleryItems = galleryData.flatMap((item) =>
+    item.images.map((image) => ({
+      image,
+      text: item.title,
+    }))
+  );
+const filters = [
+  {
+    id: "all",
+    name: "All",
+  },
+  {
+    id: "events",
+    name: "Events",
+  },
+  {
+    id: "volunteers",
+    name: "Volunteers",
+  },
+  {
+    id: "testimonials",
+    name: "Testimonials",
+  },
+  {
+    id: "workshops",
+    name: "Workshops",
+  },
+];
 const Gallery = () => {
-    const [activeFilter, setActiveFilter] = useState("all");
-    const [lightboxOpen, setLightboxOpen] = useState(false);
-    const [selectedItem, setSelectedItem] = useState({
-        id: "",
-        title: "",
-        images: [],
-        description: "",
-        category: "",
+  const [activeFilter, setActiveFilter] = useState("all");
+
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  const [currentImage, setCurrentImage] = useState(0);
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
     });
-    const [index, setIndex] = useState(0);
-   useEffect(() => {
-        window.scroll({ top: 0,left: 0, behaviour: "smooth" })
-    }, [])
-    const filters = [
-        { id: "all", name: "All" },
-        { id: "events", name: "Events" },
-        { id: "volunteers", name: "Volunteers" },
-        { id: "testimonials", name: "Testimonials" },
-        { id: "workshops", name: "Workshops" },
-    ];
+  }, []);
 
-    const filteredItems =
-        activeFilter === "all"
-            ? galleryData
-            : galleryData.filter((item) => item.category === activeFilter);
+  const filteredItems =
+    activeFilter === "all"
+      ? galleryData
+      : galleryData.filter((item) => item.category === activeFilter);
 
-    const closeLightbox = () => {
-        setLightboxOpen(false);
-        setIndex(0);
-        document.body.style.overflow = "auto";
+  const groupedGallery = useMemo(() => {
+    return {
+      events: galleryData.filter((item) => item.category === "events"),
+
+      volunteers: galleryData.filter((item) => item.category === "volunteers"),
+
+      testimonials: galleryData.filter(
+        (item) => item.category === "testimonials",
+      ),
+
+      workshops: galleryData.filter((item) => item.category === "workshops"),
     };
+  }, []);
 
-    const navigateLightbox = (direction) => {
-        if (direction === "next") {
-            setIndex(
-                (prevIndex) => (prevIndex + 1) % selectedItem.images.length
-            );
-        } else {
-            setIndex(
-                (prevIndex) => (prevIndex - 1) % selectedItem.images.length
-            );
-        }
-    };
+  const openLightbox = (item) => {
+    setSelectedItem(item);
+    setCurrentImage(0);
+    setLightboxOpen(true);
+    document.body.style.overflow = "hidden";
+  };
 
-    const handleClickOnItem = (item) => {
-        setLightboxOpen(true);
-        setSelectedItem({
-            id: item.id,
-            title: item.title,
-            images: item.images,
-            description: item.description,
-            category: item.category,
-        });
-    };
-    return (
-        <div className="gallery-page">
-            {/* Hero Section */}
-            <section className="gallery-hero">
-                <div className="container">
-                    <div className="gallery-hero-content">
-                        <h1>Gallery</h1>
-                        <p>
-                            Visual highlights of our work with educators and
-                            educational institutions
-                        </p>
-                    </div>
-                </div>
-            </section>
+  const closeLightbox = () => {
+    setSelectedItem(null);
+    setCurrentImage(0);
+    setLightboxOpen(false);
+    document.body.style.overflow = "auto";
+  };
 
-            {/* Gallery Filter */}
-            <section className="section gallery-filter">
-                <div className="container">
-                    <div className="filter-tabs">
-                        {filters.map((filter) => (
-                            <button
-                                key={filter.id}
-                                className={`filter-tab ${
-                                    activeFilter === filter.id ? "active" : ""
-                                }`}
-                                onClick={() => setActiveFilter(filter.id)}
-                            >
-                                {filter.name}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </section>
+  const nextImage = () => {
+    if (!selectedItem) return;
 
-            {/* Gallery Content */}
-            <section className="section gallery-content">
-                <div className="container">
-                    {activeFilter === "all" ? (
-                        <div>
-                            {/* Events Section */}
-                            <div className="gallery-category-section">
-                                <h1 className="gallery-category-title">
-                                    Events
-                                </h1>
-                                <div className="gallery-grid">
-                                    {filteredItems.map((item) => {
-                                        if (item.category === "events") {
-                                            return (
-                                                <div
-                                                    key={item.id}
-                                                    className="gallery-item"
-                                                    onClick={() =>
-                                                        handleClickOnItem(item)
-                                                    }
-                                                >
-                                                    <div className="gallery-item-image">
-                                                        <LazyImage
-                                                            src={item.images[0]}
-                                                            alt={item.title}
-                                                        />
-                                                    </div>
-                                                    <div className="gallery-item-overlay">
-                                                        <h3>{item.title}</h3>
-                                                        <p className="line-clamp-2">
-                                                            {item.description}
-                                                        </p>
-                                                        <div className="gallery-item-category">
-                                                            {
-                                                                filters.find(
-                                                                    (f) =>
-                                                                        f.id ===
-                                                                        item.category
-                                                                ).name
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        }
-                                        return null;
-                                    })}
-                                </div>
-                            </div>
+    setCurrentImage((prev) => (prev + 1) % selectedItem.images.length);
+  };
 
-                            {/* Volunteers Section */}
-                            <div className="gallery-category-section">
-                                <h1 className="gallery-category-title">
-                                    Volunteers
-                                </h1>
-                                <div className="gallery-grid">
-                                    {filteredItems.map((item) => {
-                                        if (item.category === "volunteers") {
-                                            return (
-                                                <div
-                                                    key={item.id}
-                                                    className="gallery-item"
-                                                    onClick={() =>
-                                                        handleClickOnItem(item)
-                                                    }
-                                                >
-                                                    <div className="gallery-item-image">
-                                                        <LazyImage
-                                                            src={item.images[0]}
-                                                            alt={item.title}
-                                                        />
-                                                    </div>
-                                                    <div className="gallery-item-overlay">
-                                                        <h3>{item.title}</h3>
-                                                        <p className="line-clamp-2">
-                                                            {item.description}
-                                                        </p>
-                                                        <div className="gallery-item-category">
-                                                            {
-                                                                filters.find(
-                                                                    (f) =>
-                                                                        f.id ===
-                                                                        item.category
-                                                                ).name
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        }
-                                        return null;
-                                    })}
-                                </div>
-                            </div>
+  const previousImage = () => {
+    if (!selectedItem) return;
 
-                            {/* Testimonials Section */}
-                            <div className="gallery-category-section">
-                                <h1 className="gallery-category-title">
-                                    Testimonials
-                                </h1>
-                                <div className="gallery-grid">
-                                    {filteredItems.map((item) => {
-                                        if (item.category === "testimonials") {
-                                            return (
-                                                <div
-                                                    key={item.id}
-                                                    className="gallery-item"
-                                                    onClick={() =>
-                                                        handleClickOnItem(item)
-                                                    }
-                                                >
-                                                    <div className="gallery-item-image">
-                                                        <LazyImage
-                                                            src={item.images[0]}
-                                                            alt={item.title}
-                                                        />
-                                                    </div>
-                                                    <div className="gallery-item-overlay">
-                                                        <h3>{item.title}</h3>
-                                                        <p className="line-clamp-2">
-                                                            {item.description}
-                                                        </p>
-                                                        <div className="gallery-item-category">
-                                                            {
-                                                                filters.find(
-                                                                    (f) =>
-                                                                        f.id ===
-                                                                        item.category
-                                                                ).name
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        }
-                                        return null;
-                                    })}
-                                </div>
-                            </div>
-
-                            {/* Workshops Section */}
-                            <div className="gallery-category-section">
-                                <h1 className="gallery-category-title">
-                                    Workshops
-                                </h1>
-                                <div className="gallery-grid">
-                                    {filteredItems.map((item) => {
-                                        if (item.category === "workshops") {
-                                            return (
-                                                <div
-                                                    key={item.id}
-                                                    className="gallery-item"
-                                                    onClick={() =>
-                                                        handleClickOnItem(item)
-                                                    }
-                                                >
-                                                    <div className="gallery-item-image">
-                                                        <LazyImage
-                                                            src={item.images[0]}
-                                                            alt={item.title}
-                                                        />
-                                                    </div>
-                                                    <div className="gallery-item-overlay">
-                                                        <h3>{item.title}</h3>
-                                                        <p className="line-clamp-2">
-                                                            {item.description}
-                                                        </p>
-                                                        <div className="gallery-item-category">
-                                                            {
-                                                                filters.find(
-                                                                    (f) =>
-                                                                        f.id ===
-                                                                        item.category
-                                                                ).name
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        }
-                                        return null;
-                                    })}
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        /*the mapping function for filtering e.g events, volunteers*/
-                        <div className="gallery-grid">
-                            {filteredItems.map((item) => (
-                                <div
-                                    key={item.id}
-                                    className="gallery-item"
-                                    onClick={() => handleClickOnItem(item)}
-                                >
-                                    <div className="gallery-item-image">
-                                        <LazyImage
-                                            src={item.images[0]}
-                                            alt={item.title}
-                                        />
-                                    </div>
-                                    <div className="gallery-item-overlay">
-                                        <h3>{item.title}</h3>
-                                        <p className="line-clamp-2">
-                                            {item.description}
-                                        </p>
-                                        <div className="gallery-item-category">
-                                            {
-                                                filters.find(
-                                                    (f) =>
-                                                        f.id === item.category
-                                                ).name
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {filteredItems.length === 0 && (
-                        <div className="no-items">
-                            <p>
-                                No gallery items found in this category. Please
-                                check back later.
-                            </p>
-                        </div>
-                    )}
-                </div>
-            </section>
-
-            {/* Lightbox */}
-            {lightboxOpen && (
-                <div className="lightbox">
-                    <div
-                        className="lightbox-overlay"
-                        onClick={closeLightbox}
-                    ></div>
-                    <div className="lightbox-content">
-                        <button
-                            className="lightbox-close"
-                            onClick={closeLightbox}
-                        >
-                            <i className="fas fa-times"></i>
-                        </button>
-                        <div className="lightbox-image">
-                            <LazyImage
-                                src={selectedItem.images[index]}
-                                alt={selectedItem.title}
-                            />
-                        </div>
-                        <div className="lightbox-details">
-                            <h3>{selectedItem.title}</h3>
-                            <p>{selectedItem.description}</p>
-                            <div className="lightbox-category">
-                                {/*
-                                    filters.find(
-                                        (f) => f.id === selectedItem.category
-                                    ).name
-                                */}
-                                {selectedItem.category}
-                            </div>
-                        </div>
-                        {selectedItem.category === "events" ||
-                        selectedItem.category === "workshops" ? (
-                            <>
-                                <button
-                                    className="lightbox-nav lightbox-prev"
-                                    onClick={() => navigateLightbox("prev")}
-                                >
-                                    <i className="fas fa-chevron-left"></i>
-                                </button>
-                                <button
-                                    className="lightbox-nav lightbox-next"
-                                    onClick={() => navigateLightbox("next")}
-                                >
-                                    <i className="fas fa-chevron-right"></i>
-                                </button>
-                            </>
-                        ) : null}
-                    </div>
-                </div>
-            )}
-
-            {/* CTA Section */}
-            <section className="section gallery-cta">
-                <div className="container">
-                    <div className="gallery-cta-content text-center">
-                        <h2>Ready to Transform Your Teaching?</h2>
-                        <p>
-                            Join thousands of educators who have already
-                            revolutionized their classrooms with our innovative
-                            EdTech solutions.
-                        </p>
-                        <div className="gallery-cta-buttons">
-                            <a href="#" className="btn btn-primary">
-                                Get Started Today
-                            </a>
-                            <a href="#" className="btn btn-outline">
-                                Learn More
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
+    setCurrentImage(
+      (prev) =>
+        (prev - 1 + selectedItem.images.length) % selectedItem.images.length,
     );
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!lightboxOpen) return;
+
+      if (e.key === "Escape") closeLightbox();
+
+      if (e.key === "ArrowRight") nextImage();
+
+      if (e.key === "ArrowLeft") previousImage();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lightboxOpen, selectedItem]);
+
+  const GalleryCard = ({ item }) => (
+    <article className="gallery-item" onClick={() => openLightbox(item)}>
+      <div className="gallery-item-image">
+        <LazyImage src={item.images[0]} alt={item.title} />
+
+        <div className="gallery-gradient"></div>
+      </div>
+
+      <div className="gallery-item-overlay">
+        <span className="gallery-category">
+          {filters.find((f) => f.id === item.category)?.name}
+        </span>
+
+        <h3>{item.title}</h3>
+
+        <p className="line-clamp-2">{item.description}</p>
+      </div>
+    </article>
+  );
+
+  const GallerySection = ({ title, items }) => (
+    <section className="gallery-category-section">
+      <div className="section-header">
+        <h2>{title}</h2>
+      </div>
+
+      <div className="gallery-grid">
+        {items.map((item) => (
+          <GalleryCard key={item.id} item={item} />
+        ))}
+      </div>
+    </section>
+  );
+
+  return (
+    <main className="gallery-page">
+      {/* ================= HERO ================= */}
+      <div className="lg:flex hidden" style={{ height: "100vh", position: "relative", backgroundColor: "#849abb" }}>
+        <CircularGallery
+          bend={1}
+          textColor="#000000"
+          borderRadius={0.05}
+          scrollEase={0.05}
+          fontUrl=""
+          font="bold 15px Orbitron"
+          scrollSpeed={2}
+          items={galleryItems}
+        />
+      </div>
+
+      {/* ================= FILTER ================= */}
+
+      <section className="gallery-filter">
+        <div className="container">
+          <div className="filter-tabs">
+            {filters.map((filter) => (
+              <button
+                key={filter.id}
+                onClick={() => setActiveFilter(filter.id)}
+                className={`filter-tab ${
+                  activeFilter === filter.id ? "active" : ""
+                }`}
+              >
+                {filter.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================= GALLERY CONTENT ================= */}
+
+      <section className="gallery-content">
+        <div className="container">
+          {activeFilter === "all" ? (
+            <>
+              <GallerySection title="Events" items={groupedGallery.events} />
+
+              <GallerySection
+                title="Volunteers"
+                items={groupedGallery.volunteers}
+              />
+
+              <GallerySection
+                title="Testimonials"
+                items={groupedGallery.testimonials}
+              />
+
+              <GallerySection
+                title="Workshops"
+                items={groupedGallery.workshops}
+              />
+            </>
+          ) : (
+            <>
+              <div className="gallery-grid">
+                {filteredItems.map((item) => (
+                  <GalleryCard key={item.id} item={item} />
+                ))}
+              </div>
+
+              {filteredItems.length === 0 && (
+                <div className="no-items">
+                  <h3>No gallery items found.</h3>
+                  <p>We couldn't find any images for this category yet.</p>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* ================= LIGHTBOX ================= */}
+
+      {lightboxOpen && selectedItem && (
+        <div className="lightbox">
+          <div className="lightbox-overlay" onClick={closeLightbox} />
+
+          <div className="lightbox-content">
+            <button className="lightbox-close" onClick={closeLightbox}>
+              <i className="fas fa-times"></i>
+            </button>
+
+            <div className="lightbox-image">
+              <LazyImage
+                src={selectedItem.images[currentImage]}
+                alt={selectedItem.title}
+              />
+            </div>
+
+            <div className="lightbox-details">
+              <span className="lightbox-category">
+                {filters.find((f) => f.id === selectedItem.category)?.name}
+              </span>
+
+              <h2>{selectedItem.title}</h2>
+
+              <p>{selectedItem.description}</p>
+
+              {(selectedItem.category === "events" ||
+                selectedItem.category === "workshops") &&
+                selectedItem.images.length > 1 && (
+                  <div className="lightbox-counter">
+                    {currentImage + 1} / {selectedItem.images.length}
+                  </div>
+                )}
+            </div>
+
+            {(selectedItem.category === "events" ||
+              selectedItem.category === "workshops") &&
+              selectedItem.images.length > 1 && (
+                <>
+                  <button
+                    className="lightbox-nav lightbox-prev"
+                    onClick={previousImage}
+                  >
+                    <i className="fas fa-chevron-left"></i>
+                  </button>
+
+                  <button
+                    className="lightbox-nav !bg-blue-500 lightbox-next"
+                    onClick={nextImage}
+                  >
+                    <i className="fas fa-chevron-right"></i>
+                  </button>
+                </>
+              )}
+          </div>
+        </div>
+      )}
+
+    </main>
+  );
 };
 
 export default Gallery;
