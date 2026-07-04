@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
+import {useEffect} from "react";
 
 const services = [
   {
@@ -19,14 +20,14 @@ const services = [
   },
 ];
 const ServicesPreview = () => {
-//   useEffect(() => {
-//     window.scroll({ top: 0, left: 0, behaviour: "smooth" });
-//   }, []);
+  useEffect(() => {
+    window.scroll({ top: 0, left: 0, behaviour: "smooth" });
+  }, []);
   return (
    <section>
-      <div className="container-page border-t border-[#2F6FCC]/10 section-y p-20 !bg-[#f8faff]">
+      <div className="container-page border-t border-[#2F6FCC]/10 section-y p-6 lg:p-20 !bg-[#f8faff]">
         <div className="flex flex-wrap items-end justify-between gap-6">
-          <div className="max-w-2xl">
+          <div className="lg:max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-wider text-brand">
               Our Services
             </p>

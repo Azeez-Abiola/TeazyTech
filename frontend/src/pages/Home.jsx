@@ -23,50 +23,16 @@ const Home = () => {
   }, []);
   return (
     <div className="home-page">
-      {/* Hero with subtle fade-up animation */}
-      {/* <AnimatedSection
-                animation="fade-up"
-                duration={1000}
-                threshold={0.05}
-            > */}
       <HeroSection />
-      {/* </AnimatedSection> */}
-
-      {/* Features with bouncy effect */}
-      {/* <AnimatedSection
-                animation="bounce"
-                duration={900}
-                className="animated-features"
-            > */}
       <FeaturesSection />
-      {/* </AnimatedSection> */}
-
-      {/* Services with slide from left effect */}
-      {/* <AnimatedSection animation="slide-left" duration={800} delay={200}> */}
       <ServicesPreview />
-      {/* </AnimatedSection> */}
-
-      {/* Testimonials with rotating effect */}
-      {/* <AnimatedSection animation="slide-right" duration={800}> */}
       <TestimonialsSection />
-      {/* </AnimatedSection> */}
-
-      {/*form with slide in effect from right*/}
-      {/* <AnimatedSection animation="slide-left" duration={900} delay={150}> */}
       <FormSection
         showSuccess={showSuccess}
         showFailure={showFailure}
         setShowSuccess={setShowSuccess}
         setShowFailure={setShowFailure}
       />
-      {/* </AnimatedSection> */}
-
-      {/* CTA with zoom in effect */}
-      {/* <AnimatedSection animation="zoom-in" duration={700} delay={100}> */}
-      {/* <CtaSection /> */}
-      {/* </AnimatedSection> */}
-
-      {/* <BlogPreview /> */}
       <NewsletterSection />
 
       {/*The success and failure messages for the form..i coldnt implement it in the form module because the animatedSection component is intefering with it not making the position fixed*/}
