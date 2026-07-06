@@ -21,14 +21,6 @@ const filters = [
     name: "Events",
   },
   {
-    id: "volunteers",
-    name: "Volunteers",
-  },
-  {
-    id: "testimonials",
-    name: "Testimonials",
-  },
-  {
     id: "workshops",
     name: "Workshops",
   },
@@ -57,12 +49,6 @@ const Gallery = () => {
   const groupedGallery = useMemo(() => {
     return {
       events: galleryData.filter((item) => item.category === "events"),
-
-      volunteers: galleryData.filter((item) => item.category === "volunteers"),
-
-      testimonials: galleryData.filter(
-        (item) => item.category === "testimonials",
-      ),
 
       workshops: galleryData.filter((item) => item.category === "workshops"),
     };
@@ -190,16 +176,6 @@ const Gallery = () => {
           {activeFilter === "all" ? (
             <>
               <GallerySection title="Events" items={groupedGallery.events} />
-
-              <GallerySection
-                title="Volunteers"
-                items={groupedGallery.volunteers}
-              />
-
-              <GallerySection
-                title="Testimonials"
-                items={groupedGallery.testimonials}
-              />
 
               <GallerySection
                 title="Workshops"

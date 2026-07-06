@@ -172,28 +172,39 @@ const Blog = () => {
             {/* ================= MAIN ================= */}
             <div>
               {filteredPosts.length > 0 ? (
-                <div className="space-y-8">
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
                   {filteredPosts.map((post) => (
                     <article
                       key={post.id}
-                      className="overflow-hidden rounded-3xl bg-white shadow-sm border border-slate-200 hover:shadow-2xl hover:-translate-y-2 transition duration-500"
+                      className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1.5 transition duration-300"
                     >
-                      <div className="relative h-80">
+                      <Link
+                        to={`/blog/${post.id}`}
+                        onClick={(e) => trackPostView(post.id, e)}
+                        className="relative block aspect-[16/10] overflow-hidden bg-slate-100"
+                      >
+                        {/* Blurred fill so odd-shaped thumbnails never look cut off */}
+                        <img
+                          src={post.thumbnail || "/default-blog-thumbnail.png"}
+                          alt=""
+                          aria-hidden="true"
+                          className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-lg"
+                        />
                         <img
                           src={post.thumbnail || "/default-blog-thumbnail.png"}
                           alt={post.title}
-                          className="w-full h-full object-cover transition duration-700 hover:scale-110"
+                          className="relative h-full w-full object-contain transition duration-500 group-hover:scale-[1.04]"
                         />
 
-                        <div className="absolute top-5 left-5">
-                          <span className="rounded-full bg-blue-600 px-5 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow-lg">
+                        <div className="absolute top-4 left-4">
+                          <span className="rounded-full bg-blue-600 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-white shadow-lg">
                             {post.category}
                           </span>
                         </div>
-                      </div>
+                      </Link>
 
-                      <div className="p-8">
-                        <div className="flex flex-wrap gap-5 text-sm text-slate-500">
+                      <div className="flex flex-1 flex-col p-6">
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
                           <span>👤 {post.author}</span>
 
                           <span>📅 {post.published_date}</span>
@@ -201,21 +212,26 @@ const Blog = () => {
                           <span>👁 {post.views || 0}</span>
                         </div>
 
-                        <h2 className="mt-5 text-3xl font-bold text-slate-900 hover:text-blue-600 transition">
-                          {post.title}
-                        </h2>
+                        <Link
+                          to={`/blog/${post.id}`}
+                          onClick={(e) => trackPostView(post.id, e)}
+                        >
+                          <h2 className="mt-3 text-xl font-bold leading-snug text-slate-900 line-clamp-2 transition group-hover:text-blue-600">
+                            {post.title}
+                          </h2>
+                        </Link>
 
-                        <p className="mt-5 leading-8 text-slate-600 line-clamp-3">
+                        <p className="mt-3 text-sm leading-6 text-slate-600 line-clamp-3">
                           {post.excerpt}
                         </p>
 
                         <Link
                           to={`/blog/${post.id}`}
                           onClick={(e) => trackPostView(post.id, e)}
-                          className="mt-8 inline-flex items-center gap-3 font-semibold text-blue-600 group"
+                          className="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-semibold text-blue-600"
                         >
                           Read More
-                          <i className="fas fa-arrow-right transition group-hover:translate-x-2"></i>
+                          <i className="fas fa-arrow-right transition group-hover:translate-x-1.5"></i>
                         </Link>
                       </div>
                     </article>
