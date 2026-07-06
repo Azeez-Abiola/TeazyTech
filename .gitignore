@@ -3,3 +3,6 @@ node_modules/
 make-admin.js
 pass.txt
 .vercel
+
+# Large brand assets stay out of the repo
+frontend/Teazy Tech Brand File.pdf
