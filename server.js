@@ -1987,7 +1987,7 @@ const sendCongratulatoryEmail = async (email, resourceTitle, downloadUrl) => {
     return;
   }
 
-  const fromEmail = process.env.RESEND_FROM_EMAIL || "Teazy Tech <onboarding@resend.dev>";
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "Teazy Tech <hello@teazytech.org>";
   
   const htmlContent = `
     <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 25px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);">
