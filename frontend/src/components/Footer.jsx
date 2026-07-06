@@ -1,93 +1,106 @@
 import { Link } from "react-router-dom";
 import Logo from "./Logo.jsx";
-import "../styles/Footer.css";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="footer overflow-hidden">
-      <div className="container">
-        <div className="footer-top">
-          <div className="footer-logo">
-            <div className="footer-logo-wrapper">
+    <footer className="bg-[#0b0b0d] text-white">
+      <div className="container py-20">
+        {/* Wordmark + tagline */}
+        <div className="grid items-start gap-12 lg:grid-cols-2">
+          <div>
+            <div className="h-10 w-10">
               <Logo variant="icon-light" />
             </div>
-            <p>
+            <h2 className="mt-8 font-display text-6xl font-medium uppercase leading-[0.95] !text-white md:text-8xl">
+              Teazy
+              <br />
+              Tech
+            </h2>
+          </div>
+
+          <div className="max-w-md lg:justify-self-end">
+            <p className="font-display text-xl font-medium uppercase leading-relaxed text-white/90 md:text-2xl">
               Empowering educators with cutting-edge knowledge and tools in
-              educational technologies .
+              educational technologies.
             </p>
-          </div>
 
-          <div className="footer-links">
-            <div className="footer-links-column">
-              <h4>Quick Links</h4>
-              <Link to="/">Home</Link>
-              {/* <Link to="/about">About Us</Link> */}
-              <Link to="/resources">Resources</Link>
-              <Link to="/services">Services</Link>
-              <Link to="/gallery">Gallery</Link>
-              <Link to="/blog">Blog</Link>
-              <Link to="/contact">Contact</Link>
-            </div>
-
-            <div className="footer-links-column">
-              <h4>Resources</h4>
-              <Link to="/resources">E-Books</Link>
-              <Link to="/resources">Webinars</Link>
-              <Link to="/resources">Tutorials</Link>
-              <Link to="/resources">Case Studies</Link>
-            </div>
-
-            <div className="footer-links-column">
-              <h4>Contact</h4>
-              <p>Email: info@teazytech.org</p>
-              <p>Phone: +234 81 4430 6629</p>
-              <div className="footer-social">
-                <a
-                  href="https://facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <i className="fab fa-facebook-f"></i>
-                </a>
-                <a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <i className="fab fa-instagram"></i>
-                </a>
-                <a
-                  href="https://linkedin.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <i className="fab fa-linkedin-in"></i>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="footer-bottom">
-          <p>&copy; {currentYear} Teazy Tech. All rights reserved.</p>
-          <div className="footer-bottom-links">
-            <Link to="/privacy">Privacy Policy</Link>
-            <Link to="/terms">Terms of Service</Link>
-          </div>
-        </div>
-      </div>
-      <div className="overflow-hidden whitespace-nowrap -mb-24 py-6">
-        <div className="!flex !flex-row !flex-nowrap w-max animate-marquee">
-          {[...Array(8)].map((_, i) => (
-            <span
-              key={i}
-              className="mx-8 text-8xl font-bold text-brand uppercase font-orbitron"
+            <Link
+              to="/contact"
+              className="mt-8 inline-flex items-center gap-3 bg-white px-7 py-4 text-[11px] font-bold uppercase tracking-[0.2em] !text-neutral-900 transition-colors hover:bg-neutral-200"
             >
-             TEAZY TECH
-            </span>
-          ))}
+              Get Started Now
+              <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Link columns */}
+        <div className="mt-20 grid gap-10 border-t border-white/10 pt-12 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/40">
+              Menu
+            </h4>
+            <div className="mt-5 space-y-3">
+              <Link to="/" className="block text-sm text-white/80 transition-colors hover:text-white">Home</Link>
+              <Link to="/resources" className="block text-sm text-white/80 transition-colors hover:text-white">Resources</Link>
+              <Link to="/services" className="block text-sm text-white/80 transition-colors hover:text-white">Services</Link>
+              <Link to="/gallery" className="block text-sm text-white/80 transition-colors hover:text-white">Gallery</Link>
+              <Link to="/blog" className="block text-sm text-white/80 transition-colors hover:text-white">Blog</Link>
+              <Link to="/contact" className="block text-sm text-white/80 transition-colors hover:text-white">Contact</Link>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/40">
+              Resources
+            </h4>
+            <div className="mt-5 space-y-3">
+              <Link to="/resources" className="block text-sm text-white/80 transition-colors hover:text-white">E-Books</Link>
+              <Link to="/resources" className="block text-sm text-white/80 transition-colors hover:text-white">Webinars</Link>
+              <Link to="/resources" className="block text-sm text-white/80 transition-colors hover:text-white">Tutorials</Link>
+              <Link to="/resources" className="block text-sm text-white/80 transition-colors hover:text-white">Case Studies</Link>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/40">
+              Contact
+            </h4>
+            <div className="mt-5 space-y-3 text-sm text-white/80">
+              <p>
+                <a href="mailto:hello@teazytech.org" className="transition-colors hover:text-white">
+                  hello@teazytech.org
+                </a>
+              </p>
+              <p>
+                <a href="tel:+2348144306629" className="transition-colors hover:text-white">
+                  +234 81 4430 6629
+                </a>
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/40">
+              Social
+            </h4>
+            <div className="mt-5 space-y-3">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/80 transition-colors hover:text-white">Facebook</a>
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/80 transition-colors hover:text-white">Instagram</a>
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/80 transition-colors hover:text-white">LinkedIn</a>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="mt-14 flex flex-col gap-4 border-t border-white/10 pt-6 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between">
+          <p>&copy; {currentYear} Teazy Tech. All rights reserved.</p>
+          <div className="flex gap-6">
+            <Link to="/privacy" className="transition-colors hover:text-white">Privacy Policy</Link>
+            <Link to="/terms" className="transition-colors hover:text-white">Terms of Service</Link>
+          </div>
         </div>
       </div>
     </footer>

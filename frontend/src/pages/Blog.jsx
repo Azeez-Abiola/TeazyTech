@@ -5,6 +5,7 @@ import Logo from "../components/Logo";
 import "../styles/Blog.css";
 import Grainient from "../components/ui/Grainient";
 import { FaSearch } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const Blog = () => {
   const [blogPosts, setBlogPosts] = useState([]);
@@ -173,9 +174,17 @@ const Blog = () => {
             <div>
               {filteredPosts.length > 0 ? (
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-                  {filteredPosts.map((post) => (
-                    <article
+                  {filteredPosts.map((post, index) => (
+                    <motion.article
                       key={post.id}
+                      initial={{ opacity: 0, y: 60 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-60px" }}
+                      transition={{
+                        duration: 0.6,
+                        ease: "easeOut",
+                        delay: (index % 3) * 0.12,
+                      }}
                       className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1.5 transition duration-300"
                     >
                       <Link
@@ -234,7 +243,7 @@ const Blog = () => {
                           <i className="fas fa-arrow-right transition group-hover:translate-x-1.5"></i>
                         </Link>
                       </div>
-                    </article>
+                    </motion.article>
                   ))}
                 </div>
               ) : (

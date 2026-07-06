@@ -180,15 +180,17 @@
   align-items: center;
   color: var(--primary-dark-blue);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
   transition: color 0.2s ease;
   padding: 0.3rem 0.8rem;
-  font-size: 15px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
 }
 
 .nav-links li.active a,
 .nav-links li.active a:hover {
-  color: #ffffff !important;
+  color: var(--primary-blue) !important;
 }
 
 .nav-links li a:hover {
@@ -196,9 +198,17 @@
 }
 
 .nav-links li.active {
-  background-color: #2F6FCC;
-  /* padding: 0px 12px; */
-  border-radius: 20px;
+  background-color: transparent;
+}
+
+.nav-links li.active::after {
+  content: "";
+  position: absolute;
+  left: 0.8rem;
+  right: 0.8rem;
+  bottom: -4px;
+  height: 2px;
+  background-color: var(--primary-blue);
 }
 
 .nav-links li:hover::after {

@@ -93,18 +93,7 @@ export default function TestimonialsSection(place) {
   };
 
   return (
-    <section className="relative overflow-hidden">
-      {/* Background */}
-
-      {/* {place !== "services" && } */}
-      <img
-        key={currentTestimonial}
-        src={testimonials[currentTestimonial].src}
-        alt={testimonials[currentTestimonial].name}
-        className="absolute inset-0 h-full w-full object-cover scale-105 transition-all duration-700"
-      />
-
-      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/35 to-black/25" />
+    <section className="relative overflow-hidden bg-[#0c0c0e] border-t border-white/10">
 
       {/* Content */}
 
@@ -113,11 +102,11 @@ export default function TestimonialsSection(place) {
           {/* LEFT */}
 
           <div className="text-white p-4 lg:p-0 text-center lg:text-left">
-            <p className="uppercase tracking-[0.3em] text-sm text-white/70">
-              Testimonials
+            <p className="text-xs font-bold uppercase tracking-[0.35em] text-white/50">
+              ( Testimonials )
             </p>
 
-            <h2 className="mt-4 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
+            <h2 className="mt-5 font-display font-medium uppercase !text-white text-4xl leading-[1.05] sm:text-5xl lg:text-6xl">
               What Educators Say About Us
             </h2>
 
@@ -130,7 +119,7 @@ export default function TestimonialsSection(place) {
           {/* RIGHT */}
 
           <div
-            className="rounded-3xl border border-white/20 bg-white/10 backdrop-blur-xl"
+            className="border border-white/15 bg-[#121214]"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}

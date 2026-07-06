@@ -21,6 +21,9 @@ export default {
       borderRadius: {
         DEFAULT: "var(--radius)",
       },
+      fontFamily: {
+        display: ["Oswald", "Arial Narrow", "sans-serif"],
+      },
     },
   },
   plugins: [typography],

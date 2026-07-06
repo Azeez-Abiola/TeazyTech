@@ -74,10 +74,16 @@ const HeroSection = () => {
     return () => clearInterval(counter);
   };
 
+  const stats = [
+    { value: yearsCount, label: "Years Experience" },
+    { value: teachersCount, label: "Teachers Trained" },
+    { value: schoolsCount, label: "Partner Schools" },
+  ];
+
   return (
     <section
       ref={heroRef}
-      className="relative min-h-screen overflow-hidden flex items-center justify-center pt-28"
+      className="relative flex min-h-screen flex-col justify-between overflow-hidden pb-16 pt-32"
     >
       {/* Background Slideshow */}
       <div className="absolute inset-0 z-0">
@@ -91,66 +97,57 @@ const HeroSection = () => {
             }`}
           />
         ))}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/55 to-black/75" />
       </div>
 
-      {/* Optional Overlay */}
-      {/* <div className="absolute inset-0 z-[1] bg-white/30 backdrop-blur-[2px]" /> */}
-
-      {/* Hero Content */}
-      <div className="container relative z-10 flex flex-col items-center justify-center text-center">
-        <div className="hero-badge !bg-white/15 !text-white w-fit">Educational Technology Partner</div>
-
-        <h1 className="hero-heading !text-white max-w-5xl">
-          Empowering Educators with Technology
-        </h1>
-
-        <p className="hero-description !text-white/90 max-w-2xl">
-          Gain the edge you need to educate this advanced generation of
-          learners.
-        </p>
-
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-          <Link
-            to="/services"
-            className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#2F6FCC] px-6 text-sm font-semibold text-brand-foreground shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-          >
-            Explore Services
-            <FaArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </Link>
-
-          <Link
-            to="/resources"
-            className="inline-flex h-12 items-center justify-center rounded-full border border-white/60 px-6 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#2F6FCC]/50 hover:text-white hover:border-transparent"
-          >
-            Take a Tour
-          </Link>
-        </div>
-
-        <div className="mt-16 flex flex-wrap justify-center gap-12">
-          <div className="flex flex-col items-center">
-            <span className="text-4xl font-bold text-white">{yearsCount}+</span>
-            <span className="text-white/70">Years</span>
-          </div>
-
-          <div className="flex flex-col items-center">
-            <span className="text-4xl font-bold text-white">
-              {teachersCount}+
-            </span>
-            <span className="text-white/70">Teachers</span>
-          </div>
-
-          <div className="flex flex-col items-center">
-            <span className="text-4xl font-bold text-white">
-              {schoolsCount}+
-            </span>
-            <span className="text-white/70">Schools</span>
-          </div>
+      {/* Stats — top left */}
+      <div className="container relative z-10 mt-8">
+        <div className="flex flex-wrap gap-10 md:gap-20">
+          {stats.map((stat) => (
+            <div key={stat.label}>
+              <span className="font-display text-4xl font-medium text-white md:text-5xl">
+                {stat.value}+
+              </span>
+              <p className="mt-2 text-[11px] uppercase tracking-[0.25em] text-white/60">
+                {stat.label}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Bottom Fade */}
-      <div className="absolute bottom-0 left-0 right-0 z-[2] h-40 bg-gradient-to-t from-white via-white/40 to-transparent" />
+      {/* Headline — bottom left, paragraph — right */}
+      <div className="container relative z-10">
+        <div className="grid items-end gap-10 lg:grid-cols-[1.7fr_1fr]">
+          <h1 className="font-display text-[clamp(3.2rem,8.5vw,7.5rem)] font-medium uppercase leading-[0.95] !text-white">
+            Empowering Educators With Technology.
+          </h1>
+
+          <div className="max-w-sm lg:justify-self-end lg:text-right">
+            <p className="text-sm leading-7 text-white/80">
+              Gain the edge you need to educate this advanced generation of
+              learners.
+            </p>
+
+            <div className="mt-6 flex flex-wrap gap-6 lg:justify-end">
+              <Link
+                to="/services"
+                className="group inline-flex items-center gap-2 border-b border-white/60 pb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white transition-colors hover:border-white"
+              >
+                Explore Services
+                <FaArrowRight className="size-3 transition-transform duration-300 group-hover:translate-x-1" />
+              </Link>
+
+              <Link
+                to="/resources"
+                className="inline-flex items-center gap-2 border-b border-transparent pb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70 transition-colors hover:border-white/60 hover:text-white"
+              >
+                Take a Tour
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   );
 };

@@ -216,9 +216,9 @@ const Navbar = () => {
         </div>
         <Link
           to="/contact"
-          className="bg-[#2F6FCC] !text-white lg:block hidden rounded-[30px] px-4 py-2 text-sm transition-colors hover:bg-[#2a63b6]"
+          className="bg-[#111114] !text-white lg:inline-flex hidden items-center px-6 py-3 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors hover:bg-[#2F6FCC]"
         >
-          Contact us
+          Contact Us
         </Link>
       </div>
     </header>

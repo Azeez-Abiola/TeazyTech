@@ -1,6 +1,4 @@
 import React from "react";
-import BorderGlow from "../ui/BorderGlow"
-import 'animate.css';
 
 export const features = [
   {
@@ -8,86 +6,65 @@ export const features = [
     description:
       "Our team combines decades of classroom experience with technical expertise",
     icon: "fas fa-graduation-cap",
-    iconColor: "var(--primary-blue)",
-    backgroundColor: "rgba(47, 111, 204, 0.1)",
   },
   {
     title: "Teacher-Centered Approach",
     description: "Solutions designed with real teaching challenges in mind",
     icon: "fas fa-hand-holding-heart",
-    iconColor: "var(--secondary-teal)",
-    backgroundColor: "rgba(68, 187, 164, 0.1)",
   },
   {
     title: "Practical Applications",
     description:
       "Focus on implementable strategies that work in real classrooms",
     icon: "fas fa-tools",
-    iconColor: "var(--secondary-red)",
-    backgroundColor: "rgba(233, 79, 55, 0.1)",
   },
   {
     title: "Ongoing Support",
     description:
       "We don't just train and leave - we partner with you for continued success",
     icon: "fas fa-sync-alt",
-    iconColor: "var(--accent-orange)",
-    backgroundColor: "rgba(243, 160, 77, 0.1)",
   },
   {
     title: "Customized Solutions",
     description:
       "Programs tailored to your specific school, subject, and student needs",
     icon: "fas fa-users",
-    iconColor: "var(--primary-dark-blue)",
-    backgroundColor: "rgba(35, 52, 99, 0.1)",
   },
   {
     title: "Comprehensive Resources",
     description: "Access to a wide range of tools, templates, and materials",
     icon: "fas fa-puzzle-piece",
-    iconColor: "var(--accent-purple)",
-    backgroundColor: "rgba(157, 108, 198, 0.1)",
   },
 ];
 
 const FeaturesSection = () => {
   return (
-    <section className="section features-section">
+    <section className="bg-[#0c0c0e] py-28 lg:pb-40">
       <div className="container">
-        <div className="text-left feature-text">
-          <div className="w-[100%] flex mx-auto h-[1px] bg-gradient-to-r from-brand mb-4 via-white to-brand"></div>
+        <h2 className="text-center font-display text-4xl font-medium uppercase leading-tight text-[#4a83d8]/90 md:text-6xl">
+          ( Why Choose Teazy Tech? )
+        </h2>
 
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-blue-400">
-            Why Choose Teazy Tech
-          </h2>
-          <p className="mt-3 font-display text-3xl font-bold text-black tracking-tight font-font md:text-2xl">
-            What sets our educational technology services apart
-          </p>
-        </div>
-        <div className="features-grid">
+        <div className="features-grid mt-20 !grid gap-6 md:!grid-cols-2 lg:!grid-cols-3">
           {features.map((feature, index) => (
-              <div
-                key={index}
-                className={`animate__animated animate__fadeInDown bg-gray-100 border rounded-[20px] p-10 h-[300px] lg:h-[400px] flex flex-col !gap-4 shadow`}
-              >
-                <div className="">
-                  <div
-                    className="feature-icon"
-                    // style={{ backgroundColor: feature.backgroundColor }}
-                  >
-                    <i
-                      className={feature.icon}
-                      style={{ color: feature.iconColor }}
-                    ></i>
-                  </div>
-                  <div className="w-[50%] h-[1px] bg-gradient-to-r from-brand mb-4 to-white"></div>
-                </div>
-                <div className="">
-                  <h3 className="text-[#0e0042]">{feature.title}</h3>
-                  <p className="text-gray-500">{feature.description}</p>
-                </div>
-              </div>
+            <div
+              key={feature.title}
+              className={`flex flex-col items-center border border-white/10 bg-[#121214] px-8 py-14 text-center transition-colors duration-300 hover:border-[#2F6FCC]/60 ${
+                index % 3 === 1 ? "lg:translate-y-10" : ""
+              }`}
+            >
+              <span className="flex h-16 w-16 items-center justify-center rounded-full border border-white/25">
+                <i className={`${feature.icon} text-lg text-white`}></i>
+              </span>
+
+              <h3 className="mt-8 font-display text-lg font-medium uppercase tracking-wide !text-white">
+                {feature.title}
+              </h3>
+
+              <p className="mt-4 max-w-xs text-sm leading-6 text-neutral-400">
+                {feature.description}
+              </p>
+            </div>
           ))}
         </div>
       </div>
