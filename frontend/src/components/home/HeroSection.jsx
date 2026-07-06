@@ -3,10 +3,18 @@ import { useEffect, useRef, useState } from "react";
 import "../../styles/Home.css";
 import { FaArrowRight } from "react-icons/fa";
 // import Particles from "./Particles";
-import Grainient from "../ui/Grainient";
+
+const heroImages = [
+  "/images/Gallery Ibadan Training/IMG_7713.jpg",
+  "/images/Gallery Kaduna Training/IMG_5756.jpg",
+  "/images/Mastercard Foundation Edtech Conference/IMG_6333.jpg",
+  "/images/Gallery Kaduna Training/IMG_6071.jpg",
+  "/images/workshopPhotos/IMG_7526.jpg",
+];
 
 const HeroSection = () => {
   const heroRef = useRef(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [countedUp, setCountedUp] = useState(false);
   const [yearsCount, setYearsCount] = useState(0);
   const [teachersCount, setTeachersCount] = useState(0);
@@ -23,6 +31,15 @@ const HeroSection = () => {
     }, 1000);
 
     return () => clearTimeout(timer);
+  }, []);
+
+  // Background slideshow
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+    }, 6000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const startCountUp = () => {
@@ -62,33 +79,19 @@ const HeroSection = () => {
       ref={heroRef}
       className="relative min-h-screen overflow-hidden flex items-center justify-center pt-28"
     >
-      {/* Grainient Background */}
+      {/* Background Slideshow */}
       <div className="absolute inset-0 z-0">
-        <Grainient
-          color1="#9ca9cc"
-          color2="#4a6bc5"
-          color3="#B497CF"
-          color4="#2F6FCC"
-          timeSpeed={0.25}
-          colorBalance={0}
-          warpStrength={1}
-          warpFrequency={5}
-          warpSpeed={2}
-          warpAmplitude={50}
-          blendAngle={0}
-          blendSoftness={0.05}
-          rotationAmount={500}
-          noiseScale={2}
-          grainAmount={0.1}
-          grainScale={2}
-          grainAnimated={false}
-          contrast={1.5}
-          gamma={1}
-          saturation={1.15}
-          centerX={0}
-          centerY={0}
-          zoom={1.3}
-        />
+        {heroImages.map((src, index) => (
+          <img
+            key={src}
+            src={src}
+            alt=""
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[1500ms] ease-in-out ${
+              index === currentSlide ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        ))}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
       </div>
 
       {/* Optional Overlay */}
@@ -96,13 +99,13 @@ const HeroSection = () => {
 
       {/* Hero Content */}
       <div className="container relative z-10 flex flex-col items-center justify-center text-center">
-        <div className="hero-badg !text[#B497CF] w-fit">Educational Technology Partner</div>
+        <div className="hero-badge !bg-white/15 !text-white w-fit">Educational Technology Partner</div>
 
-        <h1 className="hero-heading max-w-5xl">
+        <h1 className="hero-heading !text-white max-w-5xl">
           Empowering Educators with Technology
         </h1>
 
-        <p className="hero-description !text-[#2F6FCC] max-w-2xl">
+        <p className="hero-description !text-white/90 max-w-2xl">
           Gain the edge you need to educate this advanced generation of
           learners.
         </p>
@@ -118,7 +121,7 @@ const HeroSection = () => {
 
           <Link
             to="/resources"
-            className="inline-flex h-12 items-center justify-center rounded-full border border-brand px-6 text-sm font-semibold text-[#2F6FCC] transition-all duration-300 hover:bg-[#2F6FCC]/50 hover:text-white hover:border-none"
+            className="inline-flex h-12 items-center justify-center rounded-full border border-white/60 px-6 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#2F6FCC]/50 hover:text-white hover:border-transparent"
           >
             Take a Tour
           </Link>
@@ -126,22 +129,22 @@ const HeroSection = () => {
 
         <div className="mt-16 flex flex-wrap justify-center gap-12">
           <div className="flex flex-col items-center">
-            <span className="text-4xl font-bold text-white/50">{yearsCount}+</span>
-            <span className="text-brand">Years</span>
+            <span className="text-4xl font-bold text-white">{yearsCount}+</span>
+            <span className="text-white/70">Years</span>
           </div>
 
           <div className="flex flex-col items-center">
-            <span className="text-4xl font-bold text-white/50">
+            <span className="text-4xl font-bold text-white">
               {teachersCount}+
             </span>
-            <span className="text-brand">Teachers</span>
+            <span className="text-white/70">Teachers</span>
           </div>
 
           <div className="flex flex-col items-center">
-            <span className="text-4xl font-bold text-white/50">
+            <span className="text-4xl font-bold text-white">
               {schoolsCount}+
             </span>
-            <span className="text-brand">Schools</span>
+            <span className="text-white/70">Schools</span>
           </div>
         </div>
       </div>

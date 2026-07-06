@@ -1,28 +1,31 @@
 import { Link } from "react-router-dom";
 
-const CtaSection = () => {
-    return (
-        <section className="section cta">
-            <div className="container">
-                <div className="cta-content text-center">
-                    <h2>Ready to Transform ?</h2>
-                    <p>
-                        Join thousands of educators who are enhancing their
-                        teaching methods with Teazy Tech's resources and
-                        services.
-                    </p>
-                    <div className="cta-buttons">
-                        <Link to="/services" className="btn btn-accent">
-                            Get Started Today
-                        </Link>
-                        <Link to="/contact" className="btn btn-outline">
-                            Contact Us
-                        </Link>
-                    </div>
-                </div>
+const CtaSection = () => (
+    <section className="tt-ignite">
+        <div className="tt-ignite__bg" aria-hidden="true">
+            <img
+                src="/images/Gallery Kaduna Training/IMG_5756.jpg"
+                alt=""
+                data-cover
+            />
+        </div>
+        <div className="tt-ignite__shade" aria-hidden="true" />
+        <div className="tt-ignite__content">
+            <h2>Ready to Transform Your Classroom?</h2>
+            <p>
+                Join thousands of educators who are enhancing their teaching
+                methods with Teazy Tech&apos;s resources and services.
+            </p>
+            <div className="tt-ignite__actions">
+                <Link to="/services" className="btn btn-primary">
+                    Get Started Today
+                </Link>
+                <Link to="/contact" className="btn btn-outline-light">
+                    Contact Us
+                </Link>
             </div>
-        </section>
-    );
-};
+        </div>
+    </section>
+);
 
 export default CtaSection;

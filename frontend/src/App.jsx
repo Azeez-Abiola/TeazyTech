@@ -10,6 +10,7 @@ import Gallery from "./pages/Gallery.jsx";
 import Blog from "./pages/Blog.jsx";
 import ViewBlog from "./pages/ViewBlog.jsx";
 import Contact from "./pages/Contact.jsx";
+import ScrollReveal from "./components/ui/ScrollReveal.jsx";
 import "./App.css";
 
 // Admin imports
@@ -20,6 +21,7 @@ import CreatePost from "./AdminDashboardPages/CreatePost";
 import EditPost from "./AdminDashboardPages/EditPost";
 import Categories from "./AdminDashboardPages/Categories";
 import Analytics from "./AdminDashboardPages/Analytics";
+import AdminResources from "./AdminDashboardPages/AdminResources";
 import { AuthProvider } from "./Context/AuthContext.jsx";
 import { ThemeProvider } from "./Context/ThemeContext.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
@@ -79,6 +81,14 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/resources-admin"
+            element={
+              <ProtectedRoute>
+                <AdminResources />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Public Routes */}
           <Route
@@ -86,6 +96,7 @@ const App = () => {
             element={
               <div className="app">
                 <Navbar />
+                <ScrollReveal />
                 <main>
                   <Routes>
                     <Route path="/" element={<Home />} />

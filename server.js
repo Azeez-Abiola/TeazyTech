@@ -1710,7 +1710,402 @@ app.get("/api/admin/analytics", async (req, res, next) => {
   }
 });
 
+// ══════════════════════════════════════════════════════════
+//  RESOURCES — raw file storage config (Cloudinary)
+// ══════════════════════════════════════════════════════════
+
+const rawStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "resources",
+    resource_type: "raw",
+    allowed_formats: ["pdf", "doc", "docx", "pptx", "xlsx", "zip"],
+  },
+});
+
+const rawUpload = multer({
+  storage: rawStorage,
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB
+});
+
+const resourceUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024 },
+});
+
+const resourceFileFields = [
+  { name: "thumbnail", maxCount: 1 },
+  { name: "file", maxCount: 1 },
+];
+
+// Helper: upload buffer to Cloudinary
+const uploadBufferToCloudinary = (buffer, options) =>
+  new Promise((resolve, reject) => {
+    cloudinary.uploader.upload_stream(options, (err, result) => {
+      if (err) reject(err); else resolve(result);
+    }).end(buffer);
+  });
+
+const resourceSchema = Joi.object({
+  title: Joi.string().required().min(2).max(120),
+  description: Joi.string().required().min(5).max(1000),
+  category: Joi.string().valid("guides", "tools", "webinars", "research").required(),
+  price: Joi.number().min(0).required(),
+  status: Joi.string().valid("published", "draft").default("published"),
+});
+
+// ── Admin: Create Resource ──────────────────────────────
+logger.info("Defining /api/admin/resources POST route");
+app.post(
+  "/api/admin/resources",
+  (req, res, next) => multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } }).fields(resourceFileFields)(req, res, next),
+  async (req, res, next) => {
+    const token = req.cookies.accessToken;
+    if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+    try {
+      const decoded = await admin.auth().verifyIdToken(token);
+      const isAdmin = await checkAdmin(admin, db, decoded);
+      if (!isAdmin) return res.status(403).json({ error: "Admin access required" });
+
+      const { error, value } = resourceSchema.validate(req.body, { abortEarly: false });
+      if (error) {
+        return res.status(400).json({ error: error.details.map(d => d.message).join(", ") });
+      }
+
+      let thumbnailUrl = null;
+      let fileUrl = null;
+
+      if (req.files?.thumbnail?.[0]) {
+        const thumb = req.files.thumbnail[0];
+        const result = await uploadBufferToCloudinary(thumb.buffer, {
+          folder: "resource-thumbnails",
+          resource_type: "image",
+          allowed_formats: ["jpg", "jpeg", "png", "webp"],
+          transformation: [{ width: 800, height: 500, crop: "fill" }],
+        });
+        thumbnailUrl = result.secure_url;
+      }
+
+      if (req.files?.file?.[0]) {
+        const f = req.files.file[0];
+        const result = await uploadBufferToCloudinary(f.buffer, {
+          folder: "resources",
+          resource_type: "raw",
+          public_id: `resource_${Date.now()}_${f.originalname.replace(/\s+/g, "_")}`,
+        });
+        fileUrl = result.secure_url;
+      }
+
+      if (!fileUrl) {
+        return res.status(400).json({ error: "A resource file is required" });
+      }
+
+      const doc = await db.collection("resources").add({
+        ...value,
+        price: Number(value.price),
+        thumbnailUrl,
+        fileUrl,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      return res.status(201).json({ id: doc.id, message: "Resource created" });
+    } catch (err) {
+      logger.error({ err }, "Create resource failed");
+      next(err);
+    }
+  }
+);
+
+// ── Admin: List Resources ───────────────────────────────
+logger.info("Defining /api/admin/resources GET route");
+app.get("/api/admin/resources", async (req, res, next) => {
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    const isAdmin = await checkAdmin(admin, db, decoded);
+    if (!isAdmin) return res.status(403).json({ error: "Admin access required" });
+
+    const snap = await db.collection("resources").get();
+    const resources = snap.docs
+      .map(d => ({ id: d.id, ...d.data(), _ts: d.data().createdAt?._seconds || 0 }))
+      .sort((a, b) => b._ts - a._ts)
+      .map(({ _ts, ...rest }) => rest);
+    return res.json(resources);
+  } catch (err) {
+    logger.error({ err }, "List resources failed");
+    next(err);
+  }
+});
+
+// ── Admin: List Purchases ────────────────────────────────
+logger.info("Defining /api/admin/purchases GET route");
+app.get("/api/admin/purchases", async (req, res, next) => {
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    const isAdmin = await checkAdmin(admin, db, decoded);
+    if (!isAdmin) return res.status(403).json({ error: "Admin access required" });
+
+    const [purchasesSnap, resourcesSnap] = await Promise.all([
+      db.collection("purchases").get(),
+      db.collection("resources").get(),
+    ]);
+
+    // Build a resourceId -> resource map
+    const resourceMap = {};
+    resourcesSnap.docs.forEach(d => {
+      resourceMap[d.id] = { id: d.id, ...d.data() };
+    });
+
+    const purchases = purchasesSnap.docs
+      .map(d => {
+        const data = d.data();
+        const resource = resourceMap[data.resourceId] || {};
+        return {
+          id: d.id,
+          ...data,
+          resourceTitle: resource.title || "Unknown Resource",
+          resourceCategory: resource.category || "uncategorized",
+          _ts: data.purchasedAt?._seconds || 0,
+        };
+      })
+      .sort((a, b) => b._ts - a._ts)
+      .map(({ _ts, ...rest }) => rest);
+
+    return res.json(purchases);
+  } catch (err) {
+    logger.error({ err }, "List purchases failed");
+    next(err);
+  }
+});
+
+// ── Admin: Update Resource ──────────────────────────────
+logger.info("Defining /api/admin/resources/:id PATCH route");
+app.patch(
+  "/api/admin/resources/:id",
+  (req, res, next) => multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } }).fields(resourceFileFields)(req, res, next),
+  async (req, res, next) => {
+    const token = req.cookies.accessToken;
+    if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+    try {
+      const decoded = await admin.auth().verifyIdToken(token);
+      const isAdmin = await checkAdmin(admin, db, decoded);
+      if (!isAdmin) return res.status(403).json({ error: "Admin access required" });
+
+      const { id } = req.params;
+      const updates = {};
+      const { title, description, category, price, status } = req.body;
+      if (title) updates.title = title;
+      if (description) updates.description = description;
+      if (category) updates.category = category;
+      if (price !== undefined) updates.price = Number(price);
+      if (status) updates.status = status;
+
+      if (req.files?.thumbnail?.[0]) {
+        const thumb = req.files.thumbnail[0];
+        const result = await uploadBufferToCloudinary(thumb.buffer, {
+          folder: "resource-thumbnails",
+          resource_type: "image",
+          transformation: [{ width: 800, height: 500, crop: "fill" }],
+        });
+        updates.thumbnailUrl = result.secure_url;
+      }
+
+      if (req.files?.file?.[0]) {
+        const f = req.files.file[0];
+        const result = await uploadBufferToCloudinary(f.buffer, {
+          folder: "resources",
+          resource_type: "raw",
+          public_id: `resource_${Date.now()}_${f.originalname.replace(/\s+/g, "_")}`,
+        });
+        updates.fileUrl = result.secure_url;
+      }
+
+      updates.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+      await db.collection("resources").doc(id).update(updates);
+      return res.json({ message: "Resource updated" });
+    } catch (err) {
+      logger.error({ err }, "Update resource failed");
+      next(err);
+    }
+  }
+);
+
+// ── Admin: Delete Resource ──────────────────────────────
+logger.info("Defining /api/admin/resources/:id DELETE route");
+app.delete("/api/admin/resources/:id", async (req, res, next) => {
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    const isAdmin = await checkAdmin(admin, db, decoded);
+    if (!isAdmin) return res.status(403).json({ error: "Admin access required" });
+
+    await db.collection("resources").doc(req.params.id).delete();
+    return res.json({ message: "Resource deleted" });
+  } catch (err) {
+    logger.error({ err }, "Delete resource failed");
+    next(err);
+  }
+});
+
+// ── Public: List published resources ───────────────────
+logger.info("Defining /api/resources GET route");
+app.get("/api/resources", async (req, res, next) => {
+  try {
+    // Fetch all, then filter in memory to avoid Firestore composite index requirement
+    const snap = await db.collection("resources").get();
+    const resources = snap.docs
+      .map(d => {
+        const data = d.data();
+        const { fileUrl, ...safe } = data;
+        return { id: d.id, ...safe, _createdAt: data.createdAt?._seconds || 0 };
+      })
+      .filter(r => r.status === "published")
+      .sort((a, b) => b._createdAt - a._createdAt)
+      .map(({ _createdAt, ...rest }) => rest);
+    return res.json(resources);
+  } catch (err) {
+    logger.error({ err }, "Public list resources failed");
+    next(err);
+  }
+});
+
+// Helper to send a congratulatory email with Resend
+const sendCongratulatoryEmail = async (email, resourceTitle, downloadUrl) => {
+  const resendApiKey = process.env.RESEND_API_KEY;
+  if (!resendApiKey) {
+    logger.warn("Resend API Key not configured. Skipping email.");
+    return;
+  }
+
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "Teazy Tech <onboarding@resend.dev>";
+  
+  const htmlContent = `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 25px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);">
+      <div style="text-align: center; margin-bottom: 25px;">
+        <h2 style="color: #2F6FCC; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">Teazy Tech</h2>
+      </div>
+      <div style="background: linear-gradient(135deg, #2F6FCC, #1a4d99); color: #ffffff; padding: 35px 25px; border-radius: 12px; text-align: center; margin-bottom: 30px;">
+        <h1 style="margin: 0; font-size: 26px; font-weight: bold; line-height: 1.2;">Thank You for Your Purchase!</h1>
+        <p style="margin: 12px 0 0; font-size: 16px; opacity: 0.9;">Your payment was verified successfully.</p>
+      </div>
+      <div style="color: #1a202c; line-height: 1.6; font-size: 15px; margin-bottom: 35px; padding: 0 5px;">
+        <p style="font-size: 16px;">Hello,</p>
+        <p>Your payment for <strong>${resourceTitle}</strong> went through successfully. We are excited to help you transform your classroom with this resource!</p>
+        <p>Click the button below to download the resource file directly to your device:</p>
+        <div style="text-align: center; margin: 35px 0;">
+          <a href="${downloadUrl}" target="_blank" style="background-color: #2F6FCC; color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 30px; font-weight: bold; font-size: 16px; display: inline-block; box-shadow: 0 6px 16px rgba(47, 111, 204, 0.3); transition: all 0.2s ease;">Download Resource</a>
+        </div>
+        <hr style="border: 0; border-top: 1px solid #edf2f7; margin: 30px 0;" />
+        <p style="color: #718096; font-size: 13px; word-break: break-all;">If the button above does not work, copy and paste this link into your browser:<br/>
+        <a href="${downloadUrl}" style="color: #2F6FCC; text-decoration: underline;">${downloadUrl}</a></p>
+      </div>
+      <div style="border-top: 1px solid #edf2f7; padding-top: 25px; text-align: center; color: #a0aec0; font-size: 12px; line-height: 1.5;">
+        <p>This is an automated email regarding your transaction on Teazy Tech.</p>
+        <p>&copy; ${new Date().getFullYear()} Teazy Tech. All rights reserved.</p>
+      </div>
+    </div>
+  `;
+
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${resendApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: fromEmail,
+        to: [email],
+        subject: `Successful Purchase: ${resourceTitle}`,
+        html: htmlContent,
+      }),
+    });
+    
+    const data = await res.json();
+    if (!res.ok) {
+      logger.error({ data }, "Resend API returned an error");
+    } else {
+      logger.info({ emailId: data.id }, "Successfully sent congratulations email via Resend");
+    }
+  } catch (err) {
+    logger.error({ err }, "Failed to send congratulations email via Resend");
+  }
+};
+
+// ── Public: Verify payment & return download URL ────────
+logger.info("Defining /api/resources/:id/verify GET route");
+app.get("/api/resources/:id/verify", async (req, res, next) => {
+  const { id } = req.params;
+  const { ref, email } = req.query;
+
+  if (!ref || !email) {
+    return res.status(400).json({ error: "Missing ref or email" });
+  }
+
+  try {
+    const docSnap = await db.collection("resources").doc(id).get();
+    if (!docSnap.exists) return res.status(404).json({ error: "Resource not found" });
+
+    const resource = docSnap.data();
+    if (resource.status !== "published") return res.status(403).json({ error: "Resource not available" });
+
+    const isFree = Number(resource.price) === 0;
+
+    if (!isFree && ref !== "FREE") {
+      // Verify with Paystack
+      const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
+      if (!paystackSecret) return res.status(500).json({ error: "Payment service not configured" });
+
+      const verifyRes = await fetch(`https://api.paystack.co/transaction/verify/${encodeURIComponent(ref)}`, {
+        headers: { Authorization: `Bearer ${paystackSecret}` },
+      });
+      const verifyData = await verifyRes.json();
+
+      if (!verifyData.status || verifyData.data?.status !== "success") {
+        return res.status(402).json({ error: "Payment not confirmed" });
+      }
+
+      // Check that the metadata matches
+      const metaResourceId = verifyData.data?.metadata?.resource_id;
+      if (metaResourceId && metaResourceId !== id) {
+        return res.status(400).json({ error: "Payment reference mismatch" });
+      }
+
+      // Log the purchase
+      await db.collection("purchases").add({
+        resourceId: id,
+        email,
+        paystackRef: ref,
+        amount: verifyData.data.amount / 100,
+        purchasedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      // Send congratulations email asynchronously
+      sendCongratulatoryEmail(email, resource.title, resource.fileUrl).catch(err => {
+        logger.error({ err }, "Async sendCongratulatoryEmail failed");
+      });
+    }
+
+    // Return the file URL (direct Cloudinary URL)
+    return res.json({ downloadUrl: resource.fileUrl });
+  } catch (err) {
+    logger.error({ err }, "Verify resource payment failed");
+    next(err);
+  }
+});
+
 logger.info("Defining catch-all route for SPA client-side routing");
+
 app.get("*", (req, res) => {
   // Check if the request is for an asset (contains a dot and extension)
   const isAsset = req.path.includes('.') || req.path.startsWith('/assets/');

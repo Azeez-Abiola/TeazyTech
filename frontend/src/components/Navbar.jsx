@@ -85,10 +85,15 @@ const Navbar = () => {
           ref={menuRef}
         >
           <div className="navbar-menu-header">
-            <Link to="/" className="navbar-menu-logo">
-              <div className="logo-container-mobile">
-                <Logo />
-              </div>
+            <Link to="/" className="navbar-menu-logo flex items-center gap-2">
+              <img
+                src="/images/logo/teazy-tech-logo-icon-light.png"
+                alt="Teazy Tech logo"
+                className="h-8 w-8 object-contain"
+              />
+              <span className="text-lg font-bold text-white">
+                Teazy Tech
+              </span>
             </Link>
             <button
               className="menu-close"
@@ -120,7 +125,7 @@ const Navbar = () => {
             </button>
           </div>
 
-          <nav className={`nav-links ${scrolled ? "!text-brand" : "text-white"}`}>
+          <nav className="nav-links">
             <ul>
               <li className={location.pathname === "/" ? "active" : ""}>
                 <Link to="/">
@@ -209,7 +214,7 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-        <button className="bg-[#2F6FCC] lg:block hidden rounded-[30px] px-4 py-2 text-sm">
+        <button className="bg-[#2F6FCC] !text-white lg:block hidden rounded-[30px] px-4 py-2 text-sm">
           Contact us
         </button>
       </div>

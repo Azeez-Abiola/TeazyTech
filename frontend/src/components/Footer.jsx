@@ -41,7 +41,7 @@ const Footer = () => {
 
             <div className="footer-links-column">
               <h4>Contact</h4>
-              <p>Email: Teazytech1@gmail.com </p>
+              <p>Email: info@teazytech.org</p>
               <p>Phone: +234 81 4430 6629</p>
               <div className="footer-social">
                 <a

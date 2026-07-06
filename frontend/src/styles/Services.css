@@ -31,22 +31,7 @@
   align-items: center;
 }
 
-/* Background Image */
-
-.services-overview::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-
-  background-image: url("/images/Gallery Kaduna Training/IMG_6147.jpg");
-  background-size: cover;
-  background-position: center;
-
-  transform: scale(1.08);
-  /* animation: overviewZoom 18s ease-in-out infinite alternate; */
-
-  z-index: 1;
-}
+/* Background Image — handled by .hero-bg-container JS slideshow; no ::before needed */
 
 /* Dark Blurred Overlay */
 .hero-bg-slide {
@@ -187,7 +172,7 @@
   color: var(--primary-dark-blue);
 }
 
-/* Floating glow */
+/* Floating glow — kept below content layers */
 
 .services-overview::after {
   content: "";
@@ -203,7 +188,9 @@
 
   animation: floatGlow 8s ease-in-out infinite;
 
-  z-index: 2;
+  /* Must be below overlay (z-index:2) so it doesn't block clicks */
+  z-index: 0;
+  pointer-events: none;
 }
 
 /* Zoom Animation */
@@ -1419,5 +1406,127 @@
   .services-grid-two {
     grid-template-columns: 1fr;
     gap: 1rem;
+  }
+}
+/* ===== Our Services: sticky header + scrolling rectangular cards ===== */
+
+.services-pin-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.services-pin-left .section-tag {
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.services-pin-left h2 {
+  font-size: 2.4rem;
+  line-height: 1.2;
+  color: var(--primary-dark-blue);
+  margin-bottom: 1.2rem;
+  font-weight: 800;
+}
+
+.services-pin-left p {
+  color: var(--secondary-dark-gray);
+  line-height: 1.8;
+  font-size: 1.05rem;
+  max-width: 420px;
+}
+
+.services-pin-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* Rectangular card: image on one side, content on the other */
+.service-card-rect {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #edf1f7;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 18px 45px rgba(15, 30, 70, 0.07);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.service-card-rect:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 30px 70px rgba(15, 30, 70, 0.12);
+}
+
+.service-card-rect .service-image {
+  height: 240px;
+}
+
+.service-card-rect:hover img {
+  transform: scale(1.06);
+}
+
+.service-card-rect:hover .service-icon {
+  transform: rotate(-10deg) scale(1.08);
+}
+
+.service-card-rect .service-content {
+  padding: 2.2rem;
+}
+
+.service-card-rect .service-content p {
+  margin-bottom: 1.2rem;
+}
+
+.service-card-rect .service-features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.2rem;
+  margin-bottom: 1.2rem;
+}
+
+.service-card-rect .feature-pill {
+  padding: 0.35rem 0;
+}
+
+@media (min-width: 768px) {
+  .service-card-rect {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  /* Alternate: even cards image left, odd cards image right */
+  .service-card-rect.reverse {
+    flex-direction: row-reverse;
+  }
+
+  .service-card-rect .service-image {
+    width: 42%;
+    height: auto;
+    min-height: 320px;
+    flex-shrink: 0;
+  }
+
+  .service-card-rect .service-content {
+    width: 58%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .services-pin-layout {
+    grid-template-columns: 0.75fr 1.25fr;
+    gap: 4rem;
+  }
+
+  /* Header stays pinned while the cards scroll past */
+  .services-pin-left {
+    position: sticky;
+    top: 130px;
+  }
+
+  .services-pin-left h2 {
+    font-size: 2.8rem;
   }
 }

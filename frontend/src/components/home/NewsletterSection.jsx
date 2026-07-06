@@ -18,16 +18,16 @@ const NewsletterSection = () => {
   
     {/* Floating CTA Card */}
     <section className="overflow-hidden container-page relative -mt-[400px] z-20 pb-20">
-      <div className="mx-auto w-[90%] rounded-[2rem] border border-white/20 bg-blue-200/10 p-10 backdrop-blur-2xl shadow-2xl md:p-16">
+      <div className="mx-auto w-[90%] rounded-[2rem] border border-white/20 bg-[#233463]/80 p-10 backdrop-blur-md shadow-2xl md:p-16">
         {/* Decorative Blobs */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-blue-500/20 blur-3xl"
+          className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-blue-500/10 blur-3xl"
         />
   
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-24 -left-12 h-72 w-72 rounded-full bg-purple-400/20 blur-3xl"
+          className="pointer-events-none absolute -bottom-24 -left-12 h-72 w-72 rounded-full bg-purple-400/10 blur-3xl"
         />
   
         <div className="relative mx-auto max-w-2xl text-center">

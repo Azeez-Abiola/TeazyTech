@@ -168,21 +168,22 @@ const processSteps = [
 ];
 
 const Services = () => {
+  // ── State ──────────────────────────────────────────────
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const [open, setOpen] = useState(0);
+  const [currentBg, setCurrentBg] = useState(0);
+
+  // ── Effects ─────────────────────────────────────────────
   useEffect(() => {
-    window.scroll({ top: 0, left: 0, behaviour: "smooth" });
+    window.scroll({ top: 0, left: 0, behavior: "smooth" });
 
     const timer = setInterval(() => {
       setCurrentBg((prev) => (prev + 1) % bgImages.length);
     }, 5000);
     return () => clearInterval(timer);
   }, []);
-
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
-
-  const [open, setOpen] = useState(0);
-  const [currentBg, setCurrentBg] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -273,58 +274,69 @@ const Services = () => {
       {/* Main Services */}
       <section className="section main-services">
         <div className="container">
-          <div className="section-header !flex !flex-col !justify-center !gap-2 !items-center text-center">
-            <span className="section-tag">Our Services</span>
+          <div className="services-pin-layout">
+            {/* Sticky Header */}
+            <div className="services-pin-left">
+              <span className="section-tag">Our Services</span>
 
-            <h2>Everything You Need To Transform Teaching</h2>
+              <h2>Everything You Need To Transform Teaching</h2>
 
-            <p>
-              From teacher training to institution-wide technology strategy, we
-              provide practical solutions that make a lasting impact.
-            </p>
-          </div>
+              <p>
+                From teacher training to institution-wide technology strategy,
+                we provide practical solutions that make a lasting impact.
+              </p>
+            </div>
 
-          <div className="services-grid">
-            {services.map((service, index) => (
-              <div className="service-card" key={index}>
-                <div className="service-image">
-                  <img src={service.image} alt={service.title} />
+            {/* Scrolling Cards */}
+            <div className="services-pin-cards">
+              {services.map((service, index) => (
+                <motion.div
+                  className={`service-card-rect ${index % 2 !== 0 ? "reverse" : ""}`}
+                  key={service.number}
+                  initial={{ opacity: 0, y: 70 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.7, ease: "easeOut" }}
+                >
+                  <div className="service-image">
+                    <img src={service.image} alt={service.title} />
 
-                  <div className="service-number">{service.number}</div>
-                </div>
-
-                <div className="service-content">
-                  <div
-                    className="service-icon"
-                    style={{
-                      backgroundColor: `${service.color}15`,
-                      color: service.color,
-                    }}
-                  >
-                    <i className={service.icon}></i>
+                    <div className="service-number">{service.number}</div>
                   </div>
 
-                  <h3>{service.title}</h3>
+                  <div className="service-content">
+                    <div
+                      className="service-icon"
+                      style={{
+                        backgroundColor: `${service.color}15`,
+                        color: service.color,
+                      }}
+                    >
+                      <i className={service.icon}></i>
+                    </div>
 
-                  <p>{service.description}</p>
+                    <h3>{service.title}</h3>
 
-                  <div className="service-features">
-                    {service.features.map((feature, i) => (
-                      <div key={i} className="feature-pill">
-                        <FaCheck className="fas fa-check text-brand" color="" />
+                    <p>{service.description}</p>
 
-                        <span>{feature}</span>
-                      </div>
-                    ))}
+                    <div className="service-features">
+                      {service.features.map((feature, i) => (
+                        <div key={i} className="feature-pill">
+                          <FaCheck className="fas fa-check text-brand" color="" />
+
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <Link to="/contact" className="service-btn">
+                      Learn More
+                      <i className="fas fa-arrow-right"></i>
+                    </Link>
                   </div>
-
-                  <Link to="/contact" className="service-btn">
-                    Learn More
-                    <i className="fas fa-arrow-right"></i>
-                  </Link>
-                </div>
-              </div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

@@ -44,7 +44,7 @@ const ServicesPreview = () => {
           </Link>
         </div>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-reveal-cards>
           {services.map((s, i) => (
             <div key={s.title} delay={i * 80}>
               <Link

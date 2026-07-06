@@ -31,21 +31,65 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-[#121212] transition-colors duration-300">
-      <div className="max-w-md w-full bg-white dark:bg-[#1a1a1a] rounded-lg shadow-lg overflow-hidden transition-colors duration-300 border border-transparent dark:border-gray-800">
-        <div className="bg-[#e94235] px-6 py-8 text-white text-center">
-          <h2 className="text-2xl font-bold">Teazy Tech Admin</h2>
-          <p className="mt-2 text-white/80">Sign in to your account</p>
+    <div className="min-h-screen flex bg-white dark:bg-[#121212] transition-colors duration-300">
+      {/* Left: image panel */}
+      <div className="relative hidden lg:flex lg:w-1/2 flex-col justify-between overflow-hidden">
+        <img
+          src="/images/workshopPhotos/IMG_7526.jpg"
+          alt="Teazy Tech training session"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0c1c3f]/80 via-[#12295c]/70 to-[#0c1c3f]/85" />
+
+        <div className="relative z-10 flex items-center gap-3 p-10">
+          <img
+            src="/images/logo/teazy-tech-logo-icon-light.png"
+            alt="Teazy Tech logo"
+            className="h-10 w-10 object-contain"
+          />
+          <span className="text-xl font-bold text-white">Teazy Tech</span>
         </div>
 
-        <div className="p-8">
+        <div className="relative z-10 p-10 pb-14">
+          <h2 className="max-w-md text-3xl font-bold leading-tight text-white">
+            Empowering Educators with Technology
+          </h2>
+          <p className="mt-4 max-w-md text-white/75 leading-relaxed">
+            Manage your blog posts, categories, and analytics — all in one
+            place.
+          </p>
+        </div>
+      </div>
+
+      {/* Right: form panel */}
+      <div className="flex w-full lg:w-1/2 items-center justify-center px-6 py-12">
+        <div className="w-full max-w-md">
+          {/* Mobile-only logo */}
+          <div className="mb-8 flex items-center gap-3 lg:hidden">
+            <img
+              src="/images/logo/teazy-tech-logo-icon.png"
+              alt="Teazy Tech logo"
+              className="h-10 w-10 object-contain"
+            />
+            <span className="text-xl font-bold text-gray-900 dark:text-white">
+              Teazy Tech
+            </span>
+          </div>
+
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Welcome back
+          </h1>
+          <p className="mt-2 text-gray-500 dark:text-gray-400">
+            Sign in to the admin dashboard
+          </p>
+
           {(error || authError) && (
-            <div className="mb-6 bg-red-100 dark:bg-red-900/20 border-l-4 border-red-500 text-red-700 dark:text-red-400 p-4 rounded">
+            <div className="mt-6 bg-red-100 dark:bg-red-900/20 border-l-4 border-red-500 text-red-700 dark:text-red-400 p-4 rounded">
               <p className="text-sm">{error || authError}</p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
             <div>
               <label
                 className="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1.5"
@@ -54,13 +98,13 @@ const Login = () => {
                 Email Address
               </label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-[#e94235]">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-[#2F6FCC]">
                   <Mail className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   id="email"
                   type="email"
-                  className="pl-10 block w-full rounded-lg bg-gray-50 dark:bg-[#242424] border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-[#e94235] focus:ring-2 focus:ring-[#e94235]/20 p-3 border transition-all"
+                  className="pl-10 block w-full rounded-lg bg-gray-50 dark:bg-[#242424] border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-[#2F6FCC] focus:ring-2 focus:ring-[#2F6FCC]/20 p-3 border transition-all"
                   placeholder="admin@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -77,13 +121,13 @@ const Login = () => {
                 Password
               </label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-[#e94235]">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-[#2F6FCC]">
                   <Lock className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  className="pl-10 block w-full rounded-lg bg-gray-50 dark:bg-[#242424] border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-[#e94235] focus:ring-2 focus:ring-[#e94235]/20 p-3 border transition-all"
+                  className="pl-10 block w-full rounded-lg bg-gray-50 dark:bg-[#242424] border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-[#2F6FCC] focus:ring-2 focus:ring-[#2F6FCC]/20 p-3 border transition-all"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -92,7 +136,7 @@ const Login = () => {
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                   <button
                     type="button"
-                    className="text-gray-400 hover:text-[#e94235] focus:outline-none transition-colors"
+                    className="text-gray-400 hover:text-[#2F6FCC] focus:outline-none transition-colors"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
@@ -109,7 +153,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#e94235] text-white py-3 px-4 rounded-lg hover:bg-[#d23c30] focus:outline-none focus:ring-2 focus:ring-[#e94235]/50 shadow-md shadow-red-500/20 transition-all duration-300 font-semibold disabled:opacity-50"
+                className="w-full bg-[#2F6FCC] text-white py-3 px-4 rounded-lg hover:bg-[#2a63b6] focus:outline-none focus:ring-2 focus:ring-[#2F6FCC]/50 shadow-md shadow-blue-500/20 transition-all duration-300 font-semibold disabled:opacity-50"
               >
                 {loading ? "Signing in..." : "Sign In"}
               </button>
@@ -118,7 +162,10 @@ const Login = () => {
 
           <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 text-center text-sm">
             <p className="text-gray-500 dark:text-gray-500">
-              Demo: <span className="font-medium text-gray-700 dark:text-gray-300">admin@example.com / password</span>
+              Demo:{" "}
+              <span className="font-medium text-gray-700 dark:text-gray-300">
+                admin@example.com / password
+              </span>
             </p>
           </div>
         </div>

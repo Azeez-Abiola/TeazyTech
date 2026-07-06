@@ -126,7 +126,7 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
                 <span className="grid size-10 place-items-center rounded-[50%] bg-blue-200/30 text-brand">
                   <Lightbulb className="size-4" />
                 </span>
-                Teazytech1@gmail.com
+                info@teazytech.org
               </li>
               <li className="flex items-center text-brand gap-3">
                 <span className="grid size-10 place-items-center rounded-[50%] bg-blue-200/30 text-brand">
