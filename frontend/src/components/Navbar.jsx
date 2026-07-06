@@ -214,9 +214,12 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-        <button className="bg-[#2F6FCC] !text-white lg:block hidden rounded-[30px] px-4 py-2 text-sm">
+        <Link
+          to="/contact"
+          className="bg-[#2F6FCC] !text-white lg:block hidden rounded-[30px] px-4 py-2 text-sm transition-colors hover:bg-[#2a63b6]"
+        >
           Contact us
-        </button>
+        </Link>
       </div>
     </header>
   );
