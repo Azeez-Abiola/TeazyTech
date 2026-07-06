@@ -7,17 +7,17 @@
 :root {
   /* Primary Colors */
   --primary-blue: #2f6fcc;
-  --primary-dark-blue: #233463;
+  --primary-dark-blue: #233463; 
   --primary-black: #000000;
   --primary-white: #ffffff;
 
-  /* Secondary Colors */
+  /* Secondary Colors */ 
   --secondary-teal: #44bba4;
   --secondary-red: #e94f37;
   --secondary-light-gray: #f6f7eb;
   --secondary-dark-gray: #474d4f;
 
-  /* Font */
+  /* Font */ 
   --font-family: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', sans-serif;
 

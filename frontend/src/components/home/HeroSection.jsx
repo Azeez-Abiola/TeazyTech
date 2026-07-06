@@ -92,7 +92,7 @@ const HeroSection = () => {
       </div>
 
       {/* Optional Overlay */}
-      <div className="absolute inset-0 z-[1] bg-white/30 backdrop-blur-[2px]" />
+      {/* <div className="absolute inset-0 z-[1] bg-white/30 backdrop-blur-[2px]" /> */}
 
       {/* Hero Content */}
       <div className="container relative z-10 flex flex-col items-center justify-center text-center">

@@ -5,7 +5,12 @@ import "../styles/Gallery.css";
 import galleryData from "../lib/galleryData";
 import LazyImage from "../components/LazyImage";
 import CircularGallery from "../components/ui/CircularGallery";
-
+const galleryItems = galleryData.flatMap((item) =>
+    item.images.map((image) => ({
+      image,
+      text: item.title,
+    }))
+  );
 const filters = [
   {
     id: "all",
@@ -145,44 +150,18 @@ const Gallery = () => {
   return (
     <main className="gallery-page">
       {/* ================= HERO ================= */}
-      <div style={{ height: "600px", position: "relative" }}>
+      <div style={{ height: "100vh", position: "relative", backgroundColor: "#849abb" }}>
         <CircularGallery
           bend={1}
-          textColor="#ffffff"
+          textColor="#000000"
           borderRadius={0.05}
           scrollEase={0.05}
-          // Optionally load a custom font for the labels.
-          // Accepts a stylesheet URL (e.g. Google Fonts) or a direct font file.
           fontUrl=""
-          font="bold 30px Orbitron"
+          font="bold 15px Orbitron"
           scrollSpeed={2}
-          items={[]}
+          items={galleryItems}
         />
       </div>
-
-      {/* <section className="gallery-hero">
-        <div className="gallery-hero-bg"></div>
-
-        <div className="gallery-overlay"></div>
-
-        <div className="container">
-          <div className="gallery-hero-content">
-            <span className="gallery-badge">OUR JOURNEY</span>
-
-            <h1>
-              Capturing
-              <br />
-              Every Milestone
-            </h1>
-
-            <p>
-              Explore memorable workshops, volunteer activities, classroom
-              moments and inspiring success stories from educators transforming
-              learning with technology.
-            </p>
-          </div>
-        </div>
-      </section> */}
 
       {/* ================= FILTER ================= */}
 
@@ -305,41 +284,6 @@ const Gallery = () => {
         </div>
       )}
 
-      {/* ================= CTA ================= */}
-
-      {/* <section className="gallery-cta">
-        <div className="gallery-cta-bg"></div>
-
-        <div className="gallery-cta-overlay"></div>
-
-        <div className="container">
-          <div className="gallery-cta-content">
-            <span className="section-tag">LET'S CREATE SOMETHING AMAZING</span>
-
-            <h2>
-              Your School Could Be
-              <br />
-              Featured Here Next
-            </h2>
-
-            <p>
-              Partner with Teazy Tech to empower educators, inspire learners,
-              and create unforgettable classroom experiences that deserve to be
-              celebrated.
-            </p>
-
-            <div className="gallery-cta-buttons">
-              <a href="/contact" className="btn btn-primary">
-                Book a Training
-              </a>
-
-              <a href="/services" className="btn btn-outline">
-                Explore Services
-              </a>
-            </div>
-          </div>
-        </div>
-      </section> */}
     </main>
   );
 };
