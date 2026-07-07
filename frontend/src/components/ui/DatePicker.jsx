@@ -102,7 +102,7 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", disableFutur
 
       {/* Popover */}
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-[300px] rounded-2xl border border-gray-100 bg-white p-4 shadow-xl dark:border-gray-800 dark:bg-[#1a1a1a]">
+        <div className="absolute right-0 z-50 mt-2 w-[300px] max-w-none rounded-2xl border border-gray-100 bg-white p-4 shadow-xl dark:border-gray-800 dark:bg-[#1a1a1a]">
           {/* Month header */}
           <div className="mb-3 flex items-center justify-between">
             <button

@@ -224,9 +224,10 @@ button {
   text-align: center;
 }
 
+/* Legacy helper — gap removed: it collided with Tailwind's .grid utility
+   and overrode every gap-* class (and distorted the admin calendar) */
 .grid {
   display: grid;
-  gap: 2rem;
 }
 
 .flex {

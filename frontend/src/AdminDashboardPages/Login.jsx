@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ArrowLeft } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -62,7 +62,15 @@ const Login = () => {
       </div>
 
       {/* Right: form panel */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center px-6 py-12">
+      <div className="relative flex w-full lg:w-1/2 items-center justify-center px-6 py-12">
+        <Link
+          to="/"
+          className="absolute left-6 top-6 inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-[#2F6FCC] dark:text-gray-400 dark:hover:text-blue-400"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to home
+        </Link>
+
         <div className="w-full max-w-md">
           {/* Mobile-only logo */}
           <div className="mb-8 flex items-center gap-3 lg:hidden">
@@ -160,14 +168,6 @@ const Login = () => {
             </div>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 text-center text-sm">
-            <p className="text-gray-500 dark:text-gray-500">
-              Demo:{" "}
-              <span className="font-medium text-gray-700 dark:text-gray-300">
-                admin@example.com / password
-              </span>
-            </p>
-          </div>
         </div>
       </div>
     </div>
