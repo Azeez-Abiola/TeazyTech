@@ -22,7 +22,7 @@ export default {
         DEFAULT: "var(--radius)",
       },
       fontFamily: {
-        display: ["Oswald", "Arial Narrow", "sans-serif"],
+        display: ["Space Grotesk", "sans-serif"],
       },
     },
   },

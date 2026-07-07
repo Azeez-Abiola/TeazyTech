@@ -93,7 +93,7 @@ export default function TestimonialsSection(place) {
   };
 
   return (
-    <section className="relative overflow-hidden bg-[#0c0c0e] border-t border-white/10">
+    <section className="relative overflow-hidden bg-[#233463] border-t border-white/10">
 
       {/* Content */}
 
@@ -119,7 +119,7 @@ export default function TestimonialsSection(place) {
           {/* RIGHT */}
 
           <div
-            className="border border-white/15 bg-[#121214]"
+            className="border border-white/15 bg-white/[0.06]"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}

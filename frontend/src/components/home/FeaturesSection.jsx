@@ -39,9 +39,9 @@ export const features = [
 
 const FeaturesSection = () => {
   return (
-    <section className="bg-[#0c0c0e] py-28 lg:pb-40">
+    <section className="bg-[#233463] py-28 lg:pb-40">
       <div className="container">
-        <h2 className="text-center font-display text-4xl font-medium uppercase leading-tight text-[#4a83d8]/90 md:text-6xl">
+        <h2 className="text-center font-display text-4xl font-medium uppercase leading-tight !text-white/90 md:text-6xl">
           ( Why Choose Teazy Tech? )
         </h2>
 
@@ -49,7 +49,7 @@ const FeaturesSection = () => {
           {features.map((feature, index) => (
             <div
               key={feature.title}
-              className={`flex flex-col items-center border border-white/10 bg-[#121214] px-8 py-14 text-center transition-colors duration-300 hover:border-[#2F6FCC]/60 ${
+              className={`flex flex-col items-center border border-white/15 bg-white/[0.06] px-8 py-14 text-center transition-colors duration-300 hover:border-white/50 ${
                 index % 3 === 1 ? "lg:translate-y-10" : ""
               }`}
             >
@@ -61,7 +61,7 @@ const FeaturesSection = () => {
                 {feature.title}
               </h3>
 
-              <p className="mt-4 max-w-xs text-sm leading-6 text-neutral-400">
+              <p className="mt-4 max-w-xs text-sm leading-6 text-white/60">
                 {feature.description}
               </p>
             </div>

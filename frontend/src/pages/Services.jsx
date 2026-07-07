@@ -2,46 +2,10 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../styles/Services.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { FaPlus, FaMinus, FaCheck } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
-
-const faqs = [
-  {
-    question: "Am I paying for the resources or guide?",
-    answer:
-      "No. Most of our resources and guides are completely free for teachers. For premium resources, we always ensure they remain affordable for educators.",
-  },
-  {
-    question: "Can I get help with an EdTech tool that's not mentioned here?",
-    answer:
-      "Absolutely. Join our community and we'll support you with any educational technology tool you're struggling with, even if it's not currently listed on our platform.",
-  },
-  {
-    question: "Can my school become part of the physical training?",
-    answer:
-      "Yes. Simply send us an email with your school's name and location and we'll organize a customized on-site training session.",
-  },
-  {
-    question: "Can you train my school privately?",
-    answer:
-      "Yes. We provide private workshops for schools looking to improve their staff's technology integration skills.",
-  },
-  {
-    question: "Are the EdTech tools for specific grades and subjects?",
-    answer:
-      "Yes. We recommend different tools based on grade level and subject area so every educator gets the best fit.",
-  },
-  {
-    question: "I'm not tech-savvy. Can I still benefit?",
-    answer:
-      "Definitely. Our programs are designed for beginners and experienced educators alike. We teach step-by-step with practical examples.",
-  },
-  {
-    question: "How long before I see results?",
-    answer:
-      "Most educators notice improved classroom engagement within a few weeks of consistently applying what they learn.",
-  },
-];
+import { FaCheck } from "react-icons/fa";
+import { motion } from "framer-motion";
+import FaqSection from "../components/home/FaqSection";
+import NewsletterSection from "../components/home/NewsletterSection";
 const services = [
   {
     number: "01",
@@ -172,7 +136,6 @@ const Services = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
-  const [open, setOpen] = useState(0);
   const [currentBg, setCurrentBg] = useState(0);
 
   // ── Effects ─────────────────────────────────────────────
@@ -295,7 +258,7 @@ const Services = () => {
                   key={service.number}
                   initial={{ opacity: 0, y: 70 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-80px" }}
+                  viewport={{ once: false, margin: "-80px" }}
                   transition={{ duration: 0.7, ease: "easeOut" }}
                 >
                   <div className="service-image">
@@ -488,43 +451,10 @@ const Services = () => {
       </section>
 
       {/* FAQ */}
-      <section className="section services-faq">
-        <div className="container">
-          <div className="section-header !flex !flex-col !justify-center !gap-2 !items-center text-center">
-            <span className="section-tag">Frequently Asked Questions</span>
+      <FaqSection />
 
-            {/* <h3>Everything You Need To Know</h3> */}
-
-            <p>
-              Have questions? Here are the answers educators ask us most often.
-            </p>
-          </div>
-
-          <div className="faq-list">
-            {faqs.map((faq, index) => (
-              <div
-                key={index}
-                className={`faq-card ${open === index ? "active" : ""}`}
-              >
-                <button
-                  className="faq-question"
-                  onClick={() => setOpen(open === index ? -1 : index)}
-                >
-                  <h3>{faq.question}</h3>
-
-                  <span className="faq-icon">
-                    {open === index ? <FaMinus /> : <FaPlus />}
-                  </span>
-                </button>
-
-                <div className={`faq-answer ${open === index ? "show" : ""}`}>
-                  <p>{faq.answer}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Newsletter */}
+      <NewsletterSection />
     </div>
   );
 };

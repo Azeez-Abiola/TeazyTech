@@ -165,6 +165,26 @@ const Navbar = () => {
                   <span className="nav-text">Blogs</span>
                 </Link>
               </li>
+              <li>
+                <a
+                  href="https://www.teazytech.online"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="nav-icon">🎓</span>
+                  <span className="nav-text">Learn With Us</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://ai.teazytech.online"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="nav-icon">🤖</span>
+                  <span className="nav-text">Explore AI Tools</span>
+                </a>
+              </li>
               {/* <li className={location.pathname === '/contact' ? 'active' : ''}>
                 <Link to="/contact">
                   <span className="nav-icon">📝</span>
@@ -216,7 +236,7 @@ const Navbar = () => {
         </div>
         <Link
           to="/contact"
-          className="bg-[#111114] !text-white lg:inline-flex hidden items-center px-6 py-3 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors hover:bg-[#2F6FCC]"
+          className="bg-gradient-to-r from-[#233463] to-[#2F6FCC] !text-white lg:inline-flex hidden items-center px-6 py-3 text-[11px] font-bold uppercase tracking-[0.2em] transition-opacity hover:opacity-90"
         >
           Contact Us
         </Link>

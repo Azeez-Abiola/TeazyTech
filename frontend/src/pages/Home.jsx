@@ -11,6 +11,8 @@ import ServicesPreview from "../components/home/ServicesPreview";
 import TestimonialsSection from "../components/home/TestimonialsSection";
 import CtaSection from "../components/home/CtaSection";
 import BlogPreview from "../components/home/BlogPreview";
+import BlogMarquee from "../components/home/BlogMarquee";
+import FaqSection from "../components/home/FaqSection";
 import NewsletterSection from "../components/home/NewsletterSection";
 import AnimatedSection from "../components/home/AnimatedSection";
 import FormSection from "../components/home/formSection";
@@ -27,13 +29,15 @@ const Home = () => {
       <FeaturesSection />
       <ServicesPreview />
       <TestimonialsSection />
+      <BlogMarquee />
+      <FaqSection />
+      <NewsletterSection />
       <FormSection
         showSuccess={showSuccess}
         showFailure={showFailure}
         setShowSuccess={setShowSuccess}
         setShowFailure={setShowFailure}
       />
-      <NewsletterSection />
 
       {/*The success and failure messages for the form..i coldnt implement it in the form module because the animatedSection component is intefering with it not making the position fixed*/}
       {showSuccess && (

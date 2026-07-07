@@ -6,6 +6,7 @@ import "../styles/Blog.css";
 import Grainient from "../components/ui/Grainient";
 import { FaSearch } from "react-icons/fa";
 import { motion } from "framer-motion";
+import NewsletterSection from "../components/home/NewsletterSection";
 
 const Blog = () => {
   const [blogPosts, setBlogPosts] = useState([]);
@@ -179,7 +180,7 @@ const Blog = () => {
                       key={post.id}
                       initial={{ opacity: 0, y: 60 }}
                       whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: "-60px" }}
+                      viewport={{ once: false, margin: "-60px" }}
                       transition={{
                         duration: 0.6,
                         ease: "easeOut",
@@ -335,44 +336,8 @@ const Blog = () => {
         </div>
       </section>
 
-      <div className="relative overflow-hidden w-full bg-gradient-to-br from-[#0F172A] via-[#1E3A8A] to-[#3B82F6] p-8 text-white shadow-2xl">
-        {/* Background decoration */}
-        <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute -bottom-16 -left-10 h-36 w-36 rounded-full bg-cyan-400/20 blur-3xl" />
-
-        <div className="relative z-10">
-          <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur">
-            ✉️
-          </div>
-
-          <h3 className="text-3xl font-bold leading-tight">Stay in the Loop</h3>
-
-          <p className="mt-3 text-sm leading-7 text-white/75">
-            Get exclusive articles, development tips, design inspiration, and
-            curated resources delivered straight to your inbox. No
-            spam—unsubscribe anytime.
-          </p>
-
-          <form className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="flex-1 rounded-2xl border border-white/15 bg-white/10 p-1 backdrop-blur-md">
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                className="w-full rounded-xl bg-transparent px-4 py-3 text-white placeholder:text-white/50 outline-none"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="group flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-3.5 font-semibold text-slate-900 transition-all duration-300 hover:scale-[1.02] hover:bg-slate-100 active:scale-[0.98] sm:w-auto"
-            >
-              Subscribe Now
-              <span className="transition-transform duration-300 group-hover:translate-x-1">
-                →
-              </span>
-            </button>
-          </form>
-        </div>
+      <div className="relative z-10 w-full">
+        <NewsletterSection />
       </div>
     </div>
   );

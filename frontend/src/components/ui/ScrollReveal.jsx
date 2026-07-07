@@ -21,12 +21,18 @@ const ScrollReveal = () => {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
+    // Reveals when entering the viewport; resets once the element has
+    // fully left it, so the animation replays on every scroll direction.
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("sr-in");
-            io.unobserve(entry.target);
+          } else if (
+            entry.boundingClientRect.top > window.innerHeight ||
+            entry.boundingClientRect.bottom < 0
+          ) {
+            entry.target.classList.remove("sr-in");
           }
         });
       },
@@ -34,10 +40,15 @@ const ScrollReveal = () => {
     );
 
     const prepare = (el, dir) => {
-      if (!el || el.dataset.srDone) return;
-      el.dataset.srDone = "1";
-      el.classList.add("sr-reveal");
-      if (dir) el.classList.add(dir);
+      if (!el) return;
+      if (!el.dataset.srDone) {
+        el.dataset.srDone = "1";
+        el.classList.add("sr-reveal");
+        if (dir) el.classList.add(dir);
+      }
+      // Re-observe on every effect run: StrictMode (and route changes)
+      // tear the previous observer down after elements were marked done,
+      // which would otherwise leave them permanently hidden.
       io.observe(el);
     };
 
@@ -45,7 +56,9 @@ const ScrollReveal = () => {
       const main = document.querySelector("main");
       if (!main) return;
 
-      main.querySelectorAll("section").forEach((el) => prepare(el));
+      main
+        .querySelectorAll("section:not([data-no-reveal])")
+        .forEach((el) => prepare(el));
 
       main.querySelectorAll(CARD_CONTAINERS).forEach((container) => {
         Array.from(container.children).forEach((child, i) =>

@@ -5,6 +5,7 @@ import "../styles/Gallery.css";
 import galleryData from "../lib/galleryData";
 import LazyImage from "../components/LazyImage";
 import CircularGallery from "../components/ui/CircularGallery";
+import Grainient from "../components/ui/Grainient";
 const galleryItems = galleryData.flatMap((item) =>
     item.images.map((image) => ({
       image,
@@ -122,7 +123,7 @@ const Gallery = () => {
   const GallerySection = ({ title, items }) => (
     <section className="gallery-category-section">
       <div className="section-header">
-        <h2>{title}</h2>
+        <h2 className="!text-white">{title}</h2>
       </div>
 
       <div className="gallery-grid">
@@ -171,8 +172,35 @@ const Gallery = () => {
 
       {/* ================= GALLERY CONTENT ================= */}
 
-      <section className="gallery-content">
-        <div className="container">
+      <section className="gallery-content relative overflow-hidden">
+        {/* Animated gradient background (same as blog page) */}
+        <div className="absolute inset-0 z-0">
+          <Grainient
+            color1="#9ca9cc"
+            color2="#4a6bc5"
+            timeSpeed={0.25}
+            colorBalance={0}
+            warpStrength={1}
+            warpFrequency={5}
+            warpSpeed={2}
+            warpAmplitude={50}
+            blendAngle={0}
+            blendSoftness={0.05}
+            rotationAmount={500}
+            noiseScale={2}
+            grainAmount={0.1}
+            grainScale={2}
+            grainAnimated={false}
+            contrast={1.5}
+            gamma={1}
+            saturation={1.15}
+            centerX={0}
+            centerY={0}
+            zoom={1.3}
+          />
+        </div>
+
+        <div className="container relative z-10">
           {activeFilter === "all" ? (
             <>
               <GallerySection title="Events" items={groupedGallery.events} />

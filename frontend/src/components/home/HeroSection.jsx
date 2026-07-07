@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import "../../styles/Home.css";
 import { FaArrowRight } from "react-icons/fa";
 // import Particles from "./Particles";
@@ -83,7 +84,8 @@ const HeroSection = () => {
   return (
     <section
       ref={heroRef}
-      className="relative flex min-h-screen flex-col justify-between overflow-hidden pb-16 pt-32"
+      data-no-reveal
+      className="relative flex min-h-screen items-center overflow-hidden pt-20"
     >
       {/* Background Slideshow */}
       <div className="absolute inset-0 z-0">
@@ -97,56 +99,70 @@ const HeroSection = () => {
             }`}
           />
         ))}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/55 to-black/75" />
+        <div className="absolute inset-0 bg-black/50" />
       </div>
 
-      {/* Stats — top left */}
-      <div className="container relative z-10 mt-8">
-        <div className="flex flex-wrap gap-10 md:gap-20">
+      {/* Hero content — stats above title, copy pinned right (Foresight layout) */}
+      <div className="container relative z-10 w-full text-white">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="mb-[60px] flex flex-col gap-6 sm:flex-row sm:gap-[60px]"
+        >
           {stats.map((stat) => (
-            <div key={stat.label}>
-              <span className="font-display text-4xl font-medium text-white md:text-5xl">
+            <div key={stat.label} className="flex flex-col">
+              <span className="mb-1 font-display text-[28px] font-bold leading-tight text-white">
                 {stat.value}+
               </span>
-              <p className="mt-2 text-[11px] uppercase tracking-[0.25em] text-white/60">
+              <span className="text-xs uppercase tracking-[1px] text-white/80">
                 {stat.label}
-              </p>
+              </span>
             </div>
           ))}
-        </div>
-      </div>
+        </motion.div>
 
-      {/* Headline — bottom left, paragraph — right */}
-      <div className="container relative z-10">
-        <div className="grid items-end gap-10 lg:grid-cols-[1.7fr_1fr]">
-          <h1 className="font-display text-[clamp(3.2rem,8.5vw,7.5rem)] font-medium uppercase leading-[0.95] !text-white">
-            Empowering Educators With Technology.
-          </h1>
+        <motion.h1
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="mb-10 font-display text-[clamp(40px,10vw,60px)] font-light uppercase leading-[0.9] tracking-[-1px] !text-white md:text-[clamp(60px,8vw,100px)] md:tracking-[-3px]"
+        >
+          Empowering
+          <br />
+          Educators With
+          <br />
+          Technology.
+        </motion.h1>
 
-          <div className="max-w-sm lg:justify-self-end lg:text-right">
-            <p className="text-sm leading-7 text-white/80">
-              Gain the edge you need to educate this advanced generation of
-              learners.
-            </p>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="max-w-[300px] text-xs leading-6 text-white/80 [text-shadow:0_2px_10px_rgba(0,0,0,0.5)] lg:absolute lg:right-6 lg:top-1/2 lg:-translate-y-1/2 lg:text-right"
+        >
+          <p>
+            Gain the edge you need to educate this advanced generation of
+            learners.
+          </p>
 
-            <div className="mt-6 flex flex-wrap gap-6 lg:justify-end">
-              <Link
-                to="/services"
-                className="group inline-flex items-center gap-2 border-b border-white/60 pb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white transition-colors hover:border-white"
-              >
-                Explore Services
-                <FaArrowRight className="size-3 transition-transform duration-300 group-hover:translate-x-1" />
-              </Link>
+          <div className="mt-5 flex flex-wrap gap-6 lg:justify-end">
+            <Link
+              to="/services"
+              className="group inline-flex items-center gap-2 border-b border-white/60 pb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white transition-colors hover:border-white"
+            >
+              Explore Services
+              <FaArrowRight className="size-3 transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
 
-              <Link
-                to="/resources"
-                className="inline-flex items-center gap-2 border-b border-transparent pb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70 transition-colors hover:border-white/60 hover:text-white"
-              >
-                Take a Tour
-              </Link>
-            </div>
+            <Link
+              to="/resources"
+              className="inline-flex items-center gap-2 border-b border-transparent pb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70 transition-colors hover:border-white/60 hover:text-white"
+            >
+              Take a Tour
+            </Link>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
