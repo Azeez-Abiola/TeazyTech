@@ -279,11 +279,6 @@ button {
     word-wrap: break-word;
   }
   
-  /* Fix for any flex containers that might overflow */
-  .flex {
-    flex-wrap: wrap;
-  }
-  
   /* Extra protection for small screens */
   body, html {
     max-width: 100vw;

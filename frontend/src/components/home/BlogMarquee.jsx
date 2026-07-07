@@ -55,7 +55,7 @@ const BlogMarquee = () => {
 
       <div className="mt-14 w-full overflow-hidden">
         <div
-          className="flex w-max flex-nowrap animate-marquee"
+          className="flex w-max !max-w-none flex-nowrap animate-marquee"
           style={{ animationDuration: "22s" }}
         >
           {rail.map((post, index) => (

@@ -17,7 +17,10 @@ const Blog = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalPosts, setTotalPosts] = useState(0);
-  const postsPerPage = 10;
+  // Fewer posts per page on phones so the list stays scannable
+  const [postsPerPage] = useState(() =>
+    window.matchMedia("(max-width: 767px)").matches ? 4 : 10,
+  );
   const navigate = useNavigate();
 
   const fetchPosts = async (page = 1) => {
@@ -138,13 +141,15 @@ const Blog = () => {
       {/* ================= CONTENT ================= */}
       <section className="relative my-14 z-10 w-[90%]">
         <div className="mb-10">
-          <h2 className="text-7xl font-bold text-slate-100">Our Blog</h2>
+          <h2 className="text-4xl font-bold text-slate-100 sm:text-5xl md:text-7xl">
+            Our Blog
+          </h2>
 
           <p className="text-slate-100 mt-3">
             Browse our latest educational resources.
           </p>
         </div>
-        <div className="flex w-full items-center gap-4 mb-10">
+        <div className="mb-10 flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
           <form
             onSubmit={handleSearch}
             className="flex flex-1 items-center rounded-xl border border-gray-300 bg-white/50 px-4 py-3"
@@ -161,7 +166,7 @@ const Blog = () => {
 
           <select
             defaultValue="all"
-            className="w-48 rounded-xl border border-gray-300 bg-white/50 px-4 py-3 outline-none"
+            className="w-full rounded-xl border border-gray-300 bg-white/50 px-4 py-3 outline-none sm:w-48"
           >
             <option value="all">All</option>
             {/* <option value="1">1</option>

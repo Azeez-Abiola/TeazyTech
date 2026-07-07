@@ -102,13 +102,14 @@ const HeroSection = () => {
         <div className="absolute inset-0 bg-black/50" />
       </div>
 
-      {/* Hero content — stats above title, copy pinned right (Foresight layout) */}
-      <div className="container relative z-10 w-full text-white">
+      {/* Hero content — desktop: stats above title, copy pinned right;
+          mobile: title, copy, then stats (Foresight column-reverse) */}
+      <div className="container relative z-10 flex w-full flex-col text-white">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="mb-[60px] flex flex-col gap-6 sm:flex-row sm:gap-[60px]"
+          className="order-3 mt-12 flex flex-row flex-wrap gap-8 lg:order-none lg:mb-[60px] lg:mt-0 lg:gap-[60px]"
         >
           {stats.map((stat) => (
             <div key={stat.label} className="flex flex-col">
@@ -126,7 +127,7 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="mb-10 font-display text-[clamp(40px,10vw,60px)] font-light uppercase leading-[0.9] tracking-[-1px] !text-white md:text-[clamp(60px,8vw,100px)] md:tracking-[-3px]"
+          className="order-1 mb-10 font-display text-[clamp(40px,10vw,60px)] font-light uppercase leading-[0.9] tracking-[-1px] !text-white md:text-[clamp(60px,8vw,100px)] md:tracking-[-3px] lg:order-none"
         >
           Empowering
           <br />
@@ -139,7 +140,7 @@ const HeroSection = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="max-w-[300px] text-xs leading-6 text-white/80 [text-shadow:0_2px_10px_rgba(0,0,0,0.5)] lg:absolute lg:right-6 lg:top-1/2 lg:-translate-y-1/2 lg:text-right"
+          className="order-2 max-w-[300px] text-xs leading-6 text-white/80 [text-shadow:0_2px_10px_rgba(0,0,0,0.5)] lg:absolute lg:right-6 lg:top-1/2 lg:order-none lg:-translate-y-1/2 lg:text-right"
         >
           <p>
             Gain the edge you need to educate this advanced generation of

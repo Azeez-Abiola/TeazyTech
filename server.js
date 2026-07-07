@@ -1714,6 +1714,10 @@ app.get("/api/admin/analytics", async (req, res, next) => {
 //  RESOURCES — raw file storage config (Cloudinary)
 // ══════════════════════════════════════════════════════════
 
+// Cloudinary's free plan caps raw files at 10 MB — enforce the same limit
+// here so oversized uploads fail fast with a clear message instead of a 500.
+const MAX_RESOURCE_FILE_BYTES = 10 * 1024 * 1024;
+
 const rawStorage = new CloudinaryStorage({
   cloudinary,
   params: {
@@ -1725,18 +1729,38 @@ const rawStorage = new CloudinaryStorage({
 
 const rawUpload = multer({
   storage: rawStorage,
-  limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB
+  limits: { fileSize: MAX_RESOURCE_FILE_BYTES },
 });
 
 const resourceUpload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 50 * 1024 * 1024 },
+  limits: { fileSize: MAX_RESOURCE_FILE_BYTES },
 });
 
 const resourceFileFields = [
   { name: "thumbnail", maxCount: 1 },
   { name: "file", maxCount: 1 },
 ];
+
+// Multer middleware for resource uploads that turns size-limit errors
+// into a clear 400 instead of falling through to the global 500 handler
+const resourceFilesUpload = (req, res, next) =>
+  multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: MAX_RESOURCE_FILE_BYTES },
+  }).fields(resourceFileFields)(req, res, (err) => {
+    if (err?.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({
+        error: "File is too large — the maximum upload size is 10 MB.",
+      });
+    }
+    next(err);
+  });
+
+// Cloudinary rejections (size, format, etc.) carry a 4xx http_code —
+// surface their message to the admin instead of a generic 500
+const isCloudinaryClientError = (err) =>
+  typeof err?.http_code === "number" && err.http_code >= 400 && err.http_code < 500;
 
 // Helper: upload buffer to Cloudinary
 const uploadBufferToCloudinary = (buffer, options) =>
@@ -1758,7 +1782,7 @@ const resourceSchema = Joi.object({
 logger.info("Defining /api/admin/resources POST route");
 app.post(
   "/api/admin/resources",
-  (req, res, next) => multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } }).fields(resourceFileFields)(req, res, next),
+  resourceFilesUpload,
   async (req, res, next) => {
     const token = req.cookies.accessToken;
     if (!token) return res.status(401).json({ error: "Unauthorized" });
@@ -1813,6 +1837,9 @@ app.post(
       return res.status(201).json({ id: doc.id, message: "Resource created" });
     } catch (err) {
       logger.error({ err }, "Create resource failed");
+      if (isCloudinaryClientError(err)) {
+        return res.status(400).json({ error: err.message });
+      }
       next(err);
     }
   }
@@ -1889,7 +1916,7 @@ app.get("/api/admin/purchases", async (req, res, next) => {
 logger.info("Defining /api/admin/resources/:id PATCH route");
 app.patch(
   "/api/admin/resources/:id",
-  (req, res, next) => multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } }).fields(resourceFileFields)(req, res, next),
+  resourceFilesUpload,
   async (req, res, next) => {
     const token = req.cookies.accessToken;
     if (!token) return res.status(401).json({ error: "Unauthorized" });
@@ -1933,6 +1960,9 @@ app.patch(
       return res.json({ message: "Resource updated" });
     } catch (err) {
       logger.error({ err }, "Update resource failed");
+      if (isCloudinaryClientError(err)) {
+        return res.status(400).json({ error: err.message });
+      }
       next(err);
     }
   }
@@ -2041,6 +2071,119 @@ const sendCongratulatoryEmail = async (email, resourceTitle, downloadUrl) => {
     logger.error({ err }, "Failed to send congratulations email via Resend");
   }
 };
+
+// Helper to notify the official inbox via Resend
+const OFFICIAL_EMAIL = process.env.CONTACT_EMAIL || "hello@teazytech.org";
+
+const sendNotificationEmail = async ({ subject, html, replyTo }) => {
+  const resendApiKey = process.env.RESEND_API_KEY;
+  if (!resendApiKey) {
+    logger.warn("Resend API Key not configured. Skipping notification email.");
+    return false;
+  }
+
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "Teazy Tech <hello@teazytech.org>";
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${resendApiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: fromEmail,
+      to: [OFFICIAL_EMAIL],
+      subject,
+      html,
+      ...(replyTo ? { reply_to: replyTo } : {}),
+    }),
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    logger.error({ data }, "Resend API returned an error for notification email");
+    return false;
+  }
+  logger.info({ emailId: data.id }, "Notification email sent via Resend");
+  return true;
+};
+
+// ── Public: Newsletter subscription ─────────────────────
+logger.info("Defining /api/newsletter/subscribe POST route");
+app.post("/api/newsletter/subscribe", endpointLimiter, async (req, res, next) => {
+  const schema = Joi.object({ email: Joi.string().email().required() });
+  const { error, value } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ error: "Please provide a valid email address" });
+  }
+
+  try {
+    const sent = await sendNotificationEmail({
+      subject: "New newsletter subscriber",
+      replyTo: value.email,
+      html: `
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 25px;">
+          <h2 style="color: #2F6FCC;">New Newsletter Subscriber</h2>
+          <p>Someone just subscribed to the Teazy Tech newsletter:</p>
+          <p style="font-size: 18px; font-weight: bold;">${value.email}</p>
+          <p style="color: #718096; font-size: 12px;">Sent automatically from teazytech.org</p>
+        </div>
+      `,
+    });
+
+    if (!sent) {
+      return res.status(503).json({ error: "Email service unavailable. Please try again later." });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    logger.error({ err }, "Newsletter subscription failed");
+    next(err);
+  }
+});
+
+// ── Public: Contact form ─────────────────────────────────
+logger.info("Defining /api/contact POST route");
+app.post("/api/contact", endpointLimiter, async (req, res, next) => {
+  const schema = Joi.object({
+    name: Joi.string().min(2).max(100).required(),
+    email: Joi.string().email().required(),
+    phone: Joi.string().min(5).max(20).required(),
+    message: Joi.string().min(2).max(2000).required(),
+  });
+  const { error, value } = schema.validate(req.body, { abortEarly: false });
+  if (error) {
+    return res.status(400).json({ error: error.details.map((d) => d.message).join(", ") });
+  }
+
+  const escapeHtml = (s) =>
+    String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  try {
+    const sent = await sendNotificationEmail({
+      subject: `New contact message from ${value.name}`,
+      replyTo: value.email,
+      html: `
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 25px;">
+          <h2 style="color: #2F6FCC;">New Contact Form Message</h2>
+          <p><strong>Name:</strong> ${escapeHtml(value.name)}</p>
+          <p><strong>Email:</strong> ${escapeHtml(value.email)}</p>
+          <p><strong>Phone:</strong> ${escapeHtml(value.phone)}</p>
+          <p><strong>Message:</strong></p>
+          <p style="background: #f7fafc; padding: 15px; border-radius: 8px; white-space: pre-wrap;">${escapeHtml(value.message)}</p>
+          <p style="color: #718096; font-size: 12px;">Reply directly to this email to respond to the sender.</p>
+        </div>
+      `,
+    });
+
+    if (!sent) {
+      return res.status(503).json({ error: "Email service unavailable. Please try again later." });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    logger.error({ err }, "Contact form submission failed");
+    next(err);
+  }
+});
 
 // ── Public: Verify payment & return download URL ────────
 logger.info("Defining /api/resources/:id/verify GET route");

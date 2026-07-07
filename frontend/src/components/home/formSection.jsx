@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useForm, ValidationError } from "@formspree/react";
+import axios from "axios";
 import { MapPin, Phone, Mail, Clock, ArrowRight } from "lucide-react";
 
 export default function FormSection({ setShowSuccess, setShowFailure }) {
-  const [state, handleFormspreeSubmit] = useForm("xanjnnwz");
+  const [submitting, setSubmitting] = useState(false);
   const [fields, setFields] = useState({
     name: "",
     email: "",
@@ -43,23 +43,24 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
       return;
     }
 
-    // Submit to Formspree
-    await handleFormspreeSubmit(e);
-
-    // Handle Formspree response
-    if (state.succeeded) {
+    // Send to our backend, which emails the official inbox via Resend
+    setSubmitting(true);
+    try {
+      await axios.post("/api/contact", fields);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 4000);
-      // Reset form
       setFields({
         name: "",
         email: "",
         phone: "",
         message: "",
       });
-    } else if (state.errors) {
+    } catch (err) {
+      console.error("Contact form submission failed:", err);
       setShowFailure(true);
       setTimeout(() => setShowFailure(false), 4000);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -233,7 +234,6 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
                   onChange={handleFormChange2}
                   className={inputClass(showError.email)}
                 />
-                <ValidationError prefix="Email" field="email" errors={state.errors} />
                 {showError.email && (
                   <p className="mt-1.5 text-xs text-red-500">
                     Please enter a valid email address.
@@ -283,10 +283,10 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
 
               <button
                 type="submit"
-                disabled={state.submitting}
+                disabled={submitting}
                 className="flex w-full items-center justify-center gap-3 bg-[#233463] py-4 text-[11px] font-bold uppercase tracking-[0.25em] text-white transition-colors hover:bg-[#2F6FCC] disabled:opacity-60"
               >
-                {state.submitting ? "Sending..." : "Send Message"}
+                {submitting ? "Sending..." : "Send Message"}
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>

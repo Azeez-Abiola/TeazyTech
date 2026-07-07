@@ -1485,9 +1485,15 @@
 
 .service-card-rect .service-features {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr; /* single column on phones so labels don't break */
   gap: 0.2rem;
   margin-bottom: 1.2rem;
+}
+
+@media (min-width: 640px) {
+  .service-card-rect .service-features {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .service-card-rect .feature-pill {

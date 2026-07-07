@@ -19,7 +19,7 @@ const NewsletterSection = () => {
         </p>
 
         <Link
-          to="/"
+          to="/resources#newsletter"
           className="mt-10 inline-flex items-center gap-3 bg-gradient-to-r from-[#233463] to-[#2F6FCC] px-8 py-4 text-[11px] font-bold uppercase tracking-[0.2em] !text-white transition-opacity hover:opacity-90"
         >
           Subscribe

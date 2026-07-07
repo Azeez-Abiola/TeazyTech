@@ -219,12 +219,39 @@ const Resources = () => {
   const [downloadUrl, setDownloadUrl] = useState(null);
   const [payError, setPayError] = useState(null);
 
+  // Newsletter form: status is null | 'sending' | 'success' | 'error'
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterStatus, setNewsletterStatus] = useState(null);
+
   const { initiate } = usePaystack();
 
   useEffect(() => {
-    window.scroll({ top: 0, left: 0, behavior: "smooth" });
+    // Deep links like /resources#newsletter land on the newsletter section
+    if (window.location.hash === "#newsletter") {
+      setTimeout(() => {
+        document
+          .getElementById("newsletter")
+          ?.scrollIntoView({ behavior: "smooth" });
+      }, 300);
+    } else {
+      window.scroll({ top: 0, left: 0, behavior: "smooth" });
+    }
     fetchResources();
   }, []);
+
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault();
+    if (!newsletterEmail) return;
+    setNewsletterStatus("sending");
+    try {
+      await axios.post("/api/newsletter/subscribe", { email: newsletterEmail });
+      setNewsletterStatus("success");
+      setNewsletterEmail("");
+    } catch (err) {
+      console.error("Newsletter subscription failed:", err);
+      setNewsletterStatus("error");
+    }
+  };
 
   const fetchResources = async () => {
     try {
@@ -422,7 +449,7 @@ const Resources = () => {
       </section>
 
       {/* ── Newsletter ── */}
-      <section className="section resources-newsletter !bg-blue-200">
+      <section id="newsletter" className="section resources-newsletter !bg-blue-200">
         <div className="container">
           <div className="resources-newsletter-content">
             <div className="resources-newsletter-text">
@@ -432,15 +459,39 @@ const Resources = () => {
                 technology resources directly to your inbox.
               </p>
             </div>
-            <form className="resources-newsletter-form !bg-white/60 !p-2 rounded-[30px]">
+            <form
+              className="resources-newsletter-form !bg-white/60 !p-2 rounded-[30px]"
+              onSubmit={handleNewsletterSubmit}
+            >
               <input
                 type="email"
                 placeholder="Your email address"
                 className="!text-brand !outline-none !bg-none !border-none placeholder:!text-black"
+                value={newsletterEmail}
+                onChange={(e) => {
+                  setNewsletterEmail(e.target.value);
+                  if (newsletterStatus) setNewsletterStatus(null);
+                }}
                 required
               />
-              <button type="submit" className="btn btn-accent !rounded-[30px]">Subscribe</button>
+              <button
+                type="submit"
+                disabled={newsletterStatus === "sending"}
+                className="btn btn-accent !rounded-[30px] disabled:opacity-60"
+              >
+                {newsletterStatus === "sending" ? "Subscribing..." : "Subscribe"}
+              </button>
             </form>
+            {newsletterStatus === "success" && (
+              <p className="mt-3 text-sm font-semibold text-green-700">
+                You're subscribed! We'll be in touch.
+              </p>
+            )}
+            {newsletterStatus === "error" && (
+              <p className="mt-3 text-sm font-semibold text-red-600">
+                Something went wrong. Please try again later.
+              </p>
+            )}
           </div>
         </div>
       </section>

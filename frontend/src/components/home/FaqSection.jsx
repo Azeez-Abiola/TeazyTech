@@ -54,7 +54,7 @@ const FaqSection = () => {
                 <div key={index} className="border-b border-neutral-200">
                   <button
                     onClick={() => setOpen(isOpen ? -1 : index)}
-                    className="flex w-full items-center justify-between gap-6 py-6 text-left"
+                    className="flex w-full flex-nowrap items-center justify-between gap-4 py-6 text-left sm:gap-6"
                   >
                     <h3 className="text-base font-bold text-neutral-900 sm:text-lg">
                       {faq.question}

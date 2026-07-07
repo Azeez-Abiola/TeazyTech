@@ -98,12 +98,20 @@ function ResourceModal({ mode, resource, onClose, onSaved }) {
     if (f) setResourceFile(f);
   };
 
+  const MAX_FILE_BYTES = 10 * 1024 * 1024; // Cloudinary free-plan raw file cap
+
   const validate = () => {
     const e = {};
     if (!form.title.trim()) e.title = 'Title is required';
     if (!form.description.trim()) e.description = 'Description is required';
     if (form.price === '' || isNaN(Number(form.price))) e.price = 'Enter a valid price (0 for free)';
     if (mode === 'create' && !resourceFile) e.file = 'Please attach a resource file';
+    if (resourceFile && resourceFile.size > MAX_FILE_BYTES) {
+      e.file = `File is too large (${(resourceFile.size / (1024 * 1024)).toFixed(1)}MB) — the maximum upload size is 10MB`;
+    }
+    if (thumbnailFile && thumbnailFile.size > MAX_FILE_BYTES) {
+      e.file = 'Thumbnail is too large — the maximum upload size is 10MB';
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
