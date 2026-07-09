@@ -10,7 +10,6 @@ import AboutPreview from "../components/home/AboutPreview";
 import ServicesPreview from "../components/home/ServicesPreview";
 import TestimonialsSection from "../components/home/TestimonialsSection";
 import CtaSection from "../components/home/CtaSection";
-import BlogPreview from "../components/home/BlogPreview";
 import BlogMarquee from "../components/home/BlogMarquee";
 import FaqSection from "../components/home/FaqSection";
 import NewsletterSection from "../components/home/NewsletterSection";
