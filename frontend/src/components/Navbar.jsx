@@ -172,7 +172,7 @@ const Navbar = () => {
                   rel="noopener noreferrer"
                 >
                   <span className="nav-icon">🎓</span>
-                  <span className="nav-text">Learn With Us</span>
+                  <span className="nav-text">Courses</span>
                 </a>
               </li>
               <li>
@@ -182,7 +182,7 @@ const Navbar = () => {
                   rel="noopener noreferrer"
                 >
                   <span className="nav-icon">🤖</span>
-                  <span className="nav-text">Explore AI Tools</span>
+                  <span className="nav-text">Teazy AI</span>
                 </a>
               </li>
               {/* <li className={location.pathname === '/contact' ? 'active' : ''}>

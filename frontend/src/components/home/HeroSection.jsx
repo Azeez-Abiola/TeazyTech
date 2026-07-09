@@ -9,7 +9,6 @@ const heroImages = [
   "/images/Gallery Ibadan Training/IMG_7713.jpg",
   "/images/Gallery Kaduna Training/IMG_5756.jpg",
   "/images/Mastercard Foundation Edtech Conference/IMG_6333.jpg",
-  "/images/Gallery Kaduna Training/IMG_6071.jpg",
   "/images/workshopPhotos/IMG_7526.jpg",
 ];
 
@@ -140,11 +139,11 @@ const HeroSection = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="order-2 max-w-[300px] text-xs leading-6 text-white/80 [text-shadow:0_2px_10px_rgba(0,0,0,0.5)] lg:absolute lg:right-6 lg:top-1/2 lg:order-none lg:-translate-y-1/2 lg:text-right"
+          className="order-2 max-w-[360px] text-xs leading-6 text-white/80 [text-shadow:0_2px_10px_rgba(0,0,0,0.5)] lg:absolute lg:right-6 lg:top-1/2 lg:order-none lg:-translate-y-1/2 lg:text-right"
         >
           <p>
-            Gain the edge you need to educate this advanced generation of
-            learners.
+            Empowering educators with cutting edge knowledge and educational
+            technology tools.
           </p>
 
           <div className="mt-5 flex flex-wrap gap-6 lg:justify-end">

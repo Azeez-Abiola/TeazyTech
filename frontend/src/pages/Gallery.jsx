@@ -25,6 +25,10 @@ const filters = [
     id: "workshops",
     name: "Workshops",
   },
+  {
+    id: "exhibitions",
+    name: "Exhibitions",
+  },
 ];
 const Gallery = () => {
   const [activeFilter, setActiveFilter] = useState("all");
@@ -50,8 +54,8 @@ const Gallery = () => {
   const groupedGallery = useMemo(() => {
     return {
       events: galleryData.filter((item) => item.category === "events"),
-
       workshops: galleryData.filter((item) => item.category === "workshops"),
+      exhibitions: galleryData.filter((item) => item.category === "exhibitions"),
     };
   }, []);
 
@@ -209,6 +213,13 @@ const Gallery = () => {
                 title="Workshops"
                 items={groupedGallery.workshops}
               />
+
+              {groupedGallery.exhibitions.length > 0 && (
+                <GallerySection
+                  title="Exhibitions"
+                  items={groupedGallery.exhibitions}
+                />
+              )}
             </>
           ) : (
             <>

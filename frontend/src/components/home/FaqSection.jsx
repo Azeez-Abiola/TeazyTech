@@ -3,11 +3,6 @@ import { FaPlus, FaTimes } from "react-icons/fa";
 
 const faqs = [
   {
-    question: "Am I paying for the resources or guide?",
-    answer:
-      "No. Most of our resources and guides are completely free for teachers. For premium resources, we always ensure they remain affordable for educators.",
-  },
-  {
     question: "Can I get help with an EdTech tool that's not mentioned here?",
     answer:
       "Absolutely. Join our community and we'll support you with any educational technology tool you're struggling with, even if it's not currently listed on our platform.",
@@ -27,11 +22,6 @@ const faqs = [
     answer:
       "Definitely. Our programs are designed for beginners and experienced educators alike. We teach step-by-step with practical examples.",
   },
-  {
-    question: "How long before I see results?",
-    answer:
-      "Most educators notice improved classroom engagement within a few weeks of consistently applying what they learn.",
-  },
 ];
 
 const FaqSection = () => {
@@ -42,9 +32,9 @@ const FaqSection = () => {
       <div className="container">
         <div className="mx-auto max-w-4xl">
           <h2 className="font-display text-4xl font-medium uppercase leading-[1.02] text-neutral-900 md:text-6xl">
-            (Frequently
+            Frequently
             <br />
-            Asked Questions)
+            Asked Questions
           </h2>
 
           <div className="mt-14">

@@ -16,6 +16,8 @@ import FaqSection from "../components/home/FaqSection";
 import NewsletterSection from "../components/home/NewsletterSection";
 import AnimatedSection from "../components/home/AnimatedSection";
 import FormSection from "../components/home/formSection";
+import TeazyAIBlock from "../components/home/TeazyAIBlock";
+import TeazyLMSBlock from "../components/home/TeazyLMSBlock";
 
 const Home = () => {
   const [showSuccess, setShowSuccess] = useState(false);
@@ -28,6 +30,8 @@ const Home = () => {
       <HeroSection />
       <FeaturesSection />
       <ServicesPreview />
+      <TeazyAIBlock />
+      <TeazyLMSBlock />
       <TestimonialsSection />
       <BlogMarquee />
       <FaqSection />
