@@ -7,11 +7,8 @@ import LazyImage from "../components/LazyImage";
 import CircularGallery from "../components/ui/CircularGallery";
 import Grainient from "../components/ui/Grainient";
 const galleryItems = galleryData.flatMap((item) =>
-    item.images.map((image) => ({
-      image,
-      text: item.title,
-    }))
-  );
+  item.images.map((image) => ({ image }))
+);
 const filters = [
   {
     id: "all",
@@ -144,11 +141,8 @@ const Gallery = () => {
       <div className="lg:flex hidden" style={{ height: "100vh", position: "relative", backgroundColor: "#849abb" }}>
         <CircularGallery
           bend={1}
-          textColor="#000000"
           borderRadius={0.05}
           scrollEase={0.05}
-          fontUrl=""
-          font="bold 15px Orbitron"
           scrollSpeed={2}
           items={galleryItems}
         />

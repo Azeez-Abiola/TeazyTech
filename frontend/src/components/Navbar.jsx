@@ -4,6 +4,46 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "../styles/Navbar.css";
 import Logo from "./Logo";
+import NavDropdown from "./NavDropdown";
+import { Users, Images, FolderOpen, Bot, GraduationCap } from "lucide-react";
+
+const ABOUT_ITEMS = [
+  {
+    label: "About Us",
+    to: "/about",
+    description: "Our mission, vision, and story empowering educators",
+    Icon: Users,
+  },
+  {
+    label: "Gallery",
+    to: "/gallery",
+    description: "Photos from trainings, workshops, and events",
+    Icon: Images,
+  },
+];
+
+const SERVICES_ITEMS = [
+  {
+    label: "Resources",
+    to: "/resources",
+    description: "Guides, e-books, webinars, and EdTech tools",
+    Icon: FolderOpen,
+  },
+  {
+    label: "Teazy AI",
+    href: "https://ai.teazytech.online",
+    external: true,
+    description: "AI-powered lesson plans, quizzes, and assessments",
+    Icon: Bot,
+  },
+  {
+    label: "Courses",
+    href: "https://www.teazytech.online",
+    external: true,
+    description: "Structured online learning for educators",
+    Icon: GraduationCap,
+  },
+];
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,37 +51,30 @@ const Navbar = () => {
   const menuRef = useRef(null);
   const location = useLocation();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
+  const isAboutActive =
+    location.pathname === "/about" || location.pathname === "/gallery";
+  const isServicesActive =
+    location.pathname === "/services" ||
+    location.pathname === "/resources" ||
+    location.pathname.startsWith("/services");
 
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
-    setIsMenuOpen(false); // Close menu when route changes
+    setIsMenuOpen(false);
   }, [location]);
 
   useEffect(() => {
-    // Disable body scroll when menu is open on mobile
-    if (isMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-
+    document.body.style.overflow = isMenuOpen ? "hidden" : "unset";
     return () => {
       document.body.style.overflow = "unset";
     };
   }, [isMenuOpen]);
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -75,9 +108,9 @@ const Navbar = () => {
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           aria-label="Toggle navigation menu"
         >
-          <span className="menu-toggle-bar"></span>
-          <span className="menu-toggle-bar"></span>
-          <span className="menu-toggle-bar"></span>
+          <span className="menu-toggle-bar" />
+          <span className="menu-toggle-bar" />
+          <span className="menu-toggle-bar" />
         </button>
 
         <div
@@ -91,106 +124,70 @@ const Navbar = () => {
                 alt="Teazy Tech logo"
                 className="h-8 w-8 object-contain"
               />
-              <span className="text-lg font-bold text-white">
-                Teazy Tech
-              </span>
+              <span className="text-lg font-bold text-white">Teazy Tech</span>
             </Link>
             <button
               className="menu-close"
               onClick={() => setIsMenuOpen(false)}
               aria-label="Close navigation menu"
             >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M18 6L6 18"
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
-                  strokeLinejoin="round"
                 />
                 <path
                   d="M6 6L18 18"
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
-                  strokeLinejoin="round"
                 />
               </svg>
             </button>
           </div>
 
           <nav className="nav-links">
-            <ul>
+            <ul className="nav-links__desktop">
               <li className={location.pathname === "/" ? "active" : ""}>
                 <Link to="/">
-                  <span className="nav-icon">🏠</span>
                   <span className="nav-text">Home</span>
                 </Link>
               </li>
-              {/* <li className={location.pathname === '/about' ? 'active' : ''}>
-                <Link to="/about">
-                  <span className="nav-icon">👥</span>
-                  <span className="nav-text">About Us</span>
-                </Link>
-              </li> */}
-              <li
-                className={location.pathname === "/resources" ? "active" : ""}
-              >
-                <Link to="/resources">
-                  <span className="nav-icon">📚</span>
-                  <span className="nav-text">Resources</span>
-                </Link>
-              </li>
-              <li className={location.pathname === "/services" ? "active" : ""}>
-                <Link to="/services">
-                  <span className="nav-icon">🛠️</span>
-                  <span className="nav-text">Services</span>
-                </Link>
-              </li>
-              <li className={location.pathname === "/gallery" ? "active" : ""}>
-                <Link to="/gallery">
-                  <span className="nav-icon">🖼️</span>
-                  <span className="nav-text">Gallery</span>
-                </Link>
-              </li>
+
+              <NavDropdown
+                label="About"
+                items={ABOUT_ITEMS}
+                isActive={isAboutActive}
+              />
+
+              <NavDropdown
+                label="Services"
+                items={SERVICES_ITEMS}
+                isActive={isServicesActive}
+              />
+
               <li className={location.pathname === "/blog" ? "active" : ""}>
                 <Link to="/blog">
-                  <span className="nav-icon">📝</span>
-                  <span className="nav-text">Blogs</span>
+                  <span className="nav-text">Blog</span>
                 </Link>
               </li>
-              <li>
-                <a
-                  href="https://www.teazytech.online"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span className="nav-icon">🎓</span>
-                  <span className="nav-text">Courses</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://ai.teazytech.online"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span className="nav-icon">🤖</span>
-                  <span className="nav-text">Teazy AI</span>
-                </a>
-              </li>
-              {/* <li className={location.pathname === '/contact' ? 'active' : ''}>
-                <Link to="/contact">
-                  <span className="nav-icon">📝</span>
-                  <span className="nav-text">Contact</span>
+            </ul>
+
+            <ul className="nav-links__mobile">
+              <li className={location.pathname === "/" ? "active" : ""}>
+                <Link to="/">
+                  <span className="nav-text">Home</span>
                 </Link>
-              </li> */}
+              </li>
+              <NavDropdown label="About" items={ABOUT_ITEMS} mobile />
+              <NavDropdown label="Services" items={SERVICES_ITEMS} mobile />
+              <li className={location.pathname === "/blog" ? "active" : ""}>
+                <Link to="/blog">
+                  <span className="nav-text">Blog</span>
+                </Link>
+              </li>
             </ul>
           </nav>
 
@@ -198,42 +195,35 @@ const Navbar = () => {
             <Link to="/contact" className="btn-mobile-contact">
               Contact Us
             </Link>
-            <Link to="/get-started" className="btn-mobile-cta">
+            <Link to="/services" className="btn-mobile-cta">
               Get Started
             </Link>
-
             <div className="social-links">
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i className="fab fa-twitter"></i>
-              </a>
               <a
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <i className="fab fa-facebook"></i>
+                <i className="fab fa-facebook" />
               </a>
               <a
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <i className="fab fa-instagram"></i>
+                <i className="fab fa-instagram" />
               </a>
               <a
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <i className="fab fa-linkedin"></i>
+                <i className="fab fa-linkedin" />
               </a>
             </div>
           </div>
         </div>
+
         <Link
           to="/contact"
           className="bg-gradient-to-r from-[#233463] to-[#2F6FCC] !text-white lg:inline-flex hidden items-center px-6 py-3 text-[11px] font-bold uppercase tracking-[0.2em] transition-opacity hover:opacity-90"

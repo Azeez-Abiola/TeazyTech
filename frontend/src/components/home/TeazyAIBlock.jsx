@@ -1,10 +1,8 @@
-import { Link } from "react-router-dom";
-import { Bot, Sparkles, ArrowUpRight } from "lucide-react";
+import { Bot, ArrowUpRight } from "lucide-react";
 
 const TeazyAIBlock = () => {
   return (
     <section className="relative overflow-hidden bg-[#0d1117] py-24">
-      {/* Decorative glow */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-40 left-1/2 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-[#2F6FCC]/20 blur-[120px]"
@@ -12,7 +10,6 @@ const TeazyAIBlock = () => {
 
       <div className="container relative z-10">
         <div className="grid items-center gap-16 lg:grid-cols-2">
-          {/* Left — copy */}
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-[#2F6FCC]/40 bg-[#2F6FCC]/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.25em] text-[#6ea8ff]">
               <Bot className="h-3.5 w-3.5" />
@@ -33,7 +30,7 @@ const TeazyAIBlock = () => {
               to assessment assistants, all powered by cutting-edge AI.
             </p>
 
-            <div className="mt-10 flex flex-wrap items-center gap-6">
+            <div className="mt-10">
               <a
                 href="https://ai.teazytech.online"
                 target="_blank"
@@ -43,14 +40,9 @@ const TeazyAIBlock = () => {
                 Launch Teazy AI
                 <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </a>
-
-              <span className="text-xs text-white/40">
-                Free for educators
-              </span>
             </div>
           </div>
 
-          {/* Right — feature pills */}
           <div className="grid gap-4 sm:grid-cols-2">
             {[
               {
@@ -60,7 +52,7 @@ const TeazyAIBlock = () => {
               },
               {
                 icon: "✦",
-                title: "Assessment Builder",
+                title: "Quiz Generator",
                 desc: "Auto-generate quizzes, rubrics, and marking schemes.",
               },
               {
@@ -70,8 +62,8 @@ const TeazyAIBlock = () => {
               },
               {
                 icon: "✦",
-                title: "Classroom Q&A",
-                desc: "Get instant answers to pedagogy and EdTech questions.",
+                title: "Writing Assessment",
+                desc: "Upload handwritten answers and get 100% accurate scoring.",
               },
             ].map((item) => (
               <div

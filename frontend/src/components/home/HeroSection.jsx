@@ -46,7 +46,7 @@ const HeroSection = () => {
     if (countedUp) return;
 
     const yearsTarget = 3;
-    const teachersTarget = 1000;
+    const teachersTarget = 3000;
     const schoolsTarget = 50;
     const duration = 2000; // 2 seconds
     const steps = 40; // Number of steps to reach the target
@@ -142,8 +142,7 @@ const HeroSection = () => {
           className="order-2 max-w-[360px] text-xs leading-6 text-white/80 [text-shadow:0_2px_10px_rgba(0,0,0,0.5)] lg:absolute lg:right-6 lg:top-1/2 lg:order-none lg:-translate-y-1/2 lg:text-right"
         >
           <p>
-            Empowering educators with cutting edge knowledge and educational
-            technology tools.
+            Building Future Ready Teachers Today
           </p>
 
           <div className="mt-5 flex flex-wrap gap-6 lg:justify-end">
@@ -159,7 +158,7 @@ const HeroSection = () => {
               to="/resources"
               className="inline-flex items-center gap-2 border-b border-transparent pb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70 transition-colors hover:border-white/60 hover:text-white"
             >
-              Take a Tour
+              Resources
             </Link>
           </div>
         </motion.div>

@@ -53,9 +53,9 @@ const BlogMarquee = () => {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="font-display text-4xl font-medium uppercase leading-[0.95] !text-white md:text-5xl">
-              (Our
+              Our
               <br />
-              Blog)
+              Blog
             </h2>
             <div className="mt-3 h-[2px] w-24 bg-gradient-to-r from-white/60 to-transparent" />
           </div>

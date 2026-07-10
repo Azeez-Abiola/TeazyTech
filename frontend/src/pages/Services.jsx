@@ -6,6 +6,7 @@ import { FaCheck } from "react-icons/fa";
 import { motion } from "framer-motion";
 import FaqSection from "../components/home/FaqSection";
 import NewsletterSection from "../components/home/NewsletterSection";
+import ServicesEcosystem from "../components/services/ServicesEcosystem";
 const services = [
   {
     number: "01",
@@ -303,6 +304,8 @@ const Services = () => {
           </div>
         </div>
       </section>
+
+      <ServicesEcosystem />
 
       {/* Testimonials */}
       <div className="relative z-10 mx-auto flex min-h-fit max-w-7xl items-center px-0 py-16 lg:px-10">
