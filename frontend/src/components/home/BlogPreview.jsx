@@ -1,6 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import BlogCardIconHeader from "../blog/BlogCardIconHeader";
+import "../../styles/BlogCard.css";
 
 const BlogPreview = () => {
     const [blogPosts, setBlogPosts] = useState([]);
@@ -46,16 +48,8 @@ const BlogPreview = () => {
 
     const PostCard = ({ post, featured: isFeatured = false }) => (
         <article className={isFeatured ? "tt-mag__featured" : "tt-mag__card"}>
-            <div className="tt-mag__img">
-                <img
-                    src={post.thumbnail || "/default-blog-thumbnail.png"}
-                    alt={post.title}
-                    data-cover
-                    onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "/default-blog-thumbnail.png";
-                    }}
-                />
+            <div className="tt-mag__img tt-mag__img--icon">
+                <BlogCardIconHeader category={post.category} compact />
             </div>
             <div className="tt-mag__body">
                 <p className="tt-mag__date">{post.published_date}</p>

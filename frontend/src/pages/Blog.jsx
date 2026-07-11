@@ -5,8 +5,11 @@ import Logo from "../components/Logo";
 import "../styles/Blog.css";
 import Grainient from "../components/ui/Grainient";
 import { FaSearch } from "react-icons/fa";
+import { User, Calendar, Eye } from "lucide-react";
 import { motion } from "framer-motion";
 import NewsletterSection from "../components/home/NewsletterSection";
+import BlogCardIconHeader from "../components/blog/BlogCardIconHeader";
+import "../styles/BlogCard.css";
 
 const Blog = () => {
   const [blogPosts, setBlogPosts] = useState([]);
@@ -196,20 +199,9 @@ const Blog = () => {
                       <Link
                         to={`/blog/${post.id}`}
                         onClick={(e) => trackPostView(post.id, e)}
-                        className="relative block aspect-[16/10] overflow-hidden bg-slate-100"
+                        className="relative block aspect-[16/10] overflow-hidden"
                       >
-                        {/* Blurred fill so odd-shaped thumbnails never look cut off */}
-                        <img
-                          src={post.thumbnail || "/default-blog-thumbnail.png"}
-                          alt=""
-                          aria-hidden="true"
-                          className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-lg"
-                        />
-                        <img
-                          src={post.thumbnail || "/default-blog-thumbnail.png"}
-                          alt={post.title}
-                          className="relative h-full w-full object-contain transition duration-500 group-hover:scale-[1.04]"
-                        />
+                        <BlogCardIconHeader category={post.category} />
 
                         <div className="absolute top-4 left-4">
                           <span className="rounded-full bg-blue-600 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-white shadow-lg">
@@ -219,12 +211,19 @@ const Blog = () => {
                       </Link>
 
                       <div className="flex flex-1 flex-col p-6">
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
-                          <span>👤 {post.author}</span>
-
-                          <span>📅 {post.published_date}</span>
-
-                          <span>👁 {post.views || 0}</span>
+                        <div className="blog-card-meta">
+                          <span className="blog-card-meta__item">
+                            <User size={13} strokeWidth={2} />
+                            {post.author}
+                          </span>
+                          <span className="blog-card-meta__item">
+                            <Calendar size={13} strokeWidth={2} />
+                            {post.published_date}
+                          </span>
+                          <span className="blog-card-meta__item">
+                            <Eye size={13} strokeWidth={2} />
+                            {post.views || 0}
+                          </span>
                         </div>
 
                         <Link
