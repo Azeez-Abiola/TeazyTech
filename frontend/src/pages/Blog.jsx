@@ -8,7 +8,6 @@ import { FaSearch } from "react-icons/fa";
 import { User, Calendar, Eye } from "lucide-react";
 import { motion } from "framer-motion";
 import NewsletterSection from "../components/home/NewsletterSection";
-import BlogCardIconHeader from "../components/blog/BlogCardIconHeader";
 import "../styles/BlogCard.css";
 
 const Blog = () => {
@@ -199,9 +198,19 @@ const Blog = () => {
                       <Link
                         to={`/blog/${post.id}`}
                         onClick={(e) => trackPostView(post.id, e)}
-                        className="relative block aspect-[16/10] overflow-hidden"
+                        className="relative block aspect-[16/10] overflow-hidden bg-slate-100"
                       >
-                        <BlogCardIconHeader category={post.category} />
+                        <img
+                          src={post.thumbnail || "/default-blog-thumbnail.png"}
+                          alt=""
+                          aria-hidden="true"
+                          className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-lg"
+                        />
+                        <img
+                          src={post.thumbnail || "/default-blog-thumbnail.png"}
+                          alt={post.title}
+                          className="relative h-full w-full object-contain transition duration-500 group-hover:scale-[1.04]"
+                        />
 
                         <div className="absolute top-4 left-4">
                           <span className="rounded-full bg-blue-600 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-white shadow-lg">

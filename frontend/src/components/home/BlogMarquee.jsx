@@ -1,8 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import BlogCardIconHeader from "../blog/BlogCardIconHeader";
-import "../../styles/BlogCard.css";
 
 /**
  * Foresight-style "( OUR BLOG )" rail: an infinite horizontal marquee
@@ -99,8 +97,17 @@ const BlogMarquee = () => {
                 onClick={(e) => trackPostView(post.id, e)}
                 className="group mx-3 w-[280px] shrink-0 sm:w-[320px]"
               >
-                <div className="aspect-[4/5] overflow-hidden">
-                  <BlogCardIconHeader category={post.category} dark compact />
+                <div className="aspect-[4/5] overflow-hidden bg-white/10">
+                  <img
+                    src={post.thumbnail || "/default-blog-thumbnail.png"}
+                    alt={post.title}
+                    loading="lazy"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/default-blog-thumbnail.png";
+                    }}
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
                 </div>
 
                 <h3 className="mt-4 truncate text-[13px] font-bold uppercase tracking-[0.15em] !text-white">
