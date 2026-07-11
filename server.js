@@ -2018,11 +2018,22 @@ const sendCongratulatoryEmail = async (email, resourceTitle, downloadUrl) => {
   }
 
   const fromEmail = process.env.RESEND_FROM_EMAIL || "Teazy Tech <hello@teazytech.org>";
+  const siteUrl = (process.env.SITE_URL || "https://teazytech.org").replace(/\/$/, "");
+  const logoUrl = `${siteUrl}/images/logo/teazy-tech-logo-icon.png`;
   
   const htmlContent = `
     <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 25px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);">
       <div style="text-align: center; margin-bottom: 25px;">
-        <h2 style="color: #2F6FCC; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">Teazy Tech</h2>
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 0 auto;">
+          <tr>
+            <td style="vertical-align: middle; padding-right: 12px;">
+              <img src="${logoUrl}" alt="Teazy Tech" width="40" height="40" style="display: block; border: 0; outline: none;" />
+            </td>
+            <td style="vertical-align: middle;">
+              <h2 style="color: #2F6FCC; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">Teazy Tech</h2>
+            </td>
+          </tr>
+        </table>
       </div>
       <div style="background: linear-gradient(135deg, #2F6FCC, #1a4d99); color: #ffffff; padding: 35px 25px; border-radius: 12px; text-align: center; margin-bottom: 30px;">
         <h1 style="margin: 0; font-size: 26px; font-weight: bold; line-height: 1.2;">Thank You for Your Purchase!</h1>
