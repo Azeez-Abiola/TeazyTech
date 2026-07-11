@@ -410,6 +410,24 @@
   margin-bottom: 0.5rem;
 }
 
+.tt-partners__item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.tt-partners__logo {
+  height: 48px;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+  opacity: 0.95;
+  transition: opacity 0.3s;
+}
+
+.tt-partners__logo:hover {
+  opacity: 1;
+}
+
 .tt-partners__name {
   font-size: clamp(0.85rem, 2vw, 1rem);
   font-weight: 700;

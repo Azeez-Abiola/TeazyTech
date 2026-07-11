@@ -612,7 +612,25 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 1rem 2rem;
+  gap: 2rem 3rem;
+}
+
+.about-partners__item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.about-partners__logo {
+  height: 52px;
+  width: auto;
+  max-width: 200px;
+  object-fit: contain;
+  opacity: 0.9;
+  transition: opacity 0.3s;
+}
+
+.about-partners__logo:hover {
+  opacity: 1;
 }
 
 .about-partners__name {

@@ -485,12 +485,17 @@ const About = () => {
             </p>
           </div>
           <div className="about-partners__list">
-            {partnersData.map((partner, i) => (
-              <span key={partner.id}>
-                {i > 0 && (
-                  <span className="about-partners__dot" aria-hidden="true" />
+            {partnersData.map((partner) => (
+              <span key={partner.id} className="about-partners__item">
+                {partner.logo ? (
+                  <img
+                    src={partner.logo}
+                    alt={partner.name}
+                    className="about-partners__logo"
+                  />
+                ) : (
+                  <span className="about-partners__name">{partner.name}</span>
                 )}
-                <span className="about-partners__name">{partner.name}</span>
               </span>
             ))}
           </div>

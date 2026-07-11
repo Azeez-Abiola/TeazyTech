@@ -3,19 +3,14 @@
  */
 const partnersData = [
     {
-        id: "mastercard-foundation",
-        name: "Mastercard Foundation",
-        logo: null,
-    },
-    {
-        id: "giz",
-        name: "GIZ",
-        logo: null,
-    },
-    {
         id: "global-campaign-education",
         name: "Global Campaign for Education",
         logo: null,
+    },
+    {
+        id: "orange-corners-nigeria",
+        name: "Orange Corners Nigeria",
+        logo: "/images/orange-corners.png",
     },
 ];
 

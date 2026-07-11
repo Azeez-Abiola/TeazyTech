@@ -2218,6 +2218,20 @@ app.get("/api/resources/:id/verify", async (req, res, next) => {
         return res.status(402).json({ error: "Payment not confirmed" });
       }
 
+      const paidAmount = Number(verifyData.data.amount);
+      const expectedAmount = Math.round(Number(resource.price) * 100);
+      if (paidAmount !== expectedAmount) {
+        logger.warn(
+          { paidAmount, expectedAmount, resourceId: id, ref },
+          "Paystack amount mismatch",
+        );
+        return res.status(402).json({ error: "Payment amount mismatch" });
+      }
+
+      if (verifyData.data.currency && verifyData.data.currency !== "NGN") {
+        return res.status(402).json({ error: "Invalid payment currency" });
+      }
+
       // Check that the metadata matches
       const metaResourceId = verifyData.data?.metadata?.resource_id;
       if (metaResourceId && metaResourceId !== id) {

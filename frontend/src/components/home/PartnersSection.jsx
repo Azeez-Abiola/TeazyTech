@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import partnersData from "../../lib/partnersData";
 
 const PartnersSection = () => (
@@ -6,18 +5,20 @@ const PartnersSection = () => (
         <div className="container-wide">
             <p className="tt-partners__title">Our Partners &amp; Supporters</p>
             <div className="tt-partners__inner">
-                {partnersData.map((partner, i) => (
-                    <Fragment key={partner.name}>
-                        {i > 0 && (
-                            <span
-                                className="tt-partners__sep"
-                                aria-hidden="true"
+                {partnersData.map((partner) => (
+                    <span key={partner.id} className="tt-partners__item">
+                        {partner.logo ? (
+                            <img
+                                src={partner.logo}
+                                alt={partner.name}
+                                className="tt-partners__logo"
                             />
+                        ) : (
+                            <span className="tt-partners__name">
+                                {partner.name}
+                            </span>
                         )}
-                        <span className="tt-partners__name">
-                            {partner.name}
-                        </span>
-                    </Fragment>
+                    </span>
                 ))}
             </div>
         </div>

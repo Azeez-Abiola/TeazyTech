@@ -5,7 +5,10 @@ import { Link, useLocation } from "react-router-dom";
 import "../styles/Navbar.css";
 import Logo from "./Logo";
 import NavDropdown from "./NavDropdown";
-import { Users, Images, FolderOpen, Bot, GraduationCap } from "lucide-react";
+import { Users, Images, FolderOpen, Briefcase } from "lucide-react";
+
+const TEAZY_AI_URL = "https://ai.teazytech.online";
+const COURSES_URL = "https://www.teazytech.online";
 
 const ABOUT_ITEMS = [
   {
@@ -24,24 +27,16 @@ const ABOUT_ITEMS = [
 
 const SERVICES_ITEMS = [
   {
+    label: "Our Services",
+    to: "/services",
+    description: "Workshops, training, and technology integration for schools",
+    Icon: Briefcase,
+  },
+  {
     label: "Resources",
     to: "/resources",
     description: "Guides, e-books, webinars, and EdTech tools",
     Icon: FolderOpen,
-  },
-  {
-    label: "Teazy AI",
-    href: "https://ai.teazytech.online",
-    external: true,
-    description: "AI-powered lesson plans, quizzes, and assessments",
-    Icon: Bot,
-  },
-  {
-    label: "Courses",
-    href: "https://www.teazytech.online",
-    external: true,
-    description: "Structured online learning for educators",
-    Icon: GraduationCap,
   },
 ];
 
@@ -168,6 +163,26 @@ const Navbar = () => {
                 isActive={isServicesActive}
               />
 
+              <li>
+                <a
+                  href={TEAZY_AI_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="nav-text">Teazy AI</span>
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href={COURSES_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="nav-text">Courses</span>
+                </a>
+              </li>
+
               <li className={location.pathname === "/blog" ? "active" : ""}>
                 <Link to="/blog">
                   <span className="nav-text">Blog</span>
@@ -183,6 +198,24 @@ const Navbar = () => {
               </li>
               <NavDropdown label="About" items={ABOUT_ITEMS} mobile />
               <NavDropdown label="Services" items={SERVICES_ITEMS} mobile />
+              <li>
+                <a
+                  href={TEAZY_AI_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="nav-text">Teazy AI</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href={COURSES_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="nav-text">Courses</span>
+                </a>
+              </li>
               <li className={location.pathname === "/blog" ? "active" : ""}>
                 <Link to="/blog">
                   <span className="nav-text">Blog</span>

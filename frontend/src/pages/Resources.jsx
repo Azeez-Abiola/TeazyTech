@@ -20,18 +20,29 @@ const CATEGORIES = [
    Paystack checkout hook
 ───────────────────────────────────────── */
 function usePaystack() {
-  const initiate = useCallback(({ email, amount, resourceId, resourceTitle, onSuccess, onCancel }) => {
-    const handler = window.PaystackPop?.setup({
-      key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || "",
+  const initiate = useCallback(({ email, amount, resourceId, resourceTitle, onSuccess, onCancel, onError }) => {
+    const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
+    if (!publicKey) {
+      onError?.("Payment is not configured. Please contact support.");
+      return false;
+    }
+    if (!window.PaystackPop?.setup) {
+      onError?.("Payment provider failed to load. Please refresh and try again.");
+      return false;
+    }
+
+    const handler = window.PaystackPop.setup({
+      key: publicKey,
       email,
-      amount: amount * 100, // kobo
+      amount: Math.round(Number(amount) * 100), // kobo
       currency: "NGN",
       ref: `TEAZY_${resourceId}_${Date.now()}`,
       metadata: { resource_id: resourceId, resource_title: resourceTitle },
       callback: (response) => onSuccess(response.reference),
       onClose: onCancel,
     });
-    handler?.openIframe();
+    handler.openIframe();
+    return true;
   }, []);
   return { initiate };
 }
@@ -311,6 +322,10 @@ const Resources = () => {
         }
       },
       onCancel: () => { /* user closed Paystack — do nothing */ },
+      onError: (message) => {
+        setPayError(message);
+        setModalState("error");
+      },
     });
   };
 
