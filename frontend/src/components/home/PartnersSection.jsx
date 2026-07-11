@@ -1,8 +1,9 @@
 import partnersData from "../../lib/partnersData";
+import "../../styles/PartnersSection.css";
 
 const PartnersSection = () => (
     <section className="tt-partners">
-        <div className="container-wide">
+        <div className="container">
             <p className="tt-partners__title">Our Partners &amp; Supporters</p>
             <div className="tt-partners__inner">
                 {partnersData.map((partner) => (
