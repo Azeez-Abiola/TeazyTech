@@ -16,6 +16,8 @@ const CATEGORIES = [
   { id: "research", name: "Research & Case Studies" },
 ];
 
+const isFreeResource = (resource) => Number(resource?.price ?? NaN) === 0;
+
 /* ─────────────────────────────────────────
    Paystack checkout hook
 ───────────────────────────────────────── */
@@ -53,7 +55,7 @@ function usePaystack() {
 function EmailModal({ resource, onConfirm, onClose }) {
   const [email, setEmail] = useState("");
   const [err, setErr] = useState("");
-  const isFree = Number(resource.price) === 0;
+  const isFree = isFreeResource(resource);
 
   const submit = (e) => {
     e.preventDefault();
@@ -131,8 +133,7 @@ function VerifyingModal({ message }) {
 /* ─────────────────────────────────────────
    Success overlay
 ───────────────────────────────────────── */
-function SuccessModal({ resource, downloadUrl, onClose }) {
-  const isFree = Number(resource.price) === 0;
+function SuccessModal({ resource, downloadUrl, isFree, onClose }) {
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
@@ -167,7 +168,7 @@ function SuccessModal({ resource, downloadUrl, onClose }) {
    Resource Card
 ───────────────────────────────────────── */
 function ResourceCard({ resource, onAccess }) {
-  const isFree = Number(resource.price) === 0;
+  const isFree = isFreeResource(resource);
   const catColors = {
     guides: 'bg-blue-100 text-blue-700',
     tools: 'bg-purple-100 text-purple-700',
@@ -236,6 +237,7 @@ const Resources = () => {
   // Modal state machine: null | 'email' | 'verifying' | 'success' | 'error'
   const [modalState, setModalState] = useState(null);
   const [selectedResource, setSelectedResource] = useState(null);
+  const [pendingIsFree, setPendingIsFree] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState(null);
   const [payError, setPayError] = useState(null);
 
@@ -294,12 +296,13 @@ const Resources = () => {
 
   const handleAccess = (resource) => {
     setSelectedResource(resource);
+    setPendingIsFree(isFreeResource(resource));
     setModalState("email");
     setPayError(null);
   };
 
   const handleEmailConfirm = async (email) => {
-    const isFree = Number(selectedResource.price) === 0;
+    const isFree = pendingIsFree;
 
     if (isFree) {
       // Free resource → verify instantly (no payment reference needed)
@@ -348,6 +351,7 @@ const Resources = () => {
   const closeAll = () => {
     setModalState(null);
     setSelectedResource(null);
+    setPendingIsFree(false);
     setDownloadUrl(null);
     setPayError(null);
   };
@@ -371,14 +375,19 @@ const Resources = () => {
       {modalState === "verifying" && (
         <VerifyingModal
           message={
-            selectedResource && Number(selectedResource.price) === 0
+            pendingIsFree
               ? "Preparing your free download…"
               : "Verifying payment…"
           }
         />
       )}
       {modalState === "success" && selectedResource && downloadUrl && (
-        <SuccessModal resource={selectedResource} downloadUrl={downloadUrl} onClose={closeAll} />
+        <SuccessModal
+          resource={selectedResource}
+          downloadUrl={downloadUrl}
+          isFree={pendingIsFree}
+          onClose={closeAll}
+        />
       )}
       {modalState === "error" && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
@@ -489,7 +498,7 @@ const Resources = () => {
                       onClick={() => handleAccess(resource)}
                       className="btn btn-primary"
                     >
-                      {Number(resource.price) === 0
+                      {isFreeResource(resource)
                         ? "Download Free Resource"
                         : `Buy for ₦${Number(resource.price).toLocaleString()}`}
                     </button>
