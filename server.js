@@ -1922,8 +1922,10 @@ async function createResourceRecord(req, res, next) {
     const isAdmin = await checkAdmin(admin, db, decoded);
     if (!isAdmin) return res.status(403).json({ error: "Admin access required" });
 
-    let fileUrl = req.body.fileUrl || null;
-    let thumbnailUrl = req.body.thumbnailUrl || null;
+    const { fileUrl: bodyFileUrl, thumbnailUrl: bodyThumbUrl, ...fields } = req.body;
+
+    let fileUrl = bodyFileUrl || null;
+    let thumbnailUrl = bodyThumbUrl || null;
 
     if (req.files?.file?.[0]) {
       const result = await uploadResourceDocument(req.files.file[0]);
@@ -1935,10 +1937,10 @@ async function createResourceRecord(req, res, next) {
     }
 
     const payload = {
-      ...req.body,
-      price: Number(req.body.price),
-      featured: req.body.featured !== undefined
-        ? parseBooleanField(req.body.featured)
+      ...fields,
+      price: Number(fields.price),
+      featured: fields.featured !== undefined
+        ? parseBooleanField(fields.featured)
         : false,
     };
     const { error, value } = resourceSchema.validate(payload, { abortEarly: false });
