@@ -132,14 +132,22 @@ function VerifyingModal({ message }) {
    Success overlay
 ───────────────────────────────────────── */
 function SuccessModal({ resource, downloadUrl, onClose }) {
+  const isFree = Number(resource.price) === 0;
+
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl p-8 text-center max-w-sm w-full">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
           <CheckCircle2 className="h-8 w-8 text-green-600" />
         </div>
-        <h3 className="text-lg font-bold text-gray-900">Payment Confirmed!</h3>
-        <p className="text-sm text-gray-500 mt-1 mb-6">Your resource is ready to download.</p>
+        <h3 className="text-lg font-bold text-gray-900">
+          {isFree ? "Free Resource Confirmed!" : "Payment Confirmed!"}
+        </h3>
+        <p className="text-sm text-gray-500 mt-1 mb-6">
+          {isFree
+            ? "Your free resource is ready to download."
+            : "Your resource is ready to download."}
+        </p>
         <a
           href={downloadUrl}
           target="_blank"
@@ -361,7 +369,13 @@ const Resources = () => {
         <EmailModal resource={selectedResource} onConfirm={handleEmailConfirm} onClose={closeAll} />
       )}
       {modalState === "verifying" && (
-        <VerifyingModal message="Verifying payment…" />
+        <VerifyingModal
+          message={
+            selectedResource && Number(selectedResource.price) === 0
+              ? "Preparing your free download…"
+              : "Verifying payment…"
+          }
+        />
       )}
       {modalState === "success" && selectedResource && downloadUrl && (
         <SuccessModal resource={selectedResource} downloadUrl={downloadUrl} onClose={closeAll} />
