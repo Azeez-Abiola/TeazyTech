@@ -8,6 +8,65 @@
   overflow-x: hidden;
 }
 
+/* Mobile gallery hero */
+.gallery-hero-mobile {
+  position: relative;
+  min-height: 42vh;
+  display: flex;
+  align-items: flex-end;
+  padding: clamp(5rem, 14vw, 6rem) 0 clamp(2rem, 6vw, 2.5rem);
+  background-image: url("/images/Gallery Ibadan Training/IMG_7742.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.gallery-hero-mobile__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(35, 52, 99, 0.55) 0%,
+    rgba(35, 52, 99, 0.88) 100%
+  );
+}
+
+.gallery-hero-mobile__content {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+}
+
+.gallery-hero-mobile__eyebrow {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--secondary-teal, #44bba4);
+  margin-bottom: 0.75rem;
+}
+
+.gallery-hero-mobile__content h1 {
+  font-size: clamp(1.85rem, 6vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.12;
+  margin-bottom: 0.75rem;
+  color: #fff !important;
+}
+
+.gallery-hero-mobile__content p {
+  max-width: 520px;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.gallery-content-fallback-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(145deg, #9ca9cc 0%, #4a6bc5 55%, #3d5aa8 100%);
+}
+
 /* =====================================================
      HERO
   ===================================================== */

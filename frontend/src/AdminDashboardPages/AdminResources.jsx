@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
 import ConfirmModal from '../components/ui/ConfirmModal';
 import { useAuth } from '../Context/AuthContext';
-import axios from 'axios';
+import axios from '../lib/api';
+import { uploadToCloudinary } from '../lib/cloudinaryUpload';
 import {
   BookOpen, Plus, Trash2, Edit2, X, Upload, FileText,
   ExternalLink, AlertCircle, CheckCircle2, Loader2, Search,
   Tag, DollarSign, Eye, EyeOff, Image as ImageIcon, Paperclip,
-  ShoppingBag, CreditCard
+  ShoppingBag, CreditCard, Star
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -18,6 +19,7 @@ const CATEGORIES = [
 ];
 
 const FILE_TYPES = '.pdf,.doc,.docx,.zip,.pptx,.xlsx';
+const THUMB_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
 const emptyForm = {
   title: '',
@@ -25,6 +27,8 @@ const emptyForm = {
   category: 'guides',
   price: '',
   status: 'published',
+  isFree: false,
+  featured: false,
 };
 
 /* ─────────────────────────────────────────
@@ -71,8 +75,10 @@ function ResourceModal({ mode, resource, onClose, onSaved }) {
     title: resource.title,
     description: resource.description,
     category: resource.category,
-    price: resource.price,
+    price: Number(resource.price) === 0 ? '' : resource.price,
     status: resource.status,
+    isFree: Number(resource.price) === 0,
+    featured: Boolean(resource.featured),
   } : { ...emptyForm });
 
   const [thumbnailFile, setThumbnailFile] = useState(null);
@@ -80,15 +86,26 @@ function ResourceModal({ mode, resource, onClose, onSaved }) {
   const [thumbnailPreview, setThumbnailPreview] = useState(resource?.thumbnailUrl || null);
   const [saving, setSaving] = useState(false);
   const [uploadPct, setUploadPct] = useState(0);
+  const [savePhase, setSavePhase] = useState('idle'); // idle | uploading | saving
   const [errors, setErrors] = useState({});
   const thumbRef = useRef();
   const fileRef = useRef();
+  const errorRef = useRef();
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const pickThumb = e => {
     const f = e.target.files[0];
     if (!f) return;
+    const extOk = /\.(jpe?g|png|webp|gif)$/i.test(f.name);
+    if (!THUMB_TYPES.includes(f.type) && !extOk) {
+      setErrors(prev => ({
+        ...prev,
+        thumb: 'Thumbnail must be JPG, PNG, WEBP, or GIF. HEIC/iPhone photos are not supported — convert or screenshot first.',
+      }));
+      return;
+    }
+    setErrors(prev => ({ ...prev, thumb: undefined }));
     setThumbnailFile(f);
     setThumbnailPreview(URL.createObjectURL(f));
   };
@@ -104,7 +121,9 @@ function ResourceModal({ mode, resource, onClose, onSaved }) {
     const e = {};
     if (!form.title.trim()) e.title = 'Title is required';
     if (!form.description.trim()) e.description = 'Description is required';
-    if (form.price === '' || isNaN(Number(form.price))) e.price = 'Enter a valid price (0 for free)';
+    if (!form.isFree && (form.price === '' || isNaN(Number(form.price)) || Number(form.price) <= 0)) {
+      e.price = 'Enter a valid price for paid resources';
+    }
     if (mode === 'create' && !resourceFile) e.file = 'Please attach a resource file';
     if (resourceFile && resourceFile.size > MAX_FILE_BYTES) {
       e.file = `File is too large (${(resourceFile.size / (1024 * 1024)).toFixed(1)}MB) — the maximum upload size is 10MB`;
@@ -119,29 +138,87 @@ function ResourceModal({ mode, resource, onClose, onSaved }) {
   const submit = async () => {
     if (!validate()) return;
     setSaving(true);
+    setSavePhase('uploading');
+    setUploadPct(0);
     try {
-      const fd = new FormData();
-      Object.entries(form).forEach(([k, v]) => fd.append(k, v));
-      if (thumbnailFile) fd.append('thumbnail', thumbnailFile);
-      if (resourceFile) fd.append('file', resourceFile);
+      let fileUrl = mode === 'edit' ? resource.fileUrl : null;
+      let thumbnailUrl = mode === 'edit' ? resource.thumbnailUrl : null;
 
-      const url = mode === 'create'
-        ? '/api/admin/resources'
-        : `/api/admin/resources/${resource.id}`;
-      const method = mode === 'create' ? 'post' : 'patch';
+      const uploads = [];
 
-      await axios[method](url, fd, {
-        withCredentials: true,
-        headers: { 'Content-Type': 'multipart/form-data' },
-        onUploadProgress: e => setUploadPct(Math.round((e.loaded * 100) / e.total)),
-      });
+      if (resourceFile) {
+        uploads.push(
+          uploadToCloudinary(resourceFile, {
+            kind: 'resource',
+            onProgress: (e) => {
+              if (e.total) {
+                setUploadPct(Math.round((e.loaded * 100) / e.total));
+              }
+            },
+          }).then((url) => { fileUrl = url; }),
+        );
+      }
+
+      if (thumbnailFile) {
+        uploads.push(
+          uploadToCloudinary(thumbnailFile, { kind: 'resource-thumbnail' })
+            .then((url) => { thumbnailUrl = url; }),
+        );
+      }
+
+      if (uploads.length) {
+        await Promise.all(uploads);
+      }
+
+      if (mode === 'create' && !fileUrl) {
+        setErrors({ submit: 'Please attach a resource file' });
+        setSaving(false);
+        setSavePhase('idle');
+        setUploadPct(0);
+        return;
+      }
+
+      setSavePhase('saving');
+      setUploadPct(100);
+
+      const payload = {
+        title: form.title,
+        description: form.description,
+        category: form.category,
+        status: form.status,
+        price: form.isFree ? 0 : Number(form.price),
+        featured: form.featured,
+        ...(fileUrl ? { fileUrl } : {}),
+        ...(thumbnailUrl ? { thumbnailUrl } : {}),
+      };
+
+      if (mode === 'create') {
+        await axios.post('/api/admin/resources', payload, {
+          withCredentials: true,
+          timeout: 30000,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      } else {
+        await axios.patch(`/api/admin/resources/${resource.id}`, payload, {
+          withCredentials: true,
+          timeout: 30000,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
 
       onSaved(mode === 'create' ? 'Resource created!' : 'Resource updated!');
     } catch (err) {
-      setErrors({ submit: err.response?.data?.error || 'Save failed. Please try again.' });
+      const message = err.code === 'ECONNABORTED'
+        ? 'Upload timed out. Check your connection and try again.'
+        : err.response?.data?.error?.message
+          || err.response?.data?.error
+          || 'Save failed. Please try again.';
+      setErrors({ submit: message });
+      setTimeout(() => errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 0);
     } finally {
       setSaving(false);
       setUploadPct(0);
+      setSavePhase('idle');
     }
   };
 
@@ -160,7 +237,10 @@ function ResourceModal({ mode, resource, onClose, onSaved }) {
 
         <div className="p-6 space-y-5">
           {errors.submit && (
-            <div className="flex items-center gap-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-400">
+            <div
+              ref={errorRef}
+              className="flex items-center gap-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-400"
+            >
               <AlertCircle className="h-4 w-4 shrink-0" />
               {errors.submit}
             </div>
@@ -183,8 +263,9 @@ function ResourceModal({ mode, resource, onClose, onSaved }) {
                   </div>
                 )
               }
-              <input ref={thumbRef} type="file" accept="image/*" className="hidden" onChange={pickThumb} />
+              <input ref={thumbRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif" className="hidden" onChange={pickThumb} />
             </div>
+            {errors.thumb && <p className="mt-1 text-xs text-red-500">{errors.thumb}</p>}
           </div>
 
           {/* Title */}
@@ -212,33 +293,75 @@ function ResourceModal({ mode, resource, onClose, onSaved }) {
             {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description}</p>}
           </div>
 
-          {/* Category + Price row */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Category</label>
-              <select
-                value={form.category}
-                onChange={e => set('category', e.target.value)}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#242424] px-3 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:border-[#2F6FCC] outline-none"
-              >
-                {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Price (₦) — 0 = Free</label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm">₦</span>
-                <input
-                  type="number"
-                  min="0"
-                  value={form.price}
-                  onChange={e => set('price', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#242424] pl-7 pr-3 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:border-[#2F6FCC] focus:ring-2 focus:ring-[#2F6FCC]/20 outline-none transition-all"
-                  placeholder="2500"
-                />
+          {/* Pricing */}
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-4 space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Free resource</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  Toggle on for free downloads. Toggle off to set a price.
+                </p>
               </div>
-              {errors.price && <p className="mt-1 text-xs text-red-500">{errors.price}</p>}
+              <button
+                type="button"
+                role="switch"
+                aria-checked={form.isFree}
+                onClick={() => set('isFree', !form.isFree)}
+                className={`relative inline-flex h-7 w-12 shrink-0 rounded-full transition-colors ${form.isFree ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}
+              >
+                <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform mt-1 ${form.isFree ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
             </div>
+
+            {!form.isFree && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Price (₦)</label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm">₦</span>
+                  <input
+                    type="number"
+                    min="1"
+                    value={form.price}
+                    onChange={e => set('price', e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#242424] pl-7 pr-3 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:border-[#2F6FCC] focus:ring-2 focus:ring-[#2F6FCC]/20 outline-none transition-all"
+                    placeholder="2500"
+                  />
+                </div>
+                {errors.price && <p className="mt-1 text-xs text-red-500">{errors.price}</p>}
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Featured resource</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  Shows in the featured section on the public Resources page.
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={form.featured}
+                onClick={() => set('featured', !form.featured)}
+                className={`relative inline-flex h-7 w-12 shrink-0 rounded-full transition-colors ${form.featured ? 'bg-[#2F6FCC]' : 'bg-gray-300 dark:bg-gray-600'}`}
+              >
+                <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform mt-1 ${form.featured ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+          </div>
+
+          {/* Category + legacy price row removed */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Category</label>
+            <select
+              value={form.category}
+              onChange={e => set('category', e.target.value)}
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#242424] px-3 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:border-[#2F6FCC] outline-none"
+            >
+              {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+            </select>
           </div>
 
           {/* Status */}
@@ -283,7 +406,7 @@ function ResourceModal({ mode, resource, onClose, onSaved }) {
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {resourceFile ? resourceFile.name : mode === 'edit' ? 'Click to replace file' : 'Click to attach file'}
                 </p>
-                <p className="text-xs text-gray-400 mt-0.5">PDF, DOCX, PPTX, XLSX, ZIP — max 50MB</p>
+                <p className="text-xs text-gray-400 mt-0.5">PDF, DOC, DOCX, PPTX, XLSX, ZIP — max 10MB</p>
               </div>
               <input ref={fileRef} type="file" accept={FILE_TYPES} className="hidden" onChange={pickFile} />
             </div>
@@ -307,7 +430,9 @@ function ResourceModal({ mode, resource, onClose, onSaved }) {
             disabled={saving}
             className="flex-1 rounded-xl bg-[#2F6FCC] py-2.5 text-sm font-semibold text-white hover:bg-[#2561b8] disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
           >
-            {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Uploading…</> : mode === 'create' ? 'Create Resource' : 'Save Changes'}
+            {saving
+              ? <><Loader2 className="h-4 w-4 animate-spin" /> {savePhase === 'saving' ? 'Saving…' : `Uploading… ${uploadPct}%`}</>
+              : mode === 'create' ? 'Create Resource' : 'Save Changes'}
           </button>
         </div>
       </div>
@@ -379,6 +504,20 @@ const AdminResources = () => {
     showToast(msg);
   };
 
+  const toggleFeatured = async (resource) => {
+    try {
+      await axios.patch(`/api/admin/resources/${resource.id}`, {
+        featured: !resource.featured,
+      }, { withCredentials: true });
+      showToast(
+        resource.featured ? 'Removed from featured section' : 'Set as featured resource',
+      );
+      fetchResources();
+    } catch {
+      showToast('Failed to update featured status', 'error');
+    }
+  };
+
   const filtered = resources.filter(r => {
     const matchSearch = !search || r.title.toLowerCase().includes(search.toLowerCase());
     const matchCat = filterCat === 'all' || r.category === filterCat;
@@ -427,12 +566,13 @@ const AdminResources = () => {
       </div>
 
       {/* Stats strip */}
-      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
         {[
           { label: 'Total', value: resources.length, icon: BookOpen, color: 'text-[#2F6FCC] dark:text-blue-400', bg: 'bg-blue-100 dark:bg-blue-500/10' },
           { label: 'Published', value: resources.filter(r => r.status === 'published').length, icon: Eye, color: 'text-green-600 dark:text-green-400', bg: 'bg-green-100 dark:bg-green-500/10' },
           { label: 'Drafts', value: resources.filter(r => r.status === 'draft').length, icon: EyeOff, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-500/10' },
           { label: 'Free', value: resources.filter(r => Number(r.price) === 0).length, icon: Tag, color: 'text-purple-600 dark:text-purple-400', bg: 'bg-purple-100 dark:bg-purple-500/10' },
+          { label: 'Featured', value: resources.filter(r => r.featured).length, icon: Star, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-500/10' },
         ].map(s => {
           const Icon = s.icon;
           return (
@@ -487,7 +627,7 @@ const AdminResources = () => {
           <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
             <thead className="bg-gray-50 dark:bg-[#161616]">
               <tr>
-                {['Resource', 'Category', 'Price', 'Status', 'File', 'Actions'].map(h => (
+                {['Resource', 'Category', 'Price', 'Featured', 'Status', 'File', 'Actions'].map(h => (
                   <th key={h} className="px-5 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -525,6 +665,22 @@ const AdminResources = () => {
                         : <>₦{Number(r.price).toLocaleString()}</>
                       }
                     </span>
+                  </td>
+                  {/* Featured */}
+                  <td className="px-5 py-4">
+                    <button
+                      type="button"
+                      onClick={() => toggleFeatured(r)}
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
+                        r.featured
+                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400'
+                          : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 hover:text-amber-600'
+                      }`}
+                      title={r.featured ? 'Remove from featured' : 'Set as featured'}
+                    >
+                      <Star className={`h-3.5 w-3.5 ${r.featured ? 'fill-current' : ''}`} />
+                      {r.featured ? 'Featured' : 'Set'}
+                    </button>
                   </td>
                   {/* Status */}
                   <td className="px-5 py-4">

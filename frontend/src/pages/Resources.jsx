@@ -220,6 +220,7 @@ function ResourceCard({ resource, onAccess }) {
 const Resources = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [resources, setResources] = useState([]);
+  const [featuredResource, setFeaturedResource] = useState(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [apiError, setApiError] = useState(null);
@@ -266,10 +267,14 @@ const Resources = () => {
 
   const fetchResources = async () => {
     try {
-      const res = await axios.get("/api/resources");
-      setResources(res.data);
+      const [resourcesRes, featuredRes] = await Promise.all([
+        axios.get("/api/resources"),
+        axios.get("/api/resources/featured"),
+      ]);
+      setResources(resourcesRes.data);
+      setFeaturedResource(featuredRes.data);
+      setApiError(null);
     } catch {
-      // Fallback to local data if API fails (graceful degradation)
       setApiError("Could not load resources from server.");
     } finally {
       setLoading(false);
@@ -435,33 +440,38 @@ const Resources = () => {
         </div>
       </section>
 
-      {/* ── Featured static resource (unchanged) ── */}
-      <section className="section featured-resource !bg-gray-100">
-        <div className="container">
-          <div className="featured-resource-content">
-            <div className="featured-resource-text">
-              <div className="featured-badge">Featured Resource</div>
-              <h2>Becoming a Tech-savvy Teacher</h2>
-              <p>
-                This comprehensive guide was created for educators struggling to
-                transition from the traditional ways of teaching to the
-                integration of educational technology in their classrooms.
-              </p>
-              <ul className="featured-resource-details">
-                <li><i className="fas fa-file-pdf" /> 47-page PDF Guide</li>
-                <li><i className="fas fa-video" /> 4 Instructional Videos</li>
-                <li><i className="fas fa-file-alt" /> 5 Ready-to-use Templates</li>
-              </ul>
-              <a href="https://selar.com/24ua7n" target="_blank" rel="noreferrer" className="btn btn-primary">
-                Download Free Guide
-              </a>
-            </div>
-            <div className="featured-resource-image">
-              <img src="/images/resourcesFolder/becomingTechSavvyTeacher.png" alt="Becoming a Tech-savvy Teacher" />
+      {/* ── Featured resource (from admin dashboard) ── */}
+      {featuredResource && (
+        <section className="section featured-resource !bg-gray-100">
+          <div className="container">
+            <div className="featured-resource-content">
+              <div className="featured-resource-text">
+                <div className="featured-badge">Featured Resource</div>
+                <h2>{featuredResource.title}</h2>
+                <p>{featuredResource.description}</p>
+                <button
+                  type="button"
+                  onClick={() => handleAccess(featuredResource)}
+                  className="btn btn-primary"
+                >
+                  {Number(featuredResource.price) === 0
+                    ? "Download Free Resource"
+                    : `Buy for ₦${Number(featuredResource.price).toLocaleString()}`}
+                </button>
+              </div>
+              <div className="featured-resource-image">
+                <img
+                  src={
+                    featuredResource.thumbnailUrl ||
+                    "/images/resourcesFolder/becomingTechSavvyTeacher.png"
+                  }
+                  alt={featuredResource.title}
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── Newsletter ── */}
       <section id="newsletter" className="section resources-newsletter !bg-blue-200">

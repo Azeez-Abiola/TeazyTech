@@ -345,17 +345,36 @@ app.get("/api/admin/sign-upload", async (req, res) => {
 
     if (!isAdmin) return res.status(403).json({ error: "Unauthorized" });
 
-    const timestamp = Math.round((new Date()).getTime() / 1000);
-    const signature = cloudinary.utils.api_sign_request({
-      timestamp: timestamp,
-      folder: 'thumbnails',
-    }, process.env.CLOUDINARY_API_SECRET);
+    const kind = req.query.kind || "post";
+    const timestamp = Math.round(new Date().getTime() / 1000);
+    const folderByKind = {
+      resource: "resources",
+      "resource-thumbnail": "resource-thumbnails",
+      post: "thumbnails",
+      thumbnail: "thumbnails",
+    };
+    const params = {
+      timestamp,
+      folder: folderByKind[kind] || "thumbnails",
+    };
+
+    if (kind === "resource") {
+      params.public_id = buildRawPublicId({ originalname: req.query.filename || "resource.pdf" });
+    }
+
+    const signature = cloudinary.utils.api_sign_request(
+      params,
+      process.env.CLOUDINARY_API_SECRET,
+    );
 
     res.json({
       timestamp,
       signature,
       cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-      apiKey: process.env.CLOUDINARY_API_KEY
+      apiKey: process.env.CLOUDINARY_API_KEY,
+      folder: params.folder,
+      public_id: params.public_id,
+      resourceType: kind === "resource" ? "raw" : "image",
     });
   } catch (error) {
     logger.error({ error }, "Signature generation failed");
@@ -1770,80 +1789,201 @@ const uploadBufferToCloudinary = (buffer, options) =>
     }).end(buffer);
   });
 
+const RESOURCE_RAW_EXTENSIONS = new Set([
+  "pdf", "doc", "docx", "pptx", "xlsx", "zip",
+]);
+
+const MIME_TO_EXT = {
+  "application/pdf": "pdf",
+  "application/msword": "doc",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+  "application/vnd.ms-powerpoint": "pptx",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation": "pptx",
+  "application/vnd.ms-excel": "xlsx",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
+  "application/zip": "zip",
+  "application/x-zip-compressed": "zip",
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+};
+
+function fileExtension(file) {
+  const fromName = path.extname(file.originalname || "").slice(1).toLowerCase();
+  if (fromName) return fromName;
+  return MIME_TO_EXT[file.mimetype] || "";
+}
+
+function sanitizeFilename(name) {
+  return (name || "file").replace(/[^\w.\-]+/g, "_");
+}
+
+function buildRawPublicId(file) {
+  const ext = fileExtension(file);
+  const safe = sanitizeFilename(file.originalname);
+  const hasExt = ext && safe.toLowerCase().endsWith(`.${ext}`);
+  const filename = hasExt ? safe : ext ? `${safe}.${ext}` : safe;
+  return `resource_${Date.now()}_${filename}`;
+}
+
+async function uploadResourceThumbnail(file) {
+  const ext = fileExtension(file);
+  return uploadBufferToCloudinary(file.buffer, {
+    folder: "resource-thumbnails",
+    resource_type: "image",
+    filename: file.originalname,
+    ...(ext ? { format: ext } : {}),
+    transformation: [{ width: 800, height: 500, crop: "fill" }],
+  });
+}
+
+async function uploadResourceDocument(file) {
+  const ext = fileExtension(file);
+  if (!ext) {
+    const err = new Error(
+      "Could not determine file type. Use PDF, DOC, DOCX, PPTX, XLSX, or ZIP.",
+    );
+    err.http_code = 400;
+    throw err;
+  }
+  if (!RESOURCE_RAW_EXTENSIONS.has(ext)) {
+    const err = new Error(
+      `File type ".${ext}" is not supported. Allowed: PDF, DOC, DOCX, PPTX, XLSX, ZIP.`,
+    );
+    err.http_code = 400;
+    throw err;
+  }
+  return uploadBufferToCloudinary(file.buffer, {
+    folder: "resources",
+    resource_type: "raw",
+    public_id: buildRawPublicId(file),
+    filename: file.originalname,
+  });
+}
+
 const resourceSchema = Joi.object({
   title: Joi.string().required().min(2).max(120),
   description: Joi.string().required().min(5).max(1000),
   category: Joi.string().valid("guides", "tools", "webinars", "research").required(),
   price: Joi.number().min(0).required(),
   status: Joi.string().valid("published", "draft").default("published"),
+  featured: Joi.boolean().default(false),
 });
+
+async function syncFeaturedResource(resourceId, featured) {
+  const snap = await db.collection("resources").get();
+  const batch = db.batch();
+  let writes = 0;
+
+  snap.docs.forEach((doc) => {
+    const shouldFeature = featured === true && doc.id === resourceId;
+    if (Boolean(doc.data().featured) !== shouldFeature) {
+      batch.update(doc.ref, {
+        featured: shouldFeature,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      writes += 1;
+    }
+  });
+
+  if (writes > 0) {
+    await batch.commit();
+  }
+}
+
+function parseBooleanField(value) {
+  return value === true || value === "true";
+}
+
+function isCloudinaryUrl(url) {
+  const cloud = process.env.CLOUDINARY_CLOUD_NAME;
+  if (typeof url !== "string" || !cloud) return false;
+  return (
+    url.includes(`res.cloudinary.com/${cloud}/`) ||
+    url.includes(`res.cloudinary.com/${cloud.replace(/_/g, "-")}/`)
+  );
+}
+
+const maybeResourceUpload = (req, res, next) => {
+  const type = req.headers["content-type"] || "";
+  if (type.includes("multipart/form-data")) {
+    return resourceFilesUpload(req, res, next);
+  }
+  next();
+};
+
+async function createResourceRecord(req, res, next) {
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    const isAdmin = await checkAdmin(admin, db, decoded);
+    if (!isAdmin) return res.status(403).json({ error: "Admin access required" });
+
+    let fileUrl = req.body.fileUrl || null;
+    let thumbnailUrl = req.body.thumbnailUrl || null;
+
+    if (req.files?.file?.[0]) {
+      const result = await uploadResourceDocument(req.files.file[0]);
+      fileUrl = result.secure_url;
+    }
+    if (req.files?.thumbnail?.[0]) {
+      const result = await uploadResourceThumbnail(req.files.thumbnail[0]);
+      thumbnailUrl = result.secure_url;
+    }
+
+    const payload = {
+      ...req.body,
+      price: Number(req.body.price),
+      featured: req.body.featured !== undefined
+        ? parseBooleanField(req.body.featured)
+        : false,
+    };
+    const { error, value } = resourceSchema.validate(payload, { abortEarly: false });
+    if (error) {
+      return res.status(400).json({ error: error.details.map(d => d.message).join(", ") });
+    }
+
+    if (!fileUrl || !isCloudinaryUrl(fileUrl)) {
+      return res.status(400).json({
+        error: fileUrl
+          ? "Uploaded file URL is invalid. Please try uploading again."
+          : "A resource file is required",
+      });
+    }
+    if (thumbnailUrl && !isCloudinaryUrl(thumbnailUrl)) {
+      return res.status(400).json({ error: "Invalid thumbnail URL" });
+    }
+
+    const doc = await db.collection("resources").add({
+      ...value,
+      price: Number(value.price),
+      featured: Boolean(value.featured),
+      thumbnailUrl: thumbnailUrl || null,
+      fileUrl,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    if (value.featured) {
+      await syncFeaturedResource(doc.id, true);
+    }
+
+    return res.status(201).json({ id: doc.id, message: "Resource created" });
+  } catch (err) {
+    logger.error({ err }, "Create resource failed");
+    if (isCloudinaryClientError(err)) {
+      return res.status(400).json({ error: err.message });
+    }
+    next(err);
+  }
+}
 
 // ── Admin: Create Resource ──────────────────────────────
 logger.info("Defining /api/admin/resources POST route");
-app.post(
-  "/api/admin/resources",
-  resourceFilesUpload,
-  async (req, res, next) => {
-    const token = req.cookies.accessToken;
-    if (!token) return res.status(401).json({ error: "Unauthorized" });
-
-    try {
-      const decoded = await admin.auth().verifyIdToken(token);
-      const isAdmin = await checkAdmin(admin, db, decoded);
-      if (!isAdmin) return res.status(403).json({ error: "Admin access required" });
-
-      const { error, value } = resourceSchema.validate(req.body, { abortEarly: false });
-      if (error) {
-        return res.status(400).json({ error: error.details.map(d => d.message).join(", ") });
-      }
-
-      let thumbnailUrl = null;
-      let fileUrl = null;
-
-      if (req.files?.thumbnail?.[0]) {
-        const thumb = req.files.thumbnail[0];
-        const result = await uploadBufferToCloudinary(thumb.buffer, {
-          folder: "resource-thumbnails",
-          resource_type: "image",
-          allowed_formats: ["jpg", "jpeg", "png", "webp"],
-          transformation: [{ width: 800, height: 500, crop: "fill" }],
-        });
-        thumbnailUrl = result.secure_url;
-      }
-
-      if (req.files?.file?.[0]) {
-        const f = req.files.file[0];
-        const result = await uploadBufferToCloudinary(f.buffer, {
-          folder: "resources",
-          resource_type: "raw",
-          public_id: `resource_${Date.now()}_${f.originalname.replace(/\s+/g, "_")}`,
-        });
-        fileUrl = result.secure_url;
-      }
-
-      if (!fileUrl) {
-        return res.status(400).json({ error: "A resource file is required" });
-      }
-
-      const doc = await db.collection("resources").add({
-        ...value,
-        price: Number(value.price),
-        thumbnailUrl,
-        fileUrl,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-
-      return res.status(201).json({ id: doc.id, message: "Resource created" });
-    } catch (err) {
-      logger.error({ err }, "Create resource failed");
-      if (isCloudinaryClientError(err)) {
-        return res.status(400).json({ error: err.message });
-      }
-      next(err);
-    }
-  }
-);
+app.post("/api/admin/resources", maybeResourceUpload, createResourceRecord);
 
 // ── Admin: List Resources ───────────────────────────────
 logger.info("Defining /api/admin/resources GET route");
@@ -1914,59 +2054,61 @@ app.get("/api/admin/purchases", async (req, res, next) => {
 
 // ── Admin: Update Resource ──────────────────────────────
 logger.info("Defining /api/admin/resources/:id PATCH route");
-app.patch(
-  "/api/admin/resources/:id",
-  resourceFilesUpload,
-  async (req, res, next) => {
-    const token = req.cookies.accessToken;
-    if (!token) return res.status(401).json({ error: "Unauthorized" });
+app.patch("/api/admin/resources/:id", async (req, res, next) => {
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
 
-    try {
-      const decoded = await admin.auth().verifyIdToken(token);
-      const isAdmin = await checkAdmin(admin, db, decoded);
-      if (!isAdmin) return res.status(403).json({ error: "Admin access required" });
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    const isAdmin = await checkAdmin(admin, db, decoded);
+    if (!isAdmin) return res.status(403).json({ error: "Admin access required" });
 
-      const { id } = req.params;
-      const updates = {};
-      const { title, description, category, price, status } = req.body;
-      if (title) updates.title = title;
-      if (description) updates.description = description;
-      if (category) updates.category = category;
-      if (price !== undefined) updates.price = Number(price);
-      if (status) updates.status = status;
+    const { id } = req.params;
+    const updates = {};
+    const {
+      title,
+      description,
+      category,
+      price,
+      status,
+      featured,
+      fileUrl,
+      thumbnailUrl,
+    } = req.body;
+    if (title) updates.title = title;
+    if (description) updates.description = description;
+    if (category) updates.category = category;
+    if (price !== undefined && price !== "") updates.price = Number(price);
+    if (status) updates.status = status;
 
-      if (req.files?.thumbnail?.[0]) {
-        const thumb = req.files.thumbnail[0];
-        const result = await uploadBufferToCloudinary(thumb.buffer, {
-          folder: "resource-thumbnails",
-          resource_type: "image",
-          transformation: [{ width: 800, height: 500, crop: "fill" }],
-        });
-        updates.thumbnailUrl = result.secure_url;
-      }
-
-      if (req.files?.file?.[0]) {
-        const f = req.files.file[0];
-        const result = await uploadBufferToCloudinary(f.buffer, {
-          folder: "resources",
-          resource_type: "raw",
-          public_id: `resource_${Date.now()}_${f.originalname.replace(/\s+/g, "_")}`,
-        });
-        updates.fileUrl = result.secure_url;
-      }
-
-      updates.updatedAt = admin.firestore.FieldValue.serverTimestamp();
-      await db.collection("resources").doc(id).update(updates);
-      return res.json({ message: "Resource updated" });
-    } catch (err) {
-      logger.error({ err }, "Update resource failed");
-      if (isCloudinaryClientError(err)) {
-        return res.status(400).json({ error: err.message });
-      }
-      next(err);
+    if (featured !== undefined) {
+      const isFeatured = parseBooleanField(featured);
+      await syncFeaturedResource(id, isFeatured);
+      updates.featured = isFeatured;
     }
+
+    if (fileUrl) {
+      if (!isCloudinaryUrl(fileUrl)) {
+        return res.status(400).json({ error: "Invalid resource file URL" });
+      }
+      updates.fileUrl = fileUrl;
+    }
+
+    if (thumbnailUrl) {
+      if (!isCloudinaryUrl(thumbnailUrl)) {
+        return res.status(400).json({ error: "Invalid thumbnail URL" });
+      }
+      updates.thumbnailUrl = thumbnailUrl;
+    }
+
+    updates.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+    await db.collection("resources").doc(id).update(updates);
+    return res.json({ message: "Resource updated" });
+  } catch (err) {
+    logger.error({ err }, "Update resource failed");
+    next(err);
   }
-);
+});
 
 // ── Admin: Delete Resource ──────────────────────────────
 logger.info("Defining /api/admin/resources/:id DELETE route");
@@ -1983,6 +2125,25 @@ app.delete("/api/admin/resources/:id", async (req, res, next) => {
     return res.json({ message: "Resource deleted" });
   } catch (err) {
     logger.error({ err }, "Delete resource failed");
+    next(err);
+  }
+});
+
+// ── Public: Featured published resource ────────────────
+logger.info("Defining /api/resources/featured GET route");
+app.get("/api/resources/featured", async (req, res, next) => {
+  try {
+    const snap = await db.collection("resources").get();
+    const featured = snap.docs
+      .map((d) => ({ id: d.id, ...d.data() }))
+      .find((r) => r.status === "published" && r.featured === true);
+
+    if (!featured) return res.json(null);
+
+    const { fileUrl, ...safe } = featured;
+    return res.json(safe);
+  } catch (err) {
+    logger.error({ err }, "Fetch featured resource failed");
     next(err);
   }
 });

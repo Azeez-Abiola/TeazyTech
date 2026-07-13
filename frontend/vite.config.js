@@ -27,6 +27,9 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
+        // Note: multipart uploads can hang through this proxy — src/lib/api.js
+        // sends API requests directly to :8080 in dev instead.
+        timeout: 120000,
       },
     },
   }

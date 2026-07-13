@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from "axios";
+import axios from "../lib/api";
 
 const AuthContext = createContext(undefined);
 
@@ -17,12 +17,7 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Determine API base URL based on environment
-  // For development (Vite dev server on 3000), use localhost:8080
-  // For production or when running on localhost:8080, use relative URLs
-  // Updated: Force fresh deployment
-  const API_BASE_URL = '';
-
+  // axios baseURL is configured in src/lib/api.js (direct to :8080 in dev)
   useEffect(() => {
     axios.defaults.withCredentials = true;
   }, []);
@@ -33,7 +28,7 @@ export const AuthProvider = ({ children }) => {
 
     const getAuthAdmin = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/admin/me`, {
+        const response = await axios.get("/api/admin/me", {
           withCredentials: true,
           signal: controller.signal
         });
@@ -65,7 +60,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setIsLoading(true);
-      const response = await axios.post(`${API_BASE_URL}/api/admin/login`,
+      const response = await axios.post("/api/admin/login",
         { email, password },
         { withCredentials: true }
       );
@@ -85,7 +80,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       setIsLoading(true);
-      await axios.post(`${API_BASE_URL}/api/admin/logout`,
+      await axios.post("/api/admin/logout",
         {},
         { withCredentials: true }
       );

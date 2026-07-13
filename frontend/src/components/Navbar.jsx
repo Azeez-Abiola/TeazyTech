@@ -196,8 +196,13 @@ const Navbar = () => {
                   <span className="nav-text">Home</span>
                 </Link>
               </li>
-              <NavDropdown label="About" items={ABOUT_ITEMS} mobile />
-              <NavDropdown label="Services" items={SERVICES_ITEMS} mobile />
+              <NavDropdown label="About" items={ABOUT_ITEMS} isActive={isAboutActive} mobile />
+              <NavDropdown
+                label="Services"
+                items={SERVICES_ITEMS}
+                isActive={isServicesActive}
+                mobile
+              />
               <li>
                 <a
                   href={TEAZY_AI_URL}

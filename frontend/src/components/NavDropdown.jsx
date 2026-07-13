@@ -15,6 +15,7 @@ const NavDropdown = ({
   mobile = false,
 }) => {
   const [open, setOpen] = useState(false);
+  const [mobileExpanded, setMobileExpanded] = useState(false);
   const closeTimer = useRef(null);
 
   const handleEnter = () => {
@@ -28,8 +29,18 @@ const NavDropdown = ({
 
   if (mobile) {
     return (
-      <li className="nav-dropdown-mobile">
-        <span className="nav-dropdown-mobile__label">{label}</span>
+      <li
+        className={`nav-dropdown-mobile ${mobileExpanded ? "is-expanded" : ""} ${isActive ? "is-active" : ""}`}
+      >
+        <button
+          type="button"
+          className="nav-dropdown-mobile__trigger"
+          aria-expanded={mobileExpanded}
+          onClick={() => setMobileExpanded((prev) => !prev)}
+        >
+          <span>{label}</span>
+          <ChevronDown className="nav-dropdown-mobile__chevron" size={18} strokeWidth={2.5} />
+        </button>
         <ul className="nav-dropdown-mobile__list">
           {items.map((item) => {
             const Icon = item.Icon;

@@ -29,6 +29,10 @@ const filters = [
 ];
 const Gallery = () => {
   const [activeFilter, setActiveFilter] = useState("all");
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(min-width: 1024px)").matches,
+  );
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
@@ -41,6 +45,13 @@ const Gallery = () => {
       top: 0,
       behavior: "smooth",
     });
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const onChange = (event) => setIsDesktop(event.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
   }, []);
 
   const filteredItems =
@@ -137,16 +148,33 @@ const Gallery = () => {
 
   return (
     <main className="gallery-page">
-      {/* ================= HERO ================= */}
-      <div className="lg:flex hidden" style={{ height: "100vh", position: "relative", backgroundColor: "#849abb" }}>
-        <CircularGallery
-          bend={1}
-          borderRadius={0.05}
-          scrollEase={0.05}
-          scrollSpeed={2}
-          items={galleryItems}
-        />
-      </div>
+      {/* Desktop circular hero — WebGL only on large screens */}
+      {isDesktop && (
+        <div
+          className="gallery-hero-desktop"
+          style={{ height: "100vh", position: "relative", backgroundColor: "#849abb" }}
+        >
+          <CircularGallery
+            bend={1}
+            borderRadius={0.05}
+            scrollEase={0.05}
+            scrollSpeed={2}
+            items={galleryItems}
+          />
+        </div>
+      )}
+
+      {/* Mobile hero — static fallback (no WebGL) */}
+      {!isDesktop && (
+        <section className="gallery-hero-mobile">
+          <div className="gallery-hero-mobile__overlay" aria-hidden="true" />
+          <div className="container gallery-hero-mobile__content">
+            <span className="gallery-hero-mobile__eyebrow">Our Gallery</span>
+            <h1>Moments from trainings, workshops &amp; events</h1>
+            <p>Explore photos from Teazy Tech programs across Nigeria.</p>
+          </div>
+        </section>
+      )}
 
       {/* ================= FILTER ================= */}
 
@@ -173,29 +201,33 @@ const Gallery = () => {
       <section className="gallery-content relative overflow-hidden">
         {/* Animated gradient background (same as blog page) */}
         <div className="absolute inset-0 z-0">
-          <Grainient
-            color1="#9ca9cc"
-            color2="#4a6bc5"
-            timeSpeed={0.25}
-            colorBalance={0}
-            warpStrength={1}
-            warpFrequency={5}
-            warpSpeed={2}
-            warpAmplitude={50}
-            blendAngle={0}
-            blendSoftness={0.05}
-            rotationAmount={500}
-            noiseScale={2}
-            grainAmount={0.1}
-            grainScale={2}
-            grainAnimated={false}
-            contrast={1.5}
-            gamma={1}
-            saturation={1.15}
-            centerX={0}
-            centerY={0}
-            zoom={1.3}
-          />
+          {isDesktop ? (
+            <Grainient
+              color1="#9ca9cc"
+              color2="#4a6bc5"
+              timeSpeed={0.25}
+              colorBalance={0}
+              warpStrength={1}
+              warpFrequency={5}
+              warpSpeed={2}
+              warpAmplitude={50}
+              blendAngle={0}
+              blendSoftness={0.05}
+              rotationAmount={500}
+              noiseScale={2}
+              grainAmount={0.1}
+              grainScale={2}
+              grainAnimated={false}
+              contrast={1.5}
+              gamma={1}
+              saturation={1.15}
+              centerX={0}
+              centerY={0}
+              zoom={1.3}
+            />
+          ) : (
+            <div className="gallery-content-fallback-bg" aria-hidden="true" />
+          )}
         </div>
 
         <div className="container relative z-10">
