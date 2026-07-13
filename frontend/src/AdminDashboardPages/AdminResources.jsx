@@ -337,7 +337,7 @@ function ResourceModal({ mode, resource, onClose, onSaved }) {
               <div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">Featured resource</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  Shows in the featured section on the public Resources page.
+                  Highlight on the public Resources page. You can feature multiple resources.
                 </p>
               </div>
               <button

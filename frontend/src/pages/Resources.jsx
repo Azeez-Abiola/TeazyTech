@@ -220,7 +220,7 @@ function ResourceCard({ resource, onAccess }) {
 const Resources = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [resources, setResources] = useState([]);
-  const [featuredResource, setFeaturedResource] = useState(null);
+  const [featuredResources, setFeaturedResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [apiError, setApiError] = useState(null);
@@ -272,7 +272,10 @@ const Resources = () => {
         axios.get("/api/resources/featured"),
       ]);
       setResources(resourcesRes.data);
-      setFeaturedResource(featuredRes.data);
+      const featured = featuredRes.data;
+      setFeaturedResources(
+        Array.isArray(featured) ? featured : featured ? [featured] : [],
+      );
       setApiError(null);
     } catch {
       setApiError("Could not load resources from server.");
@@ -341,7 +344,10 @@ const Resources = () => {
     setPayError(null);
   };
 
+  const featuredIds = new Set(featuredResources.map((r) => r.id));
+
   const filtered = resources.filter(r => {
+    if (featuredIds.has(r.id)) return false;
     const matchCat = activeCategory === "all" || r.category === activeCategory;
     const matchSearch = !search || r.title.toLowerCase().includes(search.toLowerCase()) ||
       r.description?.toLowerCase().includes(search.toLowerCase());
@@ -440,34 +446,42 @@ const Resources = () => {
         </div>
       </section>
 
-      {/* ── Featured resource (from admin dashboard) ── */}
-      {featuredResource && (
-        <section className="section featured-resource !bg-gray-100">
+      {/* ── Featured resources (from admin dashboard) ── */}
+      {featuredResources.length > 0 && (
+        <section className="section featured-resources !bg-gray-100">
           <div className="container">
-            <div className="featured-resource-content">
-              <div className="featured-resource-text">
-                <div className="featured-badge">Featured Resource</div>
-                <h2>{featuredResource.title}</h2>
-                <p>{featuredResource.description}</p>
-                <button
-                  type="button"
-                  onClick={() => handleAccess(featuredResource)}
-                  className="btn btn-primary"
-                >
-                  {Number(featuredResource.price) === 0
-                    ? "Download Free Resource"
-                    : `Buy for ₦${Number(featuredResource.price).toLocaleString()}`}
-                </button>
-              </div>
-              <div className="featured-resource-image">
-                <img
-                  src={
-                    featuredResource.thumbnailUrl ||
-                    "/images/resourcesFolder/becomingTechSavvyTeacher.png"
-                  }
-                  alt={featuredResource.title}
-                />
-              </div>
+            <div className="featured-resources-header">
+              <span className="featured-badge">Featured Resources</span>
+              <h2>Hand-picked for educators</h2>
+              <p>Resources our team recommends — guides, tools, and downloads to level up your classroom.</p>
+            </div>
+            <div className="featured-resources-grid">
+              {featuredResources.map((resource) => (
+                <article key={resource.id} className="featured-resource-card">
+                  <div className="featured-resource-card__image">
+                    <img
+                      src={
+                        resource.thumbnailUrl ||
+                        "/images/resourcesFolder/becomingTechSavvyTeacher.png"
+                      }
+                      alt={resource.title}
+                    />
+                  </div>
+                  <div className="featured-resource-card__body">
+                    <h3>{resource.title}</h3>
+                    <p>{resource.description}</p>
+                    <button
+                      type="button"
+                      onClick={() => handleAccess(resource)}
+                      className="btn btn-primary"
+                    >
+                      {Number(resource.price) === 0
+                        ? "Download Free Resource"
+                        : `Buy for ₦${Number(resource.price).toLocaleString()}`}
+                    </button>
+                  </div>
+                </article>
+              ))}
             </div>
           </div>
         </section>

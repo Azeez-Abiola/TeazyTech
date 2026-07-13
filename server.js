@@ -1871,27 +1871,6 @@ const resourceSchema = Joi.object({
   featured: Joi.boolean().default(false),
 });
 
-async function syncFeaturedResource(resourceId, featured) {
-  const snap = await db.collection("resources").get();
-  const batch = db.batch();
-  let writes = 0;
-
-  snap.docs.forEach((doc) => {
-    const shouldFeature = featured === true && doc.id === resourceId;
-    if (Boolean(doc.data().featured) !== shouldFeature) {
-      batch.update(doc.ref, {
-        featured: shouldFeature,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-      writes += 1;
-    }
-  });
-
-  if (writes > 0) {
-    await batch.commit();
-  }
-}
-
 function parseBooleanField(value) {
   return value === true || value === "true";
 }
@@ -1968,10 +1947,6 @@ async function createResourceRecord(req, res, next) {
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
-
-    if (value.featured) {
-      await syncFeaturedResource(doc.id, true);
-    }
 
     return res.status(201).json({ id: doc.id, message: "Resource created" });
   } catch (err) {
@@ -2084,9 +2059,7 @@ app.patch("/api/admin/resources/:id", async (req, res, next) => {
     if (status) updates.status = status;
 
     if (featured !== undefined) {
-      const isFeatured = parseBooleanField(featured);
-      await syncFeaturedResource(id, isFeatured);
-      updates.featured = isFeatured;
+      updates.featured = parseBooleanField(featured);
     }
 
     if (fileUrl) {
@@ -2131,21 +2104,20 @@ app.delete("/api/admin/resources/:id", async (req, res, next) => {
   }
 });
 
-// ── Public: Featured published resource ────────────────
+// ── Public: Featured published resources ───────────────
 logger.info("Defining /api/resources/featured GET route");
 app.get("/api/resources/featured", async (req, res, next) => {
   try {
     const snap = await db.collection("resources").get();
     const featured = snap.docs
-      .map((d) => ({ id: d.id, ...d.data() }))
-      .find((r) => r.status === "published" && r.featured === true);
+      .map((d) => ({ id: d.id, ...d.data(), _createdAt: d.data().createdAt?._seconds || 0 }))
+      .filter((r) => r.status === "published" && r.featured === true)
+      .sort((a, b) => b._createdAt - a._createdAt)
+      .map(({ fileUrl, _createdAt, ...safe }) => safe);
 
-    if (!featured) return res.json(null);
-
-    const { fileUrl, ...safe } = featured;
-    return res.json(safe);
+    return res.json(featured);
   } catch (err) {
-    logger.error({ err }, "Fetch featured resource failed");
+    logger.error({ err }, "Fetch featured resources failed");
     next(err);
   }
 });
