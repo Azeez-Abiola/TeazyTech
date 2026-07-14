@@ -1,0 +1,46 @@
+/** Web-ready paths for site-wide photos (from /images/Gallery after HEIC conversion). */
+
+export const ibadanTrainingImages = [
+  "/images/Gallery/544c6903-94e5-4a4b-9d68-53a0c1d6a194.jpg",
+  "/images/Gallery/9a4bbb4e-cb1f-4f27-9a7d-cec96612e25e.jpg",
+  "/images/Gallery/338a7520-aed2-40a0-a4df-4eb70c4d0ff2.jpg",
+  "/images/Gallery/IMG_8254_jpg.jpg",
+];
+
+export const exhibitionImages = [
+  "/images/Gallery/IMG_0394.jpg",
+  "/images/Gallery/IMG_0399.jpg",
+  "/images/Gallery/IMG_0431.jpg",
+  "/images/Gallery/IMG_0451.jpg",
+  "/images/Gallery/IMG_0452.jpg",
+  "/images/Gallery/IMG_0453.jpg",
+  "/images/Gallery/IMG_0456.jpg",
+  "/images/Gallery/IMG_0457.jpg",
+  "/images/Gallery/IMG_0460.jpg",
+  "/images/Gallery/IMG_0462.jpg",
+  "/images/Gallery/IMG_0478.jpg",
+  "/images/Gallery/IMG_0496.jpg",
+  "/images/Gallery/FullSizeRender.jpg",
+  "/images/Gallery/FullSizeRender (1).jpg",
+  "/images/Gallery/IMG_2560.jpg",
+  "/images/Gallery/IMG_2562.jpg",
+  "/images/Gallery/IMG_2563.jpg",
+  "/images/Gallery/IMG_2613.jpg",
+  "/images/Gallery/IMG_2640.jpg",
+  "/images/Gallery/IMG_2644.jpg",
+  "/images/Gallery/IMG_2650.jpg",
+];
+
+export const heroCarouselImages = [
+  "/images/Gallery/9a4bbb4e-cb1f-4f27-9a7d-cec96612e25e.jpg",
+  "/images/Gallery/544c6903-94e5-4a4b-9d68-53a0c1d6a194.jpg",
+  "/images/Gallery/IMG_0456.jpg",
+  "/images/Gallery/IMG_2640.jpg",
+  "/images/Gallery/IMG_2560.jpg",
+  "/images/Gallery/IMG_0453.jpg",
+];
+
+export const uiWorkshopImages = [
+  "/images/Gallery/544c6903-94e5-4a4b-9d68-53a0c1d6a194.jpg",
+  "/images/Gallery/9a4bbb4e-cb1f-4f27-9a7d-cec96612e25e.jpg",
+];

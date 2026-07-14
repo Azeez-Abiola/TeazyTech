@@ -5,6 +5,7 @@ import { Image, Tag, AlertTriangle, Loader2 } from "lucide-react";
 import RichTextEditor from "../components/RichTextEditor";
 import axios from "axios";
 import { toast, Toaster } from "sonner";
+import { isHeicImage, normalizeImageForUpload } from "../lib/normalizeImageForUpload";
 
 const EditPost = () => {
   const { id } = useParams();
@@ -25,8 +26,9 @@ const EditPost = () => {
 
   const uploadImage = async (file) => {
     try {
+      const normalized = await normalizeImageForUpload(file);
       const formData = new FormData();
-      formData.append("image", file);
+      formData.append("image", normalized);
       const res = await axios.post("/api/admin/upload-image", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
@@ -78,13 +80,24 @@ const EditPost = () => {
     fetchPost();
   }, [id]);
 
-  const handleThumbnailChange = (e) => {
+  const handleThumbnailChange = async (e) => {
     const file = e.target.files?.[0];
-    if (file && file.type.startsWith("image/")) {
-      setThumbnail(file);
+    if (!file) return;
+
+    const isImage = file.type.startsWith("image/") || isHeicImage(file);
+    if (!isImage) {
+      toast.error("Please upload a valid image file");
+      return;
+    }
+
+    try {
+      const normalized = await normalizeImageForUpload(file);
+      setThumbnail(normalized);
       const reader = new FileReader();
       reader.onload = () => setThumbnailPreview(reader.result);
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(normalized);
+    } catch {
+      toast.error("Could not process this photo. Try exporting it as JPG first.");
     }
   };
 
@@ -328,7 +341,7 @@ const EditPost = () => {
             <div className="p-6 space-y-4">
               <input
                 type="file"
-                accept="image/*"
+                accept="image/*,.heic,.heif"
                 onChange={handleThumbnailChange}
                 className="text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 dark:file:bg-red-900/20 file:text-red-700 dark:file:text-red-400 hover:file:bg-red-100 dark:hover:file:bg-red-900/30 transition-all cursor-pointer"
               />

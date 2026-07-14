@@ -4,6 +4,7 @@ import ConfirmModal from '../components/ui/ConfirmModal';
 import { useAuth } from '../Context/AuthContext';
 import axios from '../lib/api';
 import { uploadToCloudinary } from '../lib/cloudinaryUpload';
+import { isHeicImage, normalizeImageForUpload } from '../lib/normalizeImageForUpload';
 import {
   BookOpen, Plus, Trash2, Edit2, X, Upload, FileText,
   ExternalLink, AlertCircle, CheckCircle2, Loader2, Search,
@@ -94,20 +95,28 @@ function ResourceModal({ mode, resource, onClose, onSaved }) {
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-  const pickThumb = e => {
+  const pickThumb = async e => {
     const f = e.target.files[0];
     if (!f) return;
-    const extOk = /\.(jpe?g|png|webp|gif)$/i.test(f.name);
-    if (!THUMB_TYPES.includes(f.type) && !extOk) {
+    const extOk = /\.(jpe?g|png|webp|gif|heic|heif)$/i.test(f.name);
+    if (!THUMB_TYPES.includes(f.type) && !isHeicImage(f) && !extOk) {
       setErrors(prev => ({
         ...prev,
-        thumb: 'Thumbnail must be JPG, PNG, WEBP, or GIF. HEIC/iPhone photos are not supported — convert or screenshot first.',
+        thumb: 'Thumbnail must be an image file (JPG, PNG, WEBP, GIF, or HEIC).',
       }));
       return;
     }
-    setErrors(prev => ({ ...prev, thumb: undefined }));
-    setThumbnailFile(f);
-    setThumbnailPreview(URL.createObjectURL(f));
+    try {
+      const normalized = await normalizeImageForUpload(f);
+      setErrors(prev => ({ ...prev, thumb: undefined }));
+      setThumbnailFile(normalized);
+      setThumbnailPreview(URL.createObjectURL(normalized));
+    } catch {
+      setErrors(prev => ({
+        ...prev,
+        thumb: 'Could not process this photo. Try exporting it as JPG first.',
+      }));
+    }
   };
 
   const pickFile = e => {
@@ -263,7 +272,7 @@ function ResourceModal({ mode, resource, onClose, onSaved }) {
                   </div>
                 )
               }
-              <input ref={thumbRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif" className="hidden" onChange={pickThumb} />
+              <input ref={thumbRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.gif,.heic,.heif" className="hidden" onChange={pickThumb} />
             </div>
             {errors.thumb && <p className="mt-1 text-xs text-red-500">{errors.thumb}</p>}
           </div>

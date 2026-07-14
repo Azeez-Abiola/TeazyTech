@@ -12,6 +12,7 @@ import Highlight from "@tiptap/extension-highlight";
 import { Color } from "@tiptap/extension-color";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { FontFamily } from "@tiptap/extension-font-family";
+import { isHeicImage } from "../lib/normalizeImageForUpload";
 
 import { createLowlight, common } from "lowlight";
 
@@ -72,7 +73,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
       handleDrop: (view, event, slice, moved) => {
         if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) {
           const file = event.dataTransfer.files[0];
-          if (file.type.startsWith("image/")) {
+          if (file.type.startsWith("image/") || isHeicImage(file)) {
             uploadImage(file).then(url => {
               if (url) {
                 const { schema } = view.state;
@@ -89,7 +90,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
       },
       handlePaste: (view, event, slice) => {
         const items = Array.from(event.clipboardData?.items || []);
-        const item = items.find(i => i.type.startsWith("image/"));
+        const item = items.find(i => i.type.startsWith("image/") || i.type === "image/heic" || i.type === "image/heif");
         if (item) {
           const file = item.getAsFile();
           uploadImage(file).then(url => {
@@ -354,7 +355,7 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
             <input
               type="file"
               className="hidden"
-              accept="image/*"
+              accept="image/*,.heic,.heif"
               onChange={insertImageFile}
             />
           </label>

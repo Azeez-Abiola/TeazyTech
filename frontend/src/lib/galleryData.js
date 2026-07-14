@@ -1,20 +1,14 @@
+import {
+  exhibitionImages,
+  ibadanTrainingImages,
+  uiWorkshopImages,
+} from "./siteImages";
+
 const galleryData = [
     {
         id: "galleryIbadan",
         title: "Ibadan Teacher Training — Golden Beryl International School",
-        images: [
-            "/images/Gallery Ibadan Training/IMG_7713.jpg",
-            "/images/Gallery Ibadan Training/IMG_7715.jpg",
-            "/images/Gallery Ibadan Training/IMG_7738.jpg",
-            "/images/Gallery Ibadan Training/IMG_7739.jpg",
-            "/images/Gallery Ibadan Training/IMG_7741.jpg",
-            "/images/Gallery Ibadan Training/IMG_7742.jpg",
-            "/images/Gallery Ibadan Training/IMG_7743.jpg",
-            "/images/Gallery Ibadan Training/IMG_7750.jpg",
-            "/images/Gallery Ibadan Training/IMG_7751.jpg",
-            "/images/Gallery Ibadan Training/IMG_7753.jpg",
-            "/images/Gallery Ibadan Training/IMG_7759.jpg",
-        ],
+        images: ibadanTrainingImages,
         description:
             "Private EdTech integration training session for teachers from Golden Beryl International School Ibadan.",
         category: "events",
@@ -76,18 +70,14 @@ const galleryData = [
     {
         id: "uiStudentTeacherWorkshop",
         title: "University of Ibadan Student Teacher Workshop",
-        images: [
-            // Pictures to be added — send images to populate this gallery
-        ],
+        images: uiWorkshopImages,
         description: "An immersive EdTech workshop for student teachers at the University of Ibadan, equipping the next generation of educators with practical digital skills.",
         category: "workshops",
     },
     {
         id: "exhibitions",
         title: "Exhibitions",
-        images: [
-            // Pictures to be added — send images to populate this gallery
-        ],
+        images: exhibitionImages,
         description: "Teazy Tech exhibition showcasing educational technology tools and resources for educators across Nigeria.",
         category: "exhibitions",
     },

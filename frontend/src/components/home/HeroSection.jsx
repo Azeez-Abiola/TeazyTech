@@ -1,16 +1,12 @@
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { heroCarouselImages } from "../../lib/siteImages";
 import "../../styles/Home.css";
 import { FaArrowRight } from "react-icons/fa";
 // import Particles from "./Particles";
 
-const heroImages = [
-  "/images/Gallery Ibadan Training/IMG_7713.jpg",
-  "/images/Gallery Kaduna Training/IMG_5756.jpg",
-  "/images/Mastercard Foundation Edtech Conference/IMG_6333.jpg",
-  "/images/workshopPhotos/IMG_7526.jpg",
-];
+const heroImages = heroCarouselImages;
 
 const HeroSection = () => {
   const heroRef = useRef(null);

@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
+import { exhibitionImages } from "../../lib/siteImages";
 
 const CtaSection = () => (
     <section className="tt-ignite">
         <div className="tt-ignite__bg" aria-hidden="true">
             <img
-                src="/images/Gallery Kaduna Training/IMG_5756.jpg"
+                src={exhibitionImages[4]}
                 alt=""
                 data-cover
             />

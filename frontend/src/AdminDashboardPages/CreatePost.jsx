@@ -7,6 +7,7 @@ import RichTextEditor from "../components/RichTextEditor";
 import axios from "axios";
 import { z } from "zod";
 import { toast, Toaster } from "sonner";
+import { isHeicImage, normalizeImageForUpload } from "../lib/normalizeImageForUpload";
 
 const postSchema = z.object({
   author: z.string().trim().min(4, "Author name is required"),
@@ -86,17 +87,28 @@ const CreatePost = () => {
     }
   }, [title, author, content, excerpt, category]);
 
-  const handleThumbnailChange = (e) => {
+  const handleThumbnailChange = async (e) => {
     const file = e.target.files[0];
-    if (file && file.type.startsWith("image/")) {
-      setThumbnail(file);
-      const reader = new FileReader();
-      reader.onload = () => setThumbnailPreview(reader.result);
-      reader.readAsDataURL(file);
-    } else {
+    if (!file) return;
+
+    const isImage = file.type.startsWith("image/") || isHeicImage(file);
+    if (!isImage) {
       setThumbnail(null);
       setThumbnailPreview("");
-      if (file) toast.error("Please upload a valid image file");
+      toast.error("Please upload a valid image file");
+      return;
+    }
+
+    try {
+      const normalized = await normalizeImageForUpload(file);
+      setThumbnail(normalized);
+      const reader = new FileReader();
+      reader.onload = () => setThumbnailPreview(reader.result);
+      reader.readAsDataURL(normalized);
+    } catch {
+      setThumbnail(null);
+      setThumbnailPreview("");
+      toast.error("Could not process this photo. Try exporting it as JPG first.");
     }
   };
 
@@ -114,6 +126,7 @@ const CreatePost = () => {
   const uploadImage = async (file) => {
     const loadingToastId = toast.loading("Starting direct upload...");
     try {
+      const normalized = await normalizeImageForUpload(file);
       // 1. Get signature from backend
       const { data: signData } = await axios.get("/api/admin/sign-upload", {
         withCredentials: true
@@ -121,7 +134,7 @@ const CreatePost = () => {
 
       // 2. Upload directly to Cloudinary
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", normalized);
       formData.append("api_key", signData.apiKey);
       formData.append("timestamp", signData.timestamp);
       formData.append("signature", signData.signature);
@@ -374,7 +387,7 @@ const CreatePost = () => {
               <div className="flex flex-col gap-1">
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/*,.heic,.heif"
                   onChange={handleThumbnailChange}
                   className="text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 dark:file:bg-red-900/20 file:text-red-700 dark:file:text-red-400 hover:file:bg-red-100 dark:hover:file:bg-red-900/30 transition-all cursor-pointer"
                 />

@@ -4,7 +4,8 @@
   "main": "server.js",
   "scripts": {
     "dev": "node --watch server.js",
-    "build": "cd frontend && npm install && npm run build"
+    "build": "cd frontend && npm install && npm run build",
+    "convert-gallery": "bash scripts/convert-gallery-images.sh"
   },
   "type": "module",
   "keywords": [],

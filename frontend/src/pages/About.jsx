@@ -14,6 +14,7 @@ import {
 import "../styles/About.css";
 import LazyImage from "../components/LazyImage";
 import partnersData from "../lib/partnersData";
+import { ibadanTrainingImages, exhibitionImages } from "../lib/siteImages";
 
 const MISSION_POINTS = [
   "Bridge traditional teaching and modern EdTech",
@@ -150,7 +151,7 @@ const About = () => {
             transition={{ duration: 0.7, delay: 0.15 }}
           >
             <LazyImage
-              src="/images/Gallery Kaduna Training/IMG_5756.jpg"
+              src={ibadanTrainingImages[0]}
               alt="Teazy Tech training session"
             />
             <span className="about-hero-split__badge">
@@ -205,7 +206,7 @@ const About = () => {
             transition={{ duration: 0.65 }}
           >
             <LazyImage
-              src="/images/workshopPhotos/IMG_8138.jpg"
+              src={ibadanTrainingImages[2]}
               alt="Teazy Tech workshop"
             />
           </motion.div>
@@ -270,13 +271,13 @@ const About = () => {
             transition={{ duration: 0.65, delay: 0.1 }}
           >
             <LazyImage
-              src="/images/Gallery Ibadan Training/IMG_7742.jpg"
+              src={ibadanTrainingImages[1]}
               alt="Teacher training in Ibadan"
               className="about-block__duo-primary"
             />
             <LazyImage
-              src="/images/Mastercard Foundation Edtech Conference/IMG_6333.jpg"
-              alt="EdTech conference"
+              src={exhibitionImages[6]}
+              alt="Teazy Tech exhibition"
               className="about-block__duo-secondary"
             />
           </motion.div>
@@ -294,12 +295,12 @@ const About = () => {
             transition={{ duration: 0.65 }}
           >
             <LazyImage
-              src="/images/Gallery Kaduna Training/IMG_5799.jpg"
-              alt="Kaduna training"
+              src={ibadanTrainingImages[3]}
+              alt="Ibadan training session"
             />
             <LazyImage
-              src="/images/workshopPhotos/IMG_7526.jpg"
-              alt="Workshop session"
+              src={exhibitionImages[0]}
+              alt="Teazy Tech exhibition booth"
             />
           </motion.div>
           <motion.div
@@ -385,7 +386,7 @@ const About = () => {
             transition={{ duration: 0.65, delay: 0.1 }}
           >
             <LazyImage
-              src="/images/Gallery Ibadan Training/IMG_7713.jpg"
+              src={ibadanTrainingImages[0]}
               alt="Teazy Tech community"
             />
           </motion.div>
@@ -505,7 +506,7 @@ const About = () => {
       {/* CTA */}
       <section className="about-cta">
         <div className="about-cta__bg" aria-hidden="true">
-          <img src="/images/Gallery Kaduna Training/IMG_5799.jpg" alt="" />
+          <img src={ibadanTrainingImages[1]} alt="" />
         </div>
         <div className="about-cta__overlay" aria-hidden="true" />
         <div className="container about-cta__inner">
