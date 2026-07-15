@@ -22,6 +22,9 @@ export const uniIbadanWorkshopImages = [
   "/images/Gallery/IMG_8254_jpg.jpg",
 ];
 
+/** Site-wide training photos (Uni Ibadan drive upload — not Golden Beryl). */
+export const ibadanTrainingImages = uniIbadanWorkshopImages;
+
 export const exhibitionImages = [
   "/images/Gallery/IMG_0394.jpg",
   "/images/Gallery/IMG_0399.jpg",
@@ -47,8 +50,10 @@ export const exhibitionImages = [
 ];
 
 export const heroCarouselImages = [
-  "/images/Gallery Ibadan Training/IMG_7713.jpg",
-  "/images/Gallery Kaduna Training/IMG_5756.jpg",
-  "/images/Mastercard Foundation Edtech Conference/IMG_6333.jpg",
-  "/images/workshopPhotos/IMG_7526.jpg",
+  "/images/Gallery/9a4bbb4e-cb1f-4f27-9a7d-cec96612e25e.jpg",
+  "/images/Gallery/544c6903-94e5-4a4b-9d68-53a0c1d6a194.jpg",
+  "/images/Gallery/IMG_0456.jpg",
+  "/images/Gallery/IMG_2640.jpg",
+  "/images/Gallery/IMG_2560.jpg",
+  "/images/Gallery/IMG_0453.jpg",
 ];

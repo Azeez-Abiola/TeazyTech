@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { goldenBerylTrainingImages } from "../../lib/siteImages"
+import { ibadanTrainingImages } from "../../lib/siteImages"
 
 const AboutPreview = () => {
   return (
@@ -23,7 +23,7 @@ const AboutPreview = () => {
           </div>
           <div className="about-preview-image">
             <img 
-              src={goldenBerylTrainingImages[5]}
+              src={ibadanTrainingImages[1]}
               alt="Teazy Tech training session with educators"
             />
           </div>
