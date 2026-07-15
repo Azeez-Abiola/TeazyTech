@@ -36,49 +36,56 @@ const NavDropdown = ({
           type="button"
           className="nav-dropdown-mobile__trigger"
           aria-expanded={mobileExpanded}
-          onClick={() => setMobileExpanded((prev) => !prev)}
+          onClick={(event) => {
+            event.stopPropagation();
+            setMobileExpanded((prev) => !prev);
+          }}
         >
           <span>{label}</span>
           <ChevronDown className="nav-dropdown-mobile__chevron" size={18} strokeWidth={2.5} />
         </button>
-        <ul className="nav-dropdown-mobile__list">
-          {items.map((item) => {
-            const Icon = item.Icon;
-            const content = (
-              <>
-                {Icon && (
-                  <span className="nav-dropdown-mobile__icon">
-                    <Icon size={16} strokeWidth={1.75} />
-                  </span>
-                )}
-                <span>
-                  <span className="nav-dropdown-mobile__title">{item.label}</span>
-                  {item.description && (
-                    <span className="nav-dropdown-mobile__desc">
-                      {item.description}
+        <div
+          className={`nav-dropdown-mobile__panel ${mobileExpanded ? "is-open" : ""}`}
+        >
+          <ul className="nav-dropdown-mobile__list">
+            {items.map((item) => {
+              const Icon = item.Icon;
+              const content = (
+                <>
+                  {Icon && (
+                    <span className="nav-dropdown-mobile__icon">
+                      <Icon size={16} strokeWidth={1.75} />
                     </span>
                   )}
-                </span>
-              </>
-            );
+                  <span>
+                    <span className="nav-dropdown-mobile__title">{item.label}</span>
+                    {item.description && (
+                      <span className="nav-dropdown-mobile__desc">
+                        {item.description}
+                      </span>
+                    )}
+                  </span>
+                </>
+              );
 
-            return (
-              <li key={item.label}>
-                {item.external || item.href ? (
-                  <a
-                    href={item.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {content}
-                  </a>
-                ) : (
-                  <Link to={item.to}>{content}</Link>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+              return (
+                <li key={item.label}>
+                  {item.external || item.href ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {content}
+                    </a>
+                  ) : (
+                    <Link to={item.to}>{content}</Link>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </li>
     );
   }

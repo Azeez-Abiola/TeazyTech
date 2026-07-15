@@ -67,9 +67,9 @@ const Gallery = () => {
     };
   }, []);
 
-  const openLightbox = (item) => {
+  const openLightbox = (item, startIndex = 0) => {
     setSelectedItem(item);
-    setCurrentImage(0);
+    setCurrentImage(startIndex);
     setLightboxOpen(true);
     document.body.style.overflow = "hidden";
   };
@@ -143,6 +143,34 @@ const Gallery = () => {
           <GalleryCard key={item.id} item={item} />
         ))}
       </div>
+    </section>
+  );
+
+  const ExhibitionPhotoGrid = ({ album }) => (
+    <div className="gallery-grid gallery-grid--photos">
+      {album.images.map((src, index) => (
+        <article
+          key={`${album.id}-${index}`}
+          className="gallery-item gallery-item--photo"
+          onClick={() => openLightbox(album, index)}
+        >
+          <div className="gallery-item-image">
+            <LazyImage src={src} alt={`${album.title} — photo ${index + 1}`} />
+            <div className="gallery-gradient" />
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+
+  const ExhibitionSection = ({ title, albums }) => (
+    <section className="gallery-category-section">
+      <div className="section-header">
+        <h2 className="!text-white">{title}</h2>
+      </div>
+      {albums.map((album) => (
+        <ExhibitionPhotoGrid key={album.id} album={album} />
+      ))}
     </section>
   );
 
@@ -241,10 +269,23 @@ const Gallery = () => {
               />
 
               {groupedGallery.exhibitions.length > 0 && (
-                <GallerySection
+                <ExhibitionSection
                   title="Exhibitions"
-                  items={groupedGallery.exhibitions}
+                  albums={groupedGallery.exhibitions}
                 />
+              )}
+            </>
+          ) : activeFilter === "exhibitions" ? (
+            <>
+              {filteredItems.length > 0 ? (
+                filteredItems.map((album) => (
+                  <ExhibitionPhotoGrid key={album.id} album={album} />
+                ))
+              ) : (
+                <div className="no-items">
+                  <h3>No gallery items found.</h3>
+                  <p>We couldn't find any images for this category yet.</p>
+                </div>
               )}
             </>
           ) : (
@@ -281,6 +322,7 @@ const Gallery = () => {
               <LazyImage
                 src={selectedItem.images[currentImage]}
                 alt={selectedItem.title}
+                objectFit="contain"
               />
             </div>
 
@@ -293,34 +335,32 @@ const Gallery = () => {
 
               <p>{selectedItem.description}</p>
 
-              {(selectedItem.category === "events" ||
-                selectedItem.category === "workshops") &&
-                selectedItem.images.length > 1 && (
-                  <div className="lightbox-counter">
-                    {currentImage + 1} / {selectedItem.images.length}
-                  </div>
-                )}
+              {selectedItem.images.length > 1 && (
+                <div className="lightbox-counter">
+                  {currentImage + 1} / {selectedItem.images.length}
+                </div>
+              )}
             </div>
 
-            {(selectedItem.category === "events" ||
-              selectedItem.category === "workshops") &&
-              selectedItem.images.length > 1 && (
-                <>
-                  <button
-                    className="lightbox-nav lightbox-prev"
-                    onClick={previousImage}
-                  >
-                    <i className="fas fa-chevron-left"></i>
-                  </button>
+            {selectedItem.images.length > 1 && (
+              <>
+                <button
+                  className="lightbox-nav lightbox-prev"
+                  onClick={previousImage}
+                  aria-label="Previous image"
+                >
+                  <i className="fas fa-chevron-left"></i>
+                </button>
 
-                  <button
-                    className="lightbox-nav !bg-blue-500 lightbox-next"
-                    onClick={nextImage}
-                  >
-                    <i className="fas fa-chevron-right"></i>
-                  </button>
-                </>
-              )}
+                <button
+                  className="lightbox-nav lightbox-next"
+                  onClick={nextImage}
+                  aria-label="Next image"
+                >
+                  <i className="fas fa-chevron-right"></i>
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

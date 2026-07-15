@@ -115,11 +115,11 @@ const Navbar = () => {
           <div className="navbar-menu-header">
             <Link to="/" className="navbar-menu-logo flex items-center gap-2">
               <img
-                src="/images/logo/teazy-tech-logo-icon-light.png"
+                src="/images/logo/teazy-tech-logo-icon.png"
                 alt="Teazy Tech logo"
                 className="h-8 w-8 object-contain"
               />
-              <span className="text-lg font-bold text-white">Teazy Tech</span>
+              <span className="text-lg font-bold">Teazy Tech</span>
             </Link>
             <button
               className="menu-close"

@@ -5,8 +5,10 @@ const LazyImage = ({
   alt, 
   className = '', 
   placeholder = '/images/placeholder.jpg',
+  objectFit = 'cover',
   ...props 
 }) => {
+  const isContain = objectFit === 'contain';
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -45,8 +47,13 @@ const LazyImage = ({
   return (
     <div 
       ref={imgRef} 
-      className={`lazy-image-container ${className}`}
-      style={{ position: 'relative', overflow: 'hidden' }}
+      className={`lazy-image-container ${isContain ? 'lazy-image-container--contain' : ''} ${className}`.trim()}
+      style={{
+        position: 'relative',
+        overflow: isContain ? 'visible' : 'hidden',
+        width: '100%',
+        height: isContain ? 'auto' : undefined,
+      }}
       {...props}
     >
       {/* Placeholder/Loading state */}
@@ -90,8 +97,8 @@ const LazyImage = ({
           onError={handleError}
           style={{
             width: '100%',
-            height: '100%',
-            objectFit: 'cover',
+            height: isContain ? 'auto' : '100%',
+            objectFit,
             transition: 'opacity 0.3s ease',
             opacity: isLoaded ? 1 : 0
           }}
