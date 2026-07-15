@@ -7,12 +7,12 @@ import { motion } from "framer-motion";
 import FaqSection from "../components/home/FaqSection";
 import NewsletterSection from "../components/home/NewsletterSection";
 import ServicesEcosystem from "../components/services/ServicesEcosystem";
-import { exhibitionImages, ibadanTrainingImages } from "../lib/siteImages";
+import { exhibitionImages } from "../lib/siteImages";
 const services = [
   {
     number: "01",
     title: "Professional Development",
-    image: ibadanTrainingImages[0],
+    image: "/images/Gallery Ibadan Training/IMG_7739.jpg",
     icon: "fas fa-chalkboard-teacher",
     color: "var(--primary-blue)",
     description:
@@ -75,9 +75,9 @@ const services = [
 ];
 
 const bgImages = [
-  `url("${ibadanTrainingImages[0]}")`,
+  'url("/images/Gallery Kaduna Training/IMG_5706.jpg")',
   `url("${exhibitionImages[7]}")`,
-  `url("${ibadanTrainingImages[2]}")`,
+  'url("/images/Gallery Kaduna Training/IMG_5799.jpg")',
 ];
 
 const testimonials = [

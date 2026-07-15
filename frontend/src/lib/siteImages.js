@@ -1,6 +1,21 @@
-/** Web-ready paths for site-wide photos (from /images/Gallery after HEIC conversion). */
+/** Web-ready paths for site-wide photos. */
 
-export const ibadanTrainingImages = [
+export const goldenBerylTrainingImages = [
+  "/images/Gallery Ibadan Training/IMG_7713.jpg",
+  "/images/Gallery Ibadan Training/IMG_7715.jpg",
+  "/images/Gallery Ibadan Training/IMG_7738.jpg",
+  "/images/Gallery Ibadan Training/IMG_7739.jpg",
+  "/images/Gallery Ibadan Training/IMG_7741.jpg",
+  "/images/Gallery Ibadan Training/IMG_7742.jpg",
+  "/images/Gallery Ibadan Training/IMG_7743.jpg",
+  "/images/Gallery Ibadan Training/IMG_7750.jpg",
+  "/images/Gallery Ibadan Training/IMG_7751.jpg",
+  "/images/Gallery Ibadan Training/IMG_7753.jpg",
+  "/images/Gallery Ibadan Training/IMG_7759.jpg",
+];
+
+/** University of Ibadan student teacher workshop (from /images/Gallery drive upload). */
+export const uniIbadanWorkshopImages = [
   "/images/Gallery/544c6903-94e5-4a4b-9d68-53a0c1d6a194.jpg",
   "/images/Gallery/9a4bbb4e-cb1f-4f27-9a7d-cec96612e25e.jpg",
   "/images/Gallery/338a7520-aed2-40a0-a4df-4eb70c4d0ff2.jpg",
@@ -32,15 +47,8 @@ export const exhibitionImages = [
 ];
 
 export const heroCarouselImages = [
-  "/images/Gallery/9a4bbb4e-cb1f-4f27-9a7d-cec96612e25e.jpg",
-  "/images/Gallery/544c6903-94e5-4a4b-9d68-53a0c1d6a194.jpg",
-  "/images/Gallery/IMG_0456.jpg",
-  "/images/Gallery/IMG_2640.jpg",
-  "/images/Gallery/IMG_2560.jpg",
-  "/images/Gallery/IMG_0453.jpg",
-];
-
-export const uiWorkshopImages = [
-  "/images/Gallery/544c6903-94e5-4a4b-9d68-53a0c1d6a194.jpg",
-  "/images/Gallery/9a4bbb4e-cb1f-4f27-9a7d-cec96612e25e.jpg",
+  "/images/Gallery Ibadan Training/IMG_7713.jpg",
+  "/images/Gallery Kaduna Training/IMG_5756.jpg",
+  "/images/Mastercard Foundation Edtech Conference/IMG_6333.jpg",
+  "/images/workshopPhotos/IMG_7526.jpg",
 ];

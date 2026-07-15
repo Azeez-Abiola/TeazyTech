@@ -1,14 +1,14 @@
 import {
   exhibitionImages,
-  ibadanTrainingImages,
-  uiWorkshopImages,
+  goldenBerylTrainingImages,
+  uniIbadanWorkshopImages,
 } from "./siteImages";
 
 const galleryData = [
     {
         id: "galleryIbadan",
         title: "Ibadan Teacher Training — Golden Beryl International School",
-        images: ibadanTrainingImages,
+        images: goldenBerylTrainingImages,
         description:
             "Private EdTech integration training session for teachers from Golden Beryl International School Ibadan.",
         category: "events",
@@ -70,7 +70,7 @@ const galleryData = [
     {
         id: "uiStudentTeacherWorkshop",
         title: "University of Ibadan Student Teacher Workshop",
-        images: uiWorkshopImages,
+        images: uniIbadanWorkshopImages,
         description: "An immersive EdTech workshop for student teachers at the University of Ibadan, equipping the next generation of educators with practical digital skills.",
         category: "workshops",
     },
