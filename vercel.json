@@ -2,29 +2,15 @@
   "version": 2,
   "installCommand": "npm install && cd frontend && npm install",
   "buildCommand": "npm run build",
+  "outputDirectory": "frontend/dist",
   "functions": {
-    "server.js": {
-      "excludeFiles": "{frontend/dist,frontend/public,frontend/node_modules}/**"
+    "api/index.js": {
+      "maxDuration": 60,
+      "excludeFiles": "frontend/**"
     }
   },
-  "builds": [
-    {
-      "src": "server.js",
-      "use": "@vercel/node",
-      "config": {
-        "excludeFiles": "{frontend/dist,frontend/public,frontend/node_modules}/**"
-      }
-    },
-    {
-      "src": "frontend/dist/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/server.js" },
-    { "src": "/assets/(.*)", "dest": "/frontend/dist/assets/$1" },
-    { "src": "/images/(.*)", "dest": "/frontend/dist/images/$1" },
-    { "src": "/(favicon\\.ico|default-blog-thumbnail\\.png)", "dest": "/frontend/dist/$1" },
-    { "src": "/(.*)", "dest": "/frontend/dist/index.html" }
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.js" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
