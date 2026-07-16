@@ -2,10 +2,18 @@
   "version": 2,
   "installCommand": "npm install && cd frontend && npm install",
   "buildCommand": "npm run build",
+  "functions": {
+    "server.js": {
+      "excludeFiles": "{frontend/dist,frontend/public,frontend/node_modules}/**"
+    }
+  },
   "builds": [
     {
       "src": "server.js",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "excludeFiles": "{frontend/dist,frontend/public,frontend/node_modules}/**"
+      }
     },
     {
       "src": "frontend/dist/**",

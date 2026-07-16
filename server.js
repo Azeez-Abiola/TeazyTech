@@ -188,20 +188,25 @@ app.use(express.urlencoded({ extended: true }));
 logger.info("Calculating __dirname for static serving");
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const isVercel = Boolean(process.env.VERCEL);
 
-logger.info("Serving static files from frontend/dist directory");
-// Serve static files with proper cache headers
-app.use(express.static(path.join(process.cwd(), "frontend", "dist"), {
-  maxAge: '1h', // Reduced cache time to help with updates
-  etag: true,
-  lastModified: true,
-  setHeaders: (res, path) => {
-    // Force no-cache for ALL files during this debugging phase to ensure updates are loaded
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-  }
-}));
+if (!isVercel) {
+  logger.info("Serving static files from frontend/dist directory");
+  // Serve static files with proper cache headers (local dev / non-Vercel hosts)
+  app.use(express.static(path.join(process.cwd(), "frontend", "dist"), {
+    maxAge: '1h', // Reduced cache time to help with updates
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, path) => {
+      // Force no-cache for ALL files during this debugging phase to ensure updates are loaded
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+  }));
+} else {
+  logger.info("Skipping express.static on Vercel — static assets served via @vercel/static");
+}
 
 logger.info("Initializing Firebase Admin SDK...");
 let db;
@@ -2417,6 +2422,10 @@ app.get("*", (req, res) => {
     logger.warn("Asset not found, avoiding SPA catch-all", {
       path: req.originalUrl,
     });
+    return res.status(404).end();
+  }
+
+  if (isVercel) {
     return res.status(404).end();
   }
 
