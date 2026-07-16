@@ -14,7 +14,7 @@ import {
 import "../styles/About.css";
 import LazyImage from "../components/LazyImage";
 import partnersData from "../lib/partnersData";
-import { ibadanTrainingImages, exhibitionImages } from "../lib/siteImages";
+import { aboutPageImages } from "../lib/siteImages";
 
 const REPEAT_IN_VIEW = { once: false, margin: "-72px", amount: 0.35 };
 
@@ -82,21 +82,21 @@ const TESTIMONIALS = [
   {
     name: "Amoatey Benjamin",
     title: "Teacher (Educator)",
-    src: "/images/Teazy tech teachers/amoatey Benjamin.jpg",
+    src: "/images/Teazy tech teachers/amoatey Benjamin.webp",
     quote:
       "I have been able to create beautiful presentations for my lessons using Canva and other tools I learned from Teazy Tech. My students are more engaged now, and I feel more confident in my teaching abilities.",
   },
   {
     name: "Florence Imhande",
     title: "Teacher (Educator)",
-    src: "/images/Teazy tech teachers/Florence imhande.jpg",
+    src: "/images/Teazy tech teachers/Florence imhande.webp",
     quote:
       "Teazy Tech gave me practical skills I could immediately apply in my classroom. Highly recommended.",
   },
   {
     name: "Abimbola Abiodun",
     title: "Maths Teacher",
-    src: "/images/Teazy tech teachers/abimbola adiodun akanbi.jpg",
+    src: "/images/Teazy tech teachers/abimbola adiodun akanbi.webp",
     quote:
       "Teazy Tech has really helped me in my online teaching. The community is so engaging, and we're always sent resources to ease our work for free.",
   },
@@ -167,7 +167,7 @@ const About = () => {
             transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           >
             <LazyImage
-              src={ibadanTrainingImages[0]}
+              src={aboutPageImages.training[0]}
               alt="Teazy Tech training session"
             />
             <span className="about-hero-split__badge">
@@ -219,7 +219,7 @@ const About = () => {
             {...riseFromLeft}
           >
             <LazyImage
-              src={ibadanTrainingImages[2]}
+              src={aboutPageImages.training[2]}
               alt="Teazy Tech workshop"
             />
           </motion.div>
@@ -277,12 +277,12 @@ const About = () => {
             transition={{ ...riseFromRight.transition, delay: 0.1 }}
           >
             <LazyImage
-              src={ibadanTrainingImages[1]}
+              src={aboutPageImages.training[1]}
               alt="Teacher training in Ibadan"
               className="about-block__duo-primary"
             />
             <LazyImage
-              src={exhibitionImages[6]}
+              src={aboutPageImages.exhibition}
               alt="Teazy Tech exhibition"
               className="about-block__duo-secondary"
             />
@@ -324,7 +324,7 @@ const About = () => {
           <div className="about-block__media about-block__media--pair">
             <motion.div className="about-block__pair-image" {...riseFromLeft}>
               <img
-                src="/images/about1.png"
+                src={aboutPageImages.story[0]}
                 alt="Teazy Tech team and educators"
               />
             </motion.div>
@@ -334,7 +334,7 @@ const About = () => {
               transition={{ ...riseFromRight.transition, delay: 0.08 }}
             >
               <img
-                src="/images/about2.png"
+                src={aboutPageImages.story[1]}
                 alt="Teazy Tech training in action"
               />
             </motion.div>
@@ -395,7 +395,7 @@ const About = () => {
             transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           >
             <LazyImage
-              src={ibadanTrainingImages[0]}
+              src={aboutPageImages.training[0]}
               alt="Teazy Tech community"
             />
           </motion.div>
@@ -500,7 +500,11 @@ const About = () => {
               <span key={partner.id} className="about-partners__item">
                 {partner.logo ? (
                   <img
-                    src={partner.logo}
+                    src={
+                      partner.id === "orange-corners-nigeria"
+                        ? aboutPageImages.partnerLogo
+                        : partner.logo
+                    }
                     alt={partner.name}
                     className={`about-partners__logo${
                       partner.id === "orange-corners-nigeria"
@@ -520,7 +524,7 @@ const About = () => {
       {/* CTA */}
       <section className="about-cta">
         <div className="about-cta__bg" aria-hidden="true">
-          <img src={ibadanTrainingImages[1]} alt="" />
+          <img src={aboutPageImages.training[1]} alt="" />
         </div>
         <div className="about-cta__overlay" aria-hidden="true" />
         <div className="container about-cta__inner">

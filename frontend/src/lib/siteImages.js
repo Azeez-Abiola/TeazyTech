@@ -49,6 +49,18 @@ export const exhibitionImages = [
   "/images/Gallery/IMG_2650.jpg",
 ];
 
+/** WebP assets for the About page. */
+export const aboutPageImages = {
+  story: ["/images/about1.webp", "/images/about2.webp"],
+  training: [
+    "/images/Gallery/544c6903-94e5-4a4b-9d68-53a0c1d6a194.webp",
+    "/images/Gallery/9a4bbb4e-cb1f-4f27-9a7d-cec96612e25e.webp",
+    "/images/Gallery/338a7520-aed2-40a0-a4df-4eb70c4d0ff2.webp",
+  ],
+  exhibition: "/images/Gallery/IMG_0456.webp",
+  partnerLogo: "/images/orange.webp",
+};
+
 export const heroCarouselSlides = [
   {
     src: "/images/Gallery/IMG_0399.jpg",
