@@ -7,6 +7,7 @@ export default defineConfig({
   base: '/',
   build: {
     outDir: 'dist',
+    emptyOutDir: false,
     sourcemap: false,
     minify: 'esbuild',
     rollupOptions: {
