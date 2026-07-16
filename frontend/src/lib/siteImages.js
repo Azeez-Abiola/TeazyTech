@@ -54,6 +54,7 @@ export const heroCarouselSlides = [
     src: "/images/Gallery/IMG_0399.jpg",
     offsetY: "8%",
   },
+  { src: "/images/Gallery/9a4bbb4e-cb1f-4f27-9a7d-cec96612e25e.jpg" },
   { src: "/images/Gallery/IMG_0453.jpg" },
   { src: "/images/Gallery/IMG_2650.jpg" },
   { src: "/images/Gallery Kaduna Training/IMG_5756.jpg" },
