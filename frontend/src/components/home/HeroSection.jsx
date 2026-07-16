@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { heroCarouselImages } from "../../lib/siteImages";
+import { heroCarouselSlides } from "../../lib/siteImages";
 import "../../styles/Home.css";
 import { FaArrowRight } from "react-icons/fa";
 // import Particles from "./Particles";
 
-const heroImages = heroCarouselImages;
+const heroSlides = heroCarouselSlides;
 
 const HeroSection = () => {
   const heroRef = useRef(null);
@@ -32,7 +32,7 @@ const HeroSection = () => {
   // Background slideshow
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 6000);
 
     return () => clearInterval(interval);
@@ -83,16 +83,26 @@ const HeroSection = () => {
       className="relative flex min-h-screen items-center overflow-hidden pt-20"
     >
       {/* Background Slideshow */}
-      <div className="absolute inset-0 z-0">
-        {heroImages.map((src, index) => (
-          <img
-            key={src}
-            src={src}
-            alt=""
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[1500ms] ease-in-out ${
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        {heroSlides.map((slide, index) => (
+          <div
+            key={slide.src}
+            className={`hero-slide-frame absolute inset-0 transition-opacity duration-[1500ms] ease-in-out ${
               index === currentSlide ? "opacity-100" : "opacity-0"
             }`}
-          />
+            aria-hidden={index !== currentSlide}
+          >
+            <img
+              src={slide.src}
+              alt=""
+              className="hero-slide"
+              style={
+                slide.offsetY
+                  ? { transform: `translate(-50%, calc(-50% + ${slide.offsetY}))` }
+                  : undefined
+              }
+            />
+          </div>
         ))}
         <div className="absolute inset-0 bg-black/50" />
       </div>

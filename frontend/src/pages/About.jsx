@@ -16,6 +16,22 @@ import LazyImage from "../components/LazyImage";
 import partnersData from "../lib/partnersData";
 import { ibadanTrainingImages, exhibitionImages } from "../lib/siteImages";
 
+const REPEAT_IN_VIEW = { once: false, margin: "-72px", amount: 0.35 };
+
+const riseFromLeft = {
+  initial: { opacity: 0, x: -56, y: 28 },
+  whileInView: { opacity: 1, x: 0, y: 0 },
+  viewport: REPEAT_IN_VIEW,
+  transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+};
+
+const riseFromRight = {
+  initial: { opacity: 0, x: 56, y: 28 },
+  whileInView: { opacity: 1, x: 0, y: 0 },
+  viewport: REPEAT_IN_VIEW,
+  transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+};
+
 const MISSION_POINTS = [
   "Bridge traditional teaching and modern EdTech",
   "Empower educators with practical tools and knowledge",
@@ -146,9 +162,9 @@ const About = () => {
 
           <motion.div
             className="about-hero-split__visual"
-            initial={{ opacity: 0, x: 32 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
+            initial={{ opacity: 0, x: 56, y: 28 }}
+            animate={{ opacity: 1, x: 0, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           >
             <LazyImage
               src={ibadanTrainingImages[0]}
@@ -200,10 +216,7 @@ const About = () => {
         <div className="container about-block__grid">
           <motion.div
             className="about-block__media"
-            initial={{ opacity: 0, x: -24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.65 }}
+            {...riseFromLeft}
           >
             <LazyImage
               src={ibadanTrainingImages[2]}
@@ -212,10 +225,8 @@ const About = () => {
           </motion.div>
           <motion.div
             className="about-block__content"
-            initial={{ opacity: 0, x: 24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.65, delay: 0.1 }}
+            {...riseFromRight}
+            transition={{ ...riseFromRight.transition, delay: 0.1 }}
           >
             <span className="section-tag">Our Mission</span>
             <h2>Empowering educators with the tools they need</h2>
@@ -242,10 +253,7 @@ const About = () => {
         <div className="container about-block__grid about-block__grid--reverse">
           <motion.div
             className="about-block__content"
-            initial={{ opacity: 0, x: -24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.65 }}
+            {...riseFromLeft}
           >
             <span className="section-tag">Our Vision</span>
             <h2>A world of confident, tech-enabled teachers</h2>
@@ -265,10 +273,8 @@ const About = () => {
           </motion.div>
           <motion.div
             className="about-block__media about-block__media--duo"
-            initial={{ opacity: 0, x: 24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.65, delay: 0.1 }}
+            {...riseFromRight}
+            transition={{ ...riseFromRight.transition, delay: 0.1 }}
           >
             <LazyImage
               src={ibadanTrainingImages[1]}
@@ -286,29 +292,13 @@ const About = () => {
 
       {/* Our Story */}
       <section className="about-block">
-        <div className="container about-block__grid">
+        <div className="container about-block__grid about-block__grid--story">
           <motion.div
-            className="about-block__media about-block__media--pair"
-            initial={{ opacity: 0, x: -24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.65 }}
-          >
-            <LazyImage
-              src={ibadanTrainingImages[3]}
-              alt="Ibadan training session"
-            />
-            <LazyImage
-              src={exhibitionImages[0]}
-              alt="Teazy Tech exhibition booth"
-            />
-          </motion.div>
-          <motion.div
-            className="about-block__content"
-            initial={{ opacity: 0, x: 24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.65, delay: 0.1 }}
+            className="about-block__content about-block__content--story"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={REPEAT_IN_VIEW}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
           >
             <span className="section-tag">Our Story</span>
             <h2>Teach Easy Technology</h2>
@@ -330,6 +320,25 @@ const About = () => {
               technology.
             </p>
           </motion.div>
+
+          <div className="about-block__media about-block__media--pair">
+            <motion.div className="about-block__pair-image" {...riseFromLeft}>
+              <img
+                src="/images/about1.png"
+                alt="Teazy Tech team and educators"
+              />
+            </motion.div>
+            <motion.div
+              className="about-block__pair-image"
+              {...riseFromRight}
+              transition={{ ...riseFromRight.transition, delay: 0.08 }}
+            >
+              <img
+                src="/images/about2.png"
+                alt="Teazy Tech training in action"
+              />
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -380,10 +389,10 @@ const About = () => {
           </motion.div>
           <motion.div
             className="about-commitment__image"
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 32 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.65, delay: 0.1 }}
+            viewport={REPEAT_IN_VIEW}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           >
             <LazyImage
               src={ibadanTrainingImages[0]}
@@ -482,7 +491,8 @@ const About = () => {
             <span className="section-tag">Collaborators</span>
             <h2>Our Partners</h2>
             <p>
-              Organizations we collaborate with to enhance educational technology
+              Organizations we partner with to enhance effective educational
+              technology integration
             </p>
           </div>
           <div className="about-partners__list">
@@ -492,7 +502,11 @@ const About = () => {
                   <img
                     src={partner.logo}
                     alt={partner.name}
-                    className="about-partners__logo"
+                    className={`about-partners__logo${
+                      partner.id === "orange-corners-nigeria"
+                        ? " about-partners__logo--orange"
+                        : ""
+                    }`}
                   />
                 ) : (
                   <span className="about-partners__name">{partner.name}</span>

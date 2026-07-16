@@ -44,7 +44,7 @@ const services = [
   {
     number: "03",
     title: "Instructional Content Design",
-    image: "/images/crossedLegs.jpg",
+    image: "/images/teaz.png",
     icon: "fas fa-pencil-ruler",
     color: "var(--secondary-red)",
     description:
@@ -91,7 +91,7 @@ const testimonials = [
   {
     name: "Wua Msughve Issac",
     title: "Teacher",
-    src: "/images/Teazy tech teachers/wua msughve issac.jpg",
+    src: "/images/Teazy tech teachers/wua msughve isaac.jpg",
     description:
       "Teazytech has become a quick go to platform for me, the short demos and introduction of important edtch tools that I never knew existed before now has made my work better as an educator. Teazy tech absolutely qualifies for every passionate teacher's companion. The demos and illustration videos are short and easy guides even for teachers that have no prior EdTech experience. With teazy tech I've come to appreciate that EdTech isn't as far fetched as I thought.",
   },

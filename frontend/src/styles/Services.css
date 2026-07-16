@@ -1464,7 +1464,13 @@
 }
 
 .service-card-rect .service-image {
-  height: 240px;
+  height: 280px;
+  background: linear-gradient(180deg, #f6f9fd 0%, #eef3fa 100%);
+}
+
+.service-card-rect .service-image img {
+  object-fit: contain;
+  object-position: center center;
 }
 
 .service-card-rect:hover img {
@@ -1512,14 +1518,20 @@
   }
 
   .service-card-rect .service-image {
-    width: 42%;
+    width: 50%;
     height: auto;
-    min-height: 320px;
+    min-height: 340px;
     flex-shrink: 0;
+    background: linear-gradient(180deg, #f6f9fd 0%, #eef3fa 100%);
+  }
+
+  .service-card-rect .service-image img {
+    object-fit: contain;
+    object-position: center center;
   }
 
   .service-card-rect .service-content {
-    width: 58%;
+    width: 50%;
   }
 }
 

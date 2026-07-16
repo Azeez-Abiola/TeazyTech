@@ -12,7 +12,11 @@ const PartnersSection = () => (
                             <img
                                 src={partner.logo}
                                 alt={partner.name}
-                                className="tt-partners__logo"
+                                className={`tt-partners__logo${
+                                    partner.id === "orange-corners-nigeria"
+                                        ? " tt-partners__logo--orange"
+                                        : ""
+                                }`}
                             />
                         ) : (
                             <span className="tt-partners__name">

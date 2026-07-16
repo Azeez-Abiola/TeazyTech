@@ -10,7 +10,7 @@ const partnersData = [
     {
         id: "orange-corners-nigeria",
         name: "Orange Corners Nigeria",
-        logo: "/images/orange-corners.png",
+        logo: "/images/orange.png",
     },
 ];
 

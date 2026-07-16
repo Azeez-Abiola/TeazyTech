@@ -38,6 +38,19 @@
   transition: opacity 0.3s;
 }
 
+.tt-partners__logo--orange {
+  height: 112px;
+  max-width: min(480px, 92vw);
+  opacity: 1;
+}
+
+@media (max-width: 767px) {
+  .tt-partners__logo--orange {
+    height: 88px;
+    max-width: min(360px, 90vw);
+  }
+}
+
 .tt-partners__logo:hover {
   opacity: 1;
 }
