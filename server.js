@@ -2414,28 +2414,24 @@ app.get("/api/resources/:id/verify", async (req, res, next) => {
 
 logger.info("Defining catch-all route for SPA client-side routing");
 
-app.get("*", (req, res) => {
-  // Check if the request is for an asset (contains a dot and extension)
-  const isAsset = req.path.includes('.') || req.path.startsWith('/assets/');
+if (!isVercel) {
+  app.get("*", (req, res) => {
+    const isAsset = req.path.includes('.') || req.path.startsWith('/assets/');
 
-  if (isAsset) {
-    logger.warn("Asset not found, avoiding SPA catch-all", {
+    if (isAsset) {
+      logger.warn("Asset not found, avoiding SPA catch-all", {
+        path: req.originalUrl,
+      });
+      return res.status(404).end();
+    }
+
+    logger.info("Serving SPA index.html for catch-all route", {
       path: req.originalUrl,
     });
-    return res.status(404).end();
-  }
-
-  if (isVercel) {
-    return res.status(404).end();
-  }
-
-  logger.info("Serving SPA index.html for catch-all route", {
-    path: req.originalUrl,
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.sendFile(path.join(process.cwd(), "frontend", "dist", "index.html"));
   });
-  // Add no-cache for the fallback HTML as well
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-  res.sendFile(path.join(process.cwd(), "frontend", "dist", "index.html"));
-});
+}
 
 
 
