@@ -35,7 +35,7 @@ const Login = () => {
       {/* Left: image panel */}
       <div className="relative hidden lg:flex lg:w-1/2 flex-col justify-between overflow-hidden">
         <img
-          src="/images/workshopPhotos/IMG_7526.jpg"
+          src="/images/Gallery/338a7520-aed2-40a0-a4df-4eb70c4d0ff2.webp"
           alt="Teazy Tech training session"
           className="absolute inset-0 h-full w-full object-cover"
         />
