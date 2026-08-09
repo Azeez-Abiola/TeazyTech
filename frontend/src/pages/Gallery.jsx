@@ -2,13 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import "../styles/Gallery.css";
-import galleryData from "../lib/galleryData";
+import galleryData, { sliderImages } from "../lib/galleryData";
 import LazyImage from "../components/LazyImage";
 import CircularGallery from "../components/ui/CircularGallery";
 import Grainient from "../components/ui/Grainient";
-const galleryItems = galleryData.flatMap((item) =>
-  item.images.map((image) => ({ image }))
-);
+const galleryItems = sliderImages.map((image) => ({ image }));
 const filters = [
   {
     id: "all",

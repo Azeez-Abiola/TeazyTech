@@ -82,4 +82,47 @@ const galleryData = [
         category: "exhibitions",
     },
 ];
+/**
+ * Curated shortlist for the homepage-style slider on the Gallery page.
+ *
+ * The slider used to show every photo from every album, which is where the
+ * repeats came from — most shoots have two or three near-identical frames of
+ * the same moment. This keeps one frame per moment, per the client's marked-up
+ * screenshots. The albums below still hold the full sets.
+ */
+export const sliderImages = [
+  // Ibadan Teacher Training — Golden Beryl
+  "/images/Gallery Ibadan Training/IMG_7713.jpg",
+  "/images/Gallery Ibadan Training/IMG_7738.jpg",
+  "/images/Gallery Ibadan Training/IMG_7741.jpg",
+  "/images/Gallery Ibadan Training/IMG_7743.jpg",
+  "/images/Gallery Ibadan Training/IMG_7750.jpg",
+  "/images/Gallery Ibadan Training/IMG_7759.jpg",
+  // Exhibitions
+  "/images/Gallery/IMG_0399.jpg",
+  "/images/Gallery/IMG_0452.jpg",
+  "/images/Gallery/IMG_0453.jpg",
+  "/images/Gallery/IMG_0478.jpg",
+  "/images/Gallery/IMG_0496.jpg",
+  "/images/Gallery/FullSizeRender (1).jpg",
+  "/images/Gallery/IMG_2560.jpg",
+  "/images/Gallery/IMG_2650.jpg",
+  // Kaduna Multi-School Training
+  "/images/Gallery Kaduna Training/IMG_5756.jpg",
+  "/images/Gallery Kaduna Training/IMG_5798.jpg",
+  "/images/Gallery Kaduna Training/IMG_5838.jpg",
+  "/images/Gallery Kaduna Training/IMG_6147.jpg",
+  // Mastercard Foundation EdTech Conference
+  "/images/Mastercard Foundation Edtech Conference/IMG_6296.jpg",
+  "/images/Mastercard Foundation Edtech Conference/IMG_6334.jpg",
+  "/images/Mastercard Foundation Edtech Conference/IMG_6338.jpg",
+  "/images/Mastercard Foundation Edtech Conference/IMG_6439.jpg",
+  "/images/Mastercard Foundation Edtech Conference/IMG_6449.jpg",
+  "/images/Mastercard Foundation Edtech Conference/IMG_6470.jpg",
+  // Educator Technology Seminar
+  "/images/workshopPhotos/IMG_7526.jpg",
+  "/images/workshopPhotos/IMG_7530.jpg",
+  "/images/workshopPhotos/IMG_7531.jpg",
+];
+
 export default galleryData;
