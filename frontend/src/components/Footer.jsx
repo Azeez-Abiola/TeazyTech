@@ -89,8 +89,8 @@ const Footer = () => {
                 </a>
               </p>
               <p>
-                <a href="tel:+2348144306629" className="transition-colors hover:text-white">
-                  +234 81 4430 6629
+                <a href="tel:+19068267461" className="transition-colors hover:text-white">
+                  +1 906 826 7461
                 </a>
               </p>
             </div>
@@ -101,9 +101,9 @@ const Footer = () => {
               Social
             </h4>
             <div className="mt-5 space-y-3">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/80 transition-colors hover:text-white">Facebook</a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/80 transition-colors hover:text-white">Instagram</a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/80 transition-colors hover:text-white">LinkedIn</a>
+              <a href="https://web.facebook.com/people/Teazy-Tech/61561340034465/" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/80 transition-colors hover:text-white">Facebook</a>
+              <a href="https://www.instagram.com/teazy_tech/" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/80 transition-colors hover:text-white">Instagram</a>
+              <a href="https://www.linkedin.com/company/teazy-tech/" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/80 transition-colors hover:text-white">LinkedIn</a>
             </div>
           </div>
         </div>

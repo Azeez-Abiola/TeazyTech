@@ -238,21 +238,21 @@ const Navbar = () => {
             </Link>
             <div className="social-links">
               <a
-                href="https://facebook.com"
+                href="https://web.facebook.com/people/Teazy-Tech/61561340034465/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <i className="fab fa-facebook" />
               </a>
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/teazy_tech/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <i className="fab fa-instagram" />
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/company/teazy-tech/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
