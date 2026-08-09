@@ -155,9 +155,12 @@ const About = () => {
               Building future-ready teachers through practical EdTech training,
               resources, and ongoing support across Nigeria.
             </p>
-            <Link to="/contact" className="btn btn-primary about-hero-split__cta">
-              Let's Talk
-            </Link>
+            <p className="about-hero-split__lead">
+              Teazy Tech is an EdTech company dedicated to helping teachers
+              transition from traditional ways of teaching to digital pedagogies.
+              Since our inception, we have prioritized educator growth through
+              customized resources, courses, and comprehensive training programs.
+            </p>
           </motion.div>
 
           <motion.div
@@ -181,18 +184,6 @@ const About = () => {
       {/* Intro + stats */}
       <section className="about-intro-stats">
         <div className="container">
-          <motion.p
-            className="about-intro-stats__lead"
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            Teazy Tech is an EdTech company dedicated to helping teachers
-            transition from traditional ways of teaching to digital pedagogies.
-            Since our inception, we have prioritized educator growth through
-            customized resources, courses, and comprehensive training programs.
-          </motion.p>
           <div className="about-intro-stats__grid">
             {STATS.map((stat, i) => (
               <motion.div
@@ -270,6 +261,9 @@ const About = () => {
                 </li>
               ))}
             </ul>
+            <Link to="/contact" className="btn btn-primary about-block__cta">
+              Let's Talk
+            </Link>
           </motion.div>
           <motion.div
             className="about-block__media about-block__media--duo"

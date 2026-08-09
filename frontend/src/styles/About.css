@@ -94,8 +94,11 @@
   margin-bottom: 2rem;
 }
 
-.about-hero-split__cta {
-  display: inline-flex;
+/* Full About Us copy — sits directly under the heading, ahead of the photo. */
+.about-hero-split__lead {
+  max-width: 540px;
+  font-size: clamp(0.95rem, 1.8vw, 1.02rem);
+  line-height: 1.8;
 }
 
 .about-hero-split__visual {
@@ -145,15 +148,6 @@
 .about-intro-stats {
   padding: clamp(3rem, 6vw, 4rem) 0;
   background: var(--brand-cream, #f6f7eb);
-}
-
-.about-intro-stats__lead {
-  max-width: 720px;
-  margin: 0 auto 2.5rem;
-  text-align: center;
-  font-size: clamp(1rem, 2vw, 1.12rem);
-  line-height: 1.8;
-  color: var(--brand-gray, #474d4f);
 }
 
 .about-intro-stats__grid {
@@ -343,6 +337,12 @@
   flex-shrink: 0;
   margin-top: 0.15rem;
   color: var(--brand-teal, #44bba4);
+}
+
+/* CTA closing out a block (used by Our Vision, ahead of Our Story). */
+.about-block__cta {
+  display: inline-flex;
+  margin-top: 2rem;
 }
 
 /* ─── Why us / Values ─── */

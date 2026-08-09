@@ -1463,14 +1463,24 @@
   box-shadow: 0 30px 70px rgba(15, 30, 70, 0.12);
 }
 
+/* Fixed 4:3 frame so every card reads the same regardless of the source
+   photo's aspect ratio. Per-image framing comes from the `focus` value in the
+   services data, applied inline as object-position. */
 .service-card-rect .service-image {
-  height: 280px;
+  aspect-ratio: 4 / 3;
+  height: auto;
   background: linear-gradient(180deg, #f6f9fd 0%, #eef3fa 100%);
 }
 
+/* Absolutely positioned so the photo's natural height never dictates the card
+   height — otherwise a portrait shot stretches the card and leaves a large
+   blank gap beside the text. */
 .service-card-rect .service-image img {
-  object-fit: contain;
-  object-position: center center;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .service-card-rect:hover img {
@@ -1517,17 +1527,13 @@
     flex-direction: row-reverse;
   }
 
+  /* Side-by-side: the 4:3 ratio sets the baseline height, and stretch takes
+     over whenever the text column happens to be taller. */
   .service-card-rect .service-image {
     width: 50%;
-    height: auto;
-    min-height: 340px;
     flex-shrink: 0;
+    align-self: stretch;
     background: linear-gradient(180deg, #f6f9fd 0%, #eef3fa 100%);
-  }
-
-  .service-card-rect .service-image img {
-    object-fit: contain;
-    object-position: center center;
   }
 
   .service-card-rect .service-content {

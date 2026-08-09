@@ -13,6 +13,8 @@ const services = [
     number: "01",
     title: "Professional Development",
     image: ibadanTrainingImages[0],
+    // Lecture hall shot — bias down so the crop drops empty ceiling, not people.
+    focus: "center 65%",
     icon: "fas fa-chalkboard-teacher",
     color: "var(--primary-blue)",
     description:
@@ -29,6 +31,8 @@ const services = [
     number: "02",
     title: "Technology Integration",
     image: "/images/Gallery Kaduna Training/watchingTv.jpg",
+    // Portrait frame — bias up to keep the screen and the teacher's head in.
+    focus: "center 42%",
     icon: "fas fa-laptop-code",
     color: "var(--secondary-teal)",
     description:
@@ -45,6 +49,8 @@ const services = [
     number: "03",
     title: "Instructional Content Design",
     image: "/images/teaz.png",
+    // 9:16 phone shot — the subject sits low in frame, so pull the crop down.
+    focus: "center 68%",
     icon: "fas fa-pencil-ruler",
     color: "var(--secondary-red)",
     description:
@@ -61,6 +67,8 @@ const services = [
     number: "04",
     title: "Strategic Planning",
     image: exhibitionImages[5],
+    // Booth group photo — faces sit just above centre.
+    focus: "center 45%",
     icon: "fas fa-users-cog",
     color: "var(--primary-dark-blue)",
     description:
@@ -264,7 +272,11 @@ const Services = () => {
                   transition={{ duration: 0.7, ease: "easeOut" }}
                 >
                   <div className="service-image">
-                    <img src={service.image} alt={service.title} />
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      style={{ objectPosition: service.focus ?? "center" }}
+                    />
 
                     <div className="service-number">{service.number}</div>
                   </div>
