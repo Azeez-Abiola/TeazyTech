@@ -346,11 +346,23 @@ app.post("/api/admin/login", endpointLimiter, async (req, res, next) => {
   try {
     logger.debug("Attempting Firebase sign-in with password");
     const authUrl = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${FIREBASE_API_KEY}`;
-    const response = await fetch(authUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, returnSecureToken: true }),
-    });
+    // Without a timeout a stalled connection to Google leaves the request
+    // hanging indefinitely, so the sign-in button spins forever instead of
+    // reporting a failure the user can act on.
+    let response;
+    try {
+      response = await fetch(authUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, returnSecureToken: true }),
+        signal: AbortSignal.timeout(15000),
+      });
+    } catch (netErr) {
+      logger.error({ err: netErr }, "Could not reach Firebase auth service");
+      return res.status(504).json({
+        error: "Could not reach the authentication service. Check your connection and try again.",
+      });
+    }
     logger.trace("Firebase auth response received", {
       status: response.status,
     });
