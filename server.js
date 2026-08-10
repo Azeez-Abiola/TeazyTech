@@ -2220,26 +2220,94 @@ app.post("/api/newsletter/subscribe", endpointLimiter, async (req, res, next) =>
     return res.status(400).json({ error: "Please provide a valid email address" });
   }
 
+  // The address is the document id, so re-subscribing updates the existing
+  // record instead of creating a duplicate.
+  const email = value.email.trim().toLowerCase();
+
   try {
-    const sent = await sendNotificationEmail({
-      subject: "New newsletter subscriber",
-      replyTo: value.email,
-      html: `
+    const ref = db.collection("newsletterSubscribers").doc(email);
+    const existing = await ref.get();
+    const alreadySubscribed =
+      existing.exists && existing.data().status === "subscribed";
+
+    if (alreadySubscribed) {
+      return res.json({ success: true, alreadySubscribed: true });
+    }
+
+    await ref.set(
+      {
+        email,
+        status: "subscribed",
+        source: "resources-page",
+        subscribedAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
+
+    // Storing the subscriber is what matters; the notification is a courtesy.
+    // A missing or failing mail provider must not fail the subscription.
+    try {
+      await sendNotificationEmail({
+        subject: "New newsletter subscriber",
+        replyTo: email,
+        html: `
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 25px;">
           <h2 style="color: #2F6FCC;">New Newsletter Subscriber</h2>
           <p>Someone just subscribed to the Teazy Tech newsletter:</p>
-          <p style="font-size: 18px; font-weight: bold;">${value.email}</p>
+          <p style="font-size: 18px; font-weight: bold;">${email}</p>
           <p style="color: #718096; font-size: 12px;">Sent automatically from teazytech.org</p>
         </div>
       `,
-    });
-
-    if (!sent) {
-      return res.status(503).json({ error: "Email service unavailable. Please try again later." });
+      });
+    } catch (mailErr) {
+      logger.error({ err: mailErr, email }, "Subscriber saved but notification email failed");
     }
+
     res.json({ success: true });
   } catch (err) {
     logger.error({ err }, "Newsletter subscription failed");
+    next(err);
+  }
+});
+
+// ── Admin: List newsletter subscribers ───────────────────
+logger.info("Defining /api/admin/newsletter GET route");
+app.get("/api/admin/newsletter", async (req, res, next) => {
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    const isAdmin = await checkAdmin(admin, db, decoded);
+    if (!isAdmin) return res.status(403).json({ error: "Admin access required" });
+
+    const snap = await db.collection("newsletterSubscribers").get();
+    const subscribers = snap.docs
+      .map((d) => ({ id: d.id, ...d.data(), _ts: d.data().subscribedAt?._seconds || 0 }))
+      .sort((a, b) => b._ts - a._ts)
+      .map(({ _ts, ...rest }) => rest);
+    return res.json(subscribers);
+  } catch (err) {
+    logger.error({ err }, "List newsletter subscribers failed");
+    next(err);
+  }
+});
+
+// ── Admin: Delete newsletter subscriber ──────────────────
+logger.info("Defining /api/admin/newsletter/:id DELETE route");
+app.delete("/api/admin/newsletter/:id", async (req, res, next) => {
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    const isAdmin = await checkAdmin(admin, db, decoded);
+    if (!isAdmin) return res.status(403).json({ error: "Admin access required" });
+
+    await db.collection("newsletterSubscribers").doc(req.params.id).delete();
+    return res.json({ success: true });
+  } catch (err) {
+    logger.error({ err }, "Delete newsletter subscriber failed");
     next(err);
   }
 });

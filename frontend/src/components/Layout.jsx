@@ -14,7 +14,8 @@ import {
   Search,
   Bell,
   BarChart3,
-  BookOpen
+  BookOpen,
+  Mail
 } from 'lucide-react';
 
 const Layout = ({ children, title }) => {
@@ -30,6 +31,7 @@ const Layout = ({ children, title }) => {
     { name: 'Posts', href: '/posts', icon: FileText },
     { name: 'Categories', href: '/categories', icon: Tag },
     { name: 'Resources', href: '/resources-admin', icon: BookOpen },
+    { name: 'Newsletters', href: '/newsletter-admin', icon: Mail },
   ];
 
   const isCurrentPath = (path) => {

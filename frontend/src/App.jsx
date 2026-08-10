@@ -22,6 +22,7 @@ import EditPost from "./AdminDashboardPages/EditPost";
 import Categories from "./AdminDashboardPages/Categories";
 import Analytics from "./AdminDashboardPages/Analytics";
 import AdminResources from "./AdminDashboardPages/AdminResources";
+import AdminNewsletter from "./AdminDashboardPages/AdminNewsletter";
 import { AuthProvider } from "./Context/AuthContext.jsx";
 import { ThemeProvider } from "./Context/ThemeContext.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
@@ -86,6 +87,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <AdminResources />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/newsletter-admin"
+            element={
+              <ProtectedRoute>
+                <AdminNewsletter />
               </ProtectedRoute>
             }
           />
