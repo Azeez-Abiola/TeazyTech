@@ -128,7 +128,7 @@ export default function FormSection({ setShowSuccess, setShowFailure }) {
     {
       icon: Phone,
       label: "Phone",
-      lines: ["+1 906 826 7461"],
+      lines: ["+234 906 826 7461"],
     },
     {
       icon: Mail,

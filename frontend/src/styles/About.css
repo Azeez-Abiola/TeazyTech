@@ -73,32 +73,25 @@
   margin-bottom: 1.25rem;
 }
 
-.about-hero-split__copy h1 {
-  font-size: clamp(2.25rem, 5vw, 3.75rem);
-  font-weight: 800;
-  line-height: 1.08;
-  letter-spacing: -0.03em;
-  color: var(--brand-navy, #233463) !important;
-  margin-bottom: 1.25rem;
-}
-
-.about-hero-split__accent {
-  color: var(--brand-blue, #2f6fcc);
-}
-
 .about-hero-split__copy > p {
   font-size: clamp(1rem, 2vw, 1.1rem);
   line-height: 1.75;
   color: var(--brand-gray, #474d4f);
-  max-width: 480px;
-  margin-bottom: 2rem;
+  max-width: 520px;
+  margin-bottom: 1.5rem;
 }
 
-/* Full About Us copy — sits directly under the heading, ahead of the photo. */
+.about-hero-split__copy > p:last-child {
+  margin-bottom: 0;
+}
+
+/* Opening paragraph — carries the hero now that the headline is gone, so it
+   sets the size the supporting paragraph steps down from. */
 .about-hero-split__lead {
-  max-width: 540px;
-  font-size: clamp(0.95rem, 1.8vw, 1.02rem);
-  line-height: 1.8;
+  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+  line-height: 1.65;
+  color: var(--brand-navy, #233463);
+  font-weight: 500;
 }
 
 .about-hero-split__visual {

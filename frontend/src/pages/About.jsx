@@ -147,19 +147,15 @@ const About = () => {
             transition={{ duration: 0.65 }}
           >
             <span className="about-hero-split__tag">About Us</span>
-            <h1>
-              Crafting excellence in{" "}
-              <span className="about-hero-split__accent">EdTech education</span>
-            </h1>
-            <p>
-              Building future-ready teachers through practical EdTech training,
-              resources, and ongoing support across Nigeria.
-            </p>
             <p className="about-hero-split__lead">
               Teazy Tech is an EdTech company dedicated to helping teachers
               transition from traditional ways of teaching to digital pedagogies.
               Since our inception, we have prioritized educator growth through
               customized resources, courses, and comprehensive training programs.
+            </p>
+            <p>
+              Building future-ready teachers through practical EdTech training,
+              resources, and ongoing support across Nigeria.
             </p>
           </motion.div>
 
