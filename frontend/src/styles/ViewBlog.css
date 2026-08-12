@@ -306,6 +306,45 @@
     color: #242424;
 }
 
+/* Tables authored in the post editor. The wrapper scrolls on its own so a wide
+   table never forces the whole article sideways on a phone. */
+.article-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2rem 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.article-content .tableWrapper {
+    overflow-x: auto;
+    margin: 2rem 0;
+    -webkit-overflow-scrolling: touch;
+}
+
+.article-content .tableWrapper table {
+    margin: 0;
+    min-width: 30rem;
+}
+
+.article-content th,
+.article-content td {
+    border: 1px solid #e2e8f0;
+    padding: 0.7rem 0.9rem;
+    text-align: left;
+    vertical-align: top;
+}
+
+.article-content th {
+    background: #f7f9fc;
+    font-weight: 600;
+    color: #1a202c;
+}
+
+.article-content tbody tr:nth-child(even) td {
+    background: #fbfcfe;
+}
+
 .article-content code {
     background: #f7f7f7;
     padding: 0.2rem 0.4rem;

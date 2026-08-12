@@ -12,6 +12,7 @@ import Highlight from "@tiptap/extension-highlight";
 import { Color } from "@tiptap/extension-color";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { FontFamily } from "@tiptap/extension-font-family";
+import { TableKit } from "@tiptap/extension-table";
 import { isHeicImage } from "../lib/normalizeImageForUpload";
 
 import { createLowlight, common } from "lowlight";
@@ -35,6 +36,11 @@ import {
   Highlighter,
   Undo,
   Redo,
+  Table as TableIcon,
+  Rows3,
+  Columns3,
+  PanelTop,
+  Trash2,
 } from "lucide-react";
 
 const lowlight = createLowlight(common);
@@ -58,6 +64,9 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
       Blockquote,
       CodeBlockLowlight.configure({
         lowlight,
+      }),
+      TableKit.configure({
+        table: { resizable: true, allowTableNodeSelection: true },
       }),
       Placeholder.configure({
         placeholder: "Write your post content here...",
@@ -174,6 +183,78 @@ const RichTextEditor = ({ value, onChange, uploadImage }) => {
           >
             <Redo className="h-4 w-4" />
           </button>
+        </div>
+
+        {/* Tables — the row/column controls only apply inside a table, so they
+            stay hidden until the cursor is in one. */}
+        <div className="flex items-center gap-1 border-r border-gray-200 dark:border-gray-700 pr-2 mr-1">
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+                .run()
+            }
+            className={btnClass(editor.isActive("table"))}
+            title="Insert table"
+          >
+            <TableIcon className="h-4 w-4" />
+          </button>
+
+          {editor.isActive("table") && (
+            <>
+              <button
+                type="button"
+                onClick={() => editor.chain().focus().addRowAfter().run()}
+                className={btnClass(false)}
+                title="Add row below"
+              >
+                <Rows3 className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => editor.chain().focus().addColumnAfter().run()}
+                className={btnClass(false)}
+                title="Add column to the right"
+              >
+                <Columns3 className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => editor.chain().focus().toggleHeaderRow().run()}
+                className={btnClass(false)}
+                title="Toggle header row"
+              >
+                <PanelTop className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => editor.chain().focus().deleteRow().run()}
+                className="p-1.5 rounded text-gray-600 dark:text-gray-400 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 transition-colors"
+                title="Delete row"
+              >
+                <Rows3 className="h-4 w-4 rotate-180" />
+              </button>
+              <button
+                type="button"
+                onClick={() => editor.chain().focus().deleteColumn().run()}
+                className="p-1.5 rounded text-gray-600 dark:text-gray-400 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 transition-colors"
+                title="Delete column"
+              >
+                <Columns3 className="h-4 w-4 rotate-180" />
+              </button>
+              <button
+                type="button"
+                onClick={() => editor.chain().focus().deleteTable().run()}
+                className="p-1.5 rounded text-gray-600 dark:text-gray-400 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 transition-colors"
+                title="Delete table"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-1 border-r border-gray-200 dark:border-gray-700 pr-2 mr-1">

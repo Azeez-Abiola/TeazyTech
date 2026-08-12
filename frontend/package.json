@@ -32,6 +32,7 @@
     "@tiptap/extension-list-item": "^3.11.0",
     "@tiptap/extension-ordered-list": "^3.11.0",
     "@tiptap/extension-placeholder": "^3.10.7",
+    "@tiptap/extension-table": "^3.30.0",
     "@tiptap/extension-text-align": "^3.10.7",
     "@tiptap/extension-text-style": "^3.11.0",
     "@tiptap/extension-underline": "^3.10.7",
