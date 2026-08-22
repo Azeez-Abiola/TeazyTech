@@ -86,11 +86,14 @@ function EmailModal({ resource, onConfirm, onClose }) {
         <form onSubmit={submit} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Your Email Address</label>
+            {/* Colours are explicit here: the modal card is always light, but
+                `.dark body` sets white text, which made what you typed
+                invisible on a phone in dark mode. */}
             <input
               type="email"
               value={email}
               onChange={e => { setEmail(e.target.value); setErr(""); }}
-              className="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm focus:border-[#2F6FCC] focus:ring-2 focus:ring-[#2F6FCC]/20 outline-none transition-all"
+              className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-[#2F6FCC] focus:ring-2 focus:ring-[#2F6FCC]/20 outline-none transition-all"
               placeholder="you@example.com"
               autoFocus
             />

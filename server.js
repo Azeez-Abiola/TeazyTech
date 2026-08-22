@@ -2403,10 +2403,14 @@ app.get("/api/resources/:id/verify", async (req, res, next) => {
 
       const paidAmount = Number(verifyData.data.amount);
       const expectedAmount = Math.round(Number(resource.price) * 100);
-      if (paidAmount !== expectedAmount) {
+      // The Paystack account passes transaction fees on to the customer, so the
+      // charge is grossed up above the list price (price + flat fee) / 0.985.
+      // Requiring an exact match rejected every real purchase — only guard
+      // against underpayment.
+      if (paidAmount < expectedAmount) {
         logger.warn(
           { paidAmount, expectedAmount, resourceId: id, ref },
-          "Paystack amount mismatch",
+          "Paystack underpayment",
         );
         return res.status(402).json({ error: "Payment amount mismatch" });
       }
